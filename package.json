@@ -1,0 +1,23 @@
+{
+  "name": "khondak",
+  "version": "1.0.0",
+  "description": "marketing",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server src --verbose",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atomicnt/khondak.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atomicnt/khondak/issues"
+  },
+  "homepage": "https://github.com/atomicnt/khondak#readme",
+  "devDependencies": {
+    "live-server": "^1.1.0"
+  }
+}
