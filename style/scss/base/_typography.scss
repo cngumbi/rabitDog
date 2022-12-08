@@ -1,0 +1,63 @@
+.aside{
+    &__logo{
+        font-size: $font-smaller;
+        text-transform: capitalize;
+        a{
+            font-weight: 700;
+            color: $text-black-700;
+            font-size: $font-smaller;
+            letter-spacing: .1rem;
+            span{
+                font-family: 'Clicker Script', cursive;
+                font-size: $font-default;
+            }
+        }
+    }
+    &__nav{
+        li{
+            a{
+                font-size: $font-smallest;
+                font-weight: 600;
+                color: $text-black-900;
+                &.active{
+                    color: $skin-color;
+                }
+            }
+        }
+    }
+   
+}
+.home{
+    color: $text-black-900;
+    .home-info{
+        .welcome{
+            font-size: $font-medium;
+            span{
+                font-family: 'Clicker Script', cursive;
+                font-size: $font-medium-3;
+                font-weight: 700;
+                color: $skin-color;
+            }
+        }
+        .job{
+            font-size: $font-default;
+            margin: 1.5rem 0;
+            .typing{
+                color: $skin-color;
+            }
+        }
+        p{
+            font-size: $font-small;
+            color: $text-black-700;
+        }
+    }
+    .home-image{
+        text-align: center;
+    }
+}
+
+.btn{
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+}

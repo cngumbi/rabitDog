@@ -1,0 +1,218 @@
+@import url("https://fonts.googleapis.com/css2?family=Clicker+Script&family=Poppins:wght@200;300;400;500;600;700&display=swap");
+body {
+  line-height: 1.5;
+  font-size: 62.5%;
+  font-family: 'poppins' sans-serif; }
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: none;
+  text-decoration: none;
+  box-sizing: border-box; }
+
+::before, ::after {
+  box-sizing: border-box; }
+
+ul {
+  list-style: none; }
+
+.aside__logo {
+  font-size: 1.2rem;
+  text-transform: capitalize; }
+.aside__logo a {
+  font-weight: 700;
+  color: #504e70;
+  font-size: 1.2rem;
+  letter-spacing: .1rem; }
+.aside__logo a span {
+  font-family: 'Clicker Script', cursive;
+  font-size: 1.6rem; }
+.aside__nav li a {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #302e4d; }
+.aside__nav li a.active {
+  color: #ec1839; }
+
+.home {
+  color: #302e4d; }
+.home .home-info .welcome {
+  font-size: 1.8rem; }
+.home .home-info .welcome span {
+  font-family: 'Clicker Script', cursive;
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ec1839; }
+.home .home-info .job {
+  font-size: 1.6rem;
+  margin: 1.5rem 0; }
+.home .home-info .job .typing {
+  color: #ec1839; }
+.home .home-info p {
+  font-size: 1.4rem;
+  color: #504e70; }
+.home .home-image {
+  text-align: center; }
+
+.btn {
+  font-size: 1rem;
+  font-weight: 500;
+  color: white; }
+
+.btn:hover {
+  transform: scale(1.05); }
+
+.section {
+  background: #f2f2fc;
+  min-height: 100vh;
+  display: block;
+  padding: 0 3rem;
+  opacity: 1; }
+
+.container {
+  max-width: 70rem;
+  width: 100%;
+  margin: auto; }
+
+.padding-15 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem; }
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  position: relative; }
+
+.main-content {
+  padding-left: 15rem; }
+
+.btn {
+  padding: 1.2rem 2.5rem;
+  background: #ec1839;
+  border-radius: 4rem;
+  display: inline-block;
+  white-space: nowrap;
+  border: none;
+  transition: all 0.3s ease; }
+
+.aside {
+  background: #fdf9ff;
+  width: 15rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 2rem;
+  z-index: 10;
+  height: 100%;
+  border-right: 0.1rem solid #e8dfec;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+.aside__logo {
+  position: absolute;
+  top: 5rem; }
+.aside__logo a {
+  padding: .1rem .1rem;
+  position: relative; }
+.aside__logo a::before {
+  content: '';
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border-bottom: 0.2rem solid #ec1839;
+  border-left: 0.2rem solid #ec1839;
+  bottom: -.2rem;
+  left: -.5rem; }
+.aside__logo a::after {
+  content: '';
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border-top: 0.2rem solid #ec1839;
+  border-right: 0.2rem solid #ec1839;
+  top: -.2rem;
+  right: -.5rem; }
+.aside__nav-toggler {
+  height: 3rem;
+  width: 3.5rem;
+  border: 0.1rem solid #e8dfec;
+  cursor: pointer;
+  position: fixed;
+  left: 14rem;
+  top: 2rem;
+  border-radius: .5rem;
+  background: #fdf9ff;
+  display: none;
+  align-items: center;
+  justify-content: center; }
+.aside__nav-toggler span {
+  height: .2rem;
+  width: 1.8rem;
+  background: #ec1839;
+  display: inline-block;
+  position: relative; }
+.aside__nav-toggler span::before {
+  content: '';
+  height: .2rem;
+  width: 1.8rem;
+  background: #ec1839;
+  position: absolute;
+  top: -.6rem;
+  left: 0; }
+.aside__nav-toggler span::after {
+  content: '';
+  height: .2rem;
+  width: 1.8rem;
+  background: #ec1839;
+  position: absolute;
+  top: .6rem;
+  left: 0; }
+.aside__nav {
+  margin-top: 2rem; }
+.aside__nav li {
+  margin-bottom: 2rem;
+  display: block; }
+.aside__nav li a {
+  display: block;
+  padding: .3rem 1rem;
+  border-bottom: 0.1rem solid #e8dfec; }
+
+.home {
+  min-height: 100vh;
+  display: flex; }
+.home .home-info {
+  flex: 0 0 60%;
+  max-width: 60%; }
+.home .home-info p {
+  margin-bottom: 7rem; }
+.home .home-image {
+  flex: 0 0 40%;
+  max-width: 40%;
+  position: relative; }
+.home .home-image img {
+  height: 25rem;
+  margin: auto;
+  border-radius: 1rem; }
+.home .home-image::after {
+  content: '';
+  position: absolute;
+  height: 4rem;
+  width: 4rem;
+  border-bottom: 0.6rem solid #ec1839;
+  border-right: 0.6rem solid #ec1839;
+  right: 2rem;
+  bottom: -0.1rem; }
+.home .home-image::before {
+  content: '';
+  position: absolute;
+  height: 4rem;
+  width: 4rem;
+  border-top: 0.6rem solid #ec1839;
+  border-left: 0.6rem solid #ec1839;
+  left: 2rem;
+  top: -3rem; }
+
+/*# sourceMappingURL=kwito.css.map */
