@@ -47,7 +47,7 @@
             }
         }
         p{
-            font-size: $font-small;
+            font-size: $font-smaller;
             color: $text-black-700;
         }
     }
@@ -60,4 +60,46 @@
     font-size: 1rem;
     font-weight: 500;
     color: white;
+}
+
+.section-title{
+    h2{
+        font-size: $font-default;
+        color: $text-black-900;
+        font-weight: 700;
+        position: relative;
+    }
+}
+.about{
+    .about-content{
+        .about-text{
+            h3{
+                font-size: $font-small;
+                font-weight: 700;
+                color: $text-black-900;
+                span{
+                    color: $skin-color;
+                }
+            }
+            p{
+                font-size: $font-smaller;
+                line-height: 2.5rem;
+                color: $text-black-700;
+            }
+        }
+        .company-info{
+            .info-item{
+                p{
+                    font-size: $font-smallest;
+                    font-weight: 600;
+                    color: $text-black-900;
+                    span{
+                        font-weight: 400;
+                        color: $text-black-700 ;
+                        
+                    }
+                }
+            }
+        }
+    }
 }
