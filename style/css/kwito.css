@@ -95,6 +95,10 @@ ul {
 .icon {
   text-align: center; }
 
+.project-heading h2 {
+  color: #302e4d;
+  font-weight: 500; }
+
 .btn:hover {
   transform: scale(1.05); }
 
@@ -330,5 +334,25 @@ ul {
 .service .service-item .service-item-inner p {
   color: #504e70;
   line-height: 1.5rem; }
+
+.project .container {
+  padding-bottom: 4rem; }
+.project .container .project-heading {
+  flex: 0 0 100%;
+  max-width: 100%;
+  margin-bottom: 2rem; }
+.project .container .project-item {
+  flex: 0 0 33.33%;
+  max-width: 33.33%;
+  margin-bottom: 3rem; }
+.project .container .project-item .project-item-inner {
+  border: 0.1rem solid #fdf9ff;
+  border-radius: 1rem;
+  overflow: hidden;
+  cursor: pointer; }
+.project .container .project-item .project-item-inner .project-img img {
+  width: 100%;
+  height: 12rem;
+  display: block; }
 
 /*# sourceMappingURL=kwito.css.map */

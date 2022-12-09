@@ -1,0 +1,29 @@
+.project{
+    .container{
+        padding-bottom: 4rem;
+        .project-heading{
+            flex: 0 0 100%;
+            max-width: 100%;
+            margin-bottom: 2rem;
+        }
+        .project-item{
+            flex: 0 0 33.33%;
+            max-width: 33.33%;
+            margin-bottom: 3rem;
+            .project-item-inner{
+                border: .1rem solid $bg-black-100;
+                border-radius: 1rem;
+                overflow: hidden;
+                cursor: pointer;
+                .project-img{
+                    
+                    img{
+                        width: 100%;
+                        height: 12rem;
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
