@@ -290,6 +290,8 @@ ul {
   display: block;
   padding: .3rem 1rem;
   border-bottom: 0.1rem solid #e8dfec; }
+.aside__nav li a .fa {
+  padding-right: 1rem; }
 
 .home {
   min-height: 100vh;
