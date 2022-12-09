@@ -103,3 +103,18 @@
         }
     }
 }
+
+
+.service-item-inner{
+    text-align: center;
+    h4{
+        font-size: $font-smallest;
+        color: $text-black-900;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+  
+}
+.icon{
+    text-align: center;
+}
