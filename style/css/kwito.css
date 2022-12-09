@@ -48,6 +48,8 @@ ul {
   font-size: 1.6rem;
   margin: 1.5rem 0; }
 .home .home-info .job .typing {
+  font-family: 'Clicker Script', cursive;
+  font-size: 1.8rem;
   color: #ec1839; }
 .home .home-info p {
   font-size: 1.2rem;
@@ -99,6 +101,33 @@ ul {
   color: #302e4d;
   font-weight: 500; }
 
+.contact-title {
+  color: #ec1839;
+  text-align: center;
+  font-size: 1.6rem; }
+
+.contact-sub-title {
+  color: #302e4d;
+  text-align: center;
+  font-size: 1.2rem; }
+
+.contact-info-item {
+  text-align: center; }
+.contact-info-item h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #302e4d;
+  text-transform: capitalize; }
+.contact-info-item p {
+  font-size: 0.6rem;
+  line-height: 1rem;
+  color: #504e70;
+  font-weight: 400; }
+
+.form-control {
+  font-size: 0.8rem;
+  color: #504e70; }
+
 .btn:hover {
   transform: scale(1.05); }
 
@@ -131,6 +160,14 @@ ul {
 .main-content {
   padding-left: 15rem; }
 
+.col-6 {
+  flex: 0 0 50%;
+  max-width: 50%; }
+
+.col-12 {
+  flex: 0 0 100%;
+  max-width: 100%; }
+
 .btn {
   padding: .5rem 1rem;
   background: #ec1839;
@@ -142,6 +179,24 @@ ul {
 
 .buttons {
   margin-top: 2rem; }
+
+.contact-form {
+  flex: 0 0 100%;
+  max-width: 100%; }
+.contact-form .form-item {
+  margin-bottom: 3rem; }
+.contact-form textarea.form-control {
+  height: 14rem; }
+.contact-form .form-control {
+  width: 100%;
+  height: 3rem;
+  border-radius: 2.5rem;
+  background: #fdf9ff;
+  border: 0.1rem solid #e8dfec;
+  padding: 1rem 2.5rem;
+  transition: all 0.3s ease; }
+.contact-form .form-control:focus {
+  box-shadow: 0 0 2rem rgba(48, 46, 77, 0.15); }
 
 .aside {
   background: #fdf9ff;
@@ -248,7 +303,7 @@ ul {
   width: 4rem;
   border-bottom: 0.6rem solid #ec1839;
   border-right: 0.6rem solid #ec1839;
-  right: 2rem;
+  right: .5rem;
   bottom: -0.1rem; }
 .home .home-image::before {
   content: '';
@@ -257,7 +312,7 @@ ul {
   width: 4rem;
   border-top: 0.6rem solid #ec1839;
   border-left: 0.6rem solid #ec1839;
-  left: 2rem;
+  left: .5rem;
   top: -3rem; }
 
 .section .container {
@@ -354,5 +409,20 @@ ul {
   width: 100%;
   height: 12rem;
   display: block; }
+
+.contact-title {
+  margin-bottom: .5rem; }
+
+.contact-sub-title {
+  margin-bottom: 1rem; }
+
+.contact-info-item {
+  flex: 0 0 25%;
+  max-width: 25%;
+  margin-bottom: 2rem; }
+.contact-info-item .icon {
+  display: inline-block; }
+.contact-info-item h4 {
+  margin: .8rem 0 .5rem; }
 
 /*# sourceMappingURL=kwito.css.map */

@@ -30,3 +30,12 @@
 .main-content{
     padding-left: 15rem;
 }
+
+.col-6{
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+.col-12{
+    flex: 0 0 100%;
+    max-width: 100%;
+}

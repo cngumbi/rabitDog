@@ -43,6 +43,8 @@
             font-size: $font-default;
             margin: 1.5rem 0;
             .typing{
+                font-family: 'Clicker Script', cursive;
+                font-size: $font-medium;
                 color: $skin-color;
             }
         }
@@ -123,4 +125,35 @@
         color: $text-black-900;
         font-weight: 500;
     }
+}
+
+.contact-title{
+    color: $skin-color;
+    text-align: center;
+    font-size: $font-default;
+}
+.contact-sub-title{
+    color: $text-black-900;
+    text-align: center;
+    font-size: $font-smaller;
+}
+.contact-info-item{
+    text-align: center;
+    h4{
+        font-size: $font-smallest;
+        font-weight: 700;
+        color: $text-black-900;
+        text-transform: capitalize;
+       
+    }
+    p{
+        font-size: $font-sm;
+        line-height: 1rem;
+        color: $text-black-700;
+        font-weight: 400;
+    }
+}
+.form-control{
+    font-size: $font-smallest;
+    color: $text-black-700;
 }
