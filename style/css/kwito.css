@@ -128,6 +128,17 @@ ul {
   font-size: 0.8rem;
   color: #504e70; }
 
+.s-icon {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #302e4d; }
+
+.style-switcher {
+  color: #504e70;
+  font-size: 0.6rem;
+  font-weight: 400;
+  text-transform: capitalize; }
+
 .btn:hover {
   transform: scale(1.05); }
 
@@ -424,5 +435,57 @@ ul {
   display: inline-block; }
 .contact-info-item h4 {
   margin: .8rem 0 .5rem; }
+
+.style-switcher {
+  position: fixed;
+  right: 0;
+  top: 1rem;
+  padding: .5rem;
+  width: 6rem;
+  border: 0.1rem solid #e8dfec;
+  background: #fdf9ff;
+  z-index: 101;
+  border-radius: .5rem;
+  transition: all 0.3s ease;
+  transform: translateX(100%); }
+.style-switcher .open {
+  transform: translateX(-1.5rem); }
+.style-switcher h4 {
+  margin: 0 0 .5rem; }
+.style-switcher .themes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; }
+.style-switcher .themes span {
+  display: inline-block;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 50%; }
+.style-switcher .themeOne {
+  background: #ec1839; }
+.style-switcher .themeTwo {
+  background: #fa5b0f; }
+.style-switcher .themeThree {
+  background: #37b182; }
+
+.style-switcher-toggler {
+  top: 0; }
+
+.s-icon {
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+  background: #fdf9ff;
+  right: 100%;
+  border: 0.1rem solid #e8dfec;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%; }
+.s-icon i {
+  line-height: 2rem; }
+
+.day-night {
+  top: 2.5rem; }
 
 /*# sourceMappingURL=kwito.css.map */
