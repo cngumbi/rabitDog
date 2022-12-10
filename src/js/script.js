@@ -2,9 +2,9 @@
 var typed = new Typed(".typing", {
     strings: [
         "",
-        "internet connection",
-        "fiber connection",
-        "phone repair"
+        "Internet Connection",
+        "Fiber Connection",
+        "Phone Repair"
     ],
     typeSpeed: 100,
     BackSpeed: 60,

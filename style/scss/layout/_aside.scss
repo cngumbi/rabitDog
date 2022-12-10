@@ -11,9 +11,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    @include responsive (tablet-landscape){
+        width: 12rem;
+        padding: 1rem;
+    }
     &__logo{
         position:absolute;
-        top: 5rem; 
+        top: 5rem;
+        @include responsive(tablet-landscape){
+            top: 3rem;
+        }
         a{
             //background: red;
             padding: .1rem .1rem;
@@ -27,6 +34,10 @@
                 border-left: .2rem solid $skin-color;
                 bottom: -.2rem;
                 left: -.5rem;
+                @include responsive(tablet-landscape){
+                    width: .7rem;
+                    height: .7rem;
+                }
             }
             &::after{
                 content: '';
@@ -37,6 +48,10 @@
                 border-right: .2rem solid $skin-color;
                 top: -.2rem;
                 right: -.5rem;
+                @include responsive(tablet-landscape){
+                    width: .7rem;
+                    height: .7rem;
+                }
             }
         }   
     }
@@ -81,6 +96,9 @@
     }
     &__nav{
         margin-top: 2rem;
+        @include responsive (tablet-landscape){
+            margin-top: 1rem;
+        }
         li{
             margin-bottom: 2rem;
             display: block;

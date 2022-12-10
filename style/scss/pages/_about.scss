@@ -2,12 +2,19 @@
     .container{
         padding-top: 6rem;
         padding-bottom: 7rem;
+        @include responsive(tablet-portrait){
+            padding-top: 2rem;
+            padding-bottom: 3rem;
+        }
     }
 }
 .section-title{
     flex: 0 0 100%;
     max-width: 100%;
     margin-bottom: 4rem;
+    @include responsive(tablet-landscape){
+        margin-bottom: 2rem;
+    }
   h2{
     &::before{
         content: '';
@@ -17,6 +24,7 @@
         position: absolute;
         top: 100%;
         left: 0;
+       
     }
     &::after{
         content: '';
@@ -42,9 +50,13 @@
             }
         }
         .company-info{
-            flex: 0 0 60%;
-            max-width: 60%;
+            flex: 0 0 100%;
+            max-width: 100%;
             margin-top: 4rem;
+            @include responsive(tablet-landscape){
+                margin-top: 2rem;
+
+            }
             .info-item{
                 flex: 0 0 50%;
                 max-width: 50%;

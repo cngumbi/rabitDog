@@ -2,11 +2,17 @@
     &__logo{
         font-size: $font-smaller;
         text-transform: capitalize;
+        @include responsive(tablet-landscape){
+            font-size: $font-smallest;
+        }
         a{
             font-weight: 700;
             color: $text-black-700;
             font-size: $font-smaller;
             letter-spacing: .1rem;
+            @include responsive(tablet-landscape){
+                font-size: $font-smallest;
+            }
             span{
                 font-family: 'Clicker Script', cursive;
                 font-size: $font-default;
@@ -19,6 +25,7 @@
                 font-size: $font-smallest;
                 font-weight: 600;
                 color: $text-black-900;
+               
                 &.active{
                     color: $skin-color;
                 }
@@ -32,17 +39,26 @@
     .home-info{
         .welcome{
             font-size: $font-medium;
+            @include responsive (tablet-landscape){
+                font-size: $font-default;
+            }
             span{
                 font-family: 'Clicker Script', cursive;
-                font-size: $font-medium-3;
+                font-size: $font-medium-2;
                 font-weight: 700;
                 color: $skin-color;
+                @include responsive (tablet-landscape){
+                    font-size: $font-medium-1;
+                }
             }
          
         }
         .job{
             font-size: $font-default;
             margin: 1.5rem 0;
+            @include responsive(tablet-landscape){
+                font-size: $font-small;
+            }
             .typing{
                 font-family: 'Clicker Script', cursive;
                 font-size: $font-medium;
@@ -52,6 +68,9 @@
         p{
             font-size: $font-smaller;
             color: $text-black-700;
+            @include responsive(tablet-landscape){
+                font-size: $font-smallest;
+            }
         }
         h5{
             font-size: $font-small;
@@ -91,6 +110,10 @@
                 font-size: $font-smaller;
                 line-height: 2.5rem;
                 color: $text-black-700;
+                @include responsive(tablet-landscape){
+                    font-size: $font-smallest;
+                    line-height: 1.5rem;
+                }
             }
         }
         .company-info{
