@@ -149,7 +149,7 @@ ul {
   transform: scale(1.05); }
 
 .section {
-  background: #f2f2fc;
+  background: rgba(218, 244, 234, 0.5);
   min-height: 100vh;
   display: block;
   padding: 0 3rem;

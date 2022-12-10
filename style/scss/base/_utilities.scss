@@ -1,5 +1,5 @@
 .section{
-    background: $bg-black-900;
+    background: lighten(rgba($themeThree, 0.5), 45);
     min-height: 100vh;
     display: block;
     padding: 0 3rem;
