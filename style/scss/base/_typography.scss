@@ -38,6 +38,7 @@
                 font-weight: 700;
                 color: $skin-color;
             }
+         
         }
         .job{
             font-size: $font-default;
@@ -51,6 +52,9 @@
         p{
             font-size: $font-smaller;
             color: $text-black-700;
+        }
+        h5{
+            font-size: $font-small;
         }
     }
     .home-image{
@@ -119,6 +123,11 @@
 }
 .icon{
     text-align: center;
+    .fa{
+        font-size: $font-small;
+        line-height: 3rem;
+        color: $skin-color;
+    }
 }
 .project-heading{
     h2{

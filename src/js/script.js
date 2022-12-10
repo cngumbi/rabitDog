@@ -1,11 +1,13 @@
 //typing animation
 var typed = new Typed(".typing", {
     strings: [
+        "",
         "internet connection",
         "fiber connection",
         "phone repair"
     ],
-    typeSpeed: 90,
-    BackSpeed: 50,
+    typeSpeed: 100,
+    BackSpeed: 60,
+    fadeOut: true,
     loop: true
 })
