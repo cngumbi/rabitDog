@@ -1,0 +1,65 @@
+@import 'color/themeOne';
+@import 'color/themeTwo';
+@import 'color/themeThree';
+
+.style-switcher{
+    position: fixed;
+    right: 0;
+    top: 1rem;
+    padding: .5rem;
+    width: 6rem;
+    border: .1rem solid $bg-black-50;
+    background: $bg-black-100;
+    z-index: 101;
+    border-radius: .5rem;
+    transition: all 0.3s ease;
+    transform: translateX(100%);
+    .open{
+        transform: translateX(-1.5rem);
+    }
+    h4{
+        margin: 0 0 .5rem;
+    }
+    .themes{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        span{
+            display: inline-block;
+            height: 1rem;
+            width: 1rem;
+            border-radius: 50%;
+            //border: .1rem solid red;
+        }
+    }
+    .themeOne{
+        background: $themeOne;
+    }
+    .themeTwo{
+        background: $themeTwo;
+    }
+    .themeThree{
+        background: $themeThree;
+    }
+}
+.style-switcher-toggler{
+    top: 0;
+}
+.s-icon{
+    position: absolute;
+    height: 2rem;
+    width: 2rem;
+    background: $bg-black-100;
+    right: 100%;
+    border: .1rem solid $bg-black-50;
+    margin-right: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    i{
+        line-height: 2rem;
+    }
+}
+.day-night{
+    top: 2.5rem;
+}
