@@ -3,7 +3,5 @@ node_modules
 
 package-lock.json
 
-
-themeOne.css
-themeTwo.css
-themeThree.css
+backend
+frontend
