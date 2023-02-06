@@ -1,0 +1,59 @@
+.home{
+    min-height: 100vh;
+    display: flex;
+    .home-info{
+        flex: 0 0 60%;
+        max-width: 60%;
+        p{
+            margin-bottom: 7rem;
+            @include responsive(tablet-landscape){
+                margin-bottom: 3rem;
+            }
+        }
+
+    }
+    .home-image{
+        flex: 0 0 40%;
+        max-width: 40%;
+        position: relative;
+        img{
+            height: 25rem;
+            margin: auto;
+            border-radius: 1rem;
+            @include responsive (tablet-landscape){
+                height: 20rem;
+            }
+            
+        }
+        &::after{
+            content: '';
+            position: absolute;
+            height: 4rem;
+            width: 4rem;
+            border-bottom: .6rem solid $skin-color;
+            border-right: .6rem solid $skin-color;
+            right: .5rem;
+            bottom: -0.1rem;
+            @include responsive(tablet-landscape){
+                height: 3rem;
+                width: 3rem;
+                right: .5rem;
+                bottom: -2rem;
+            }
+        }
+        &::before{
+            content: '';
+            position: absolute;
+            height: 4rem;
+            width: 4rem;
+            border-top: .6rem solid $skin-color;
+            border-left: .6rem solid $skin-color;
+            left: .5rem;
+            top: -2rem;
+            @include responsive(tablet-landscape){
+                height: 3rem;
+                width: 3rem;
+            }
+        }
+    }
+}
