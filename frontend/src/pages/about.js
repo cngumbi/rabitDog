@@ -15,10 +15,12 @@ const About = {
                         <div class="row">
                             <div class="about-text padding">
                                 <h3 class="job">We deal with <span class="typing">Fiber internet connections</span></h3>
-                                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. 
-                                    Corporis perferendis odit facilis, sed recusandae sint, 
-                                    similique deleniti aperiam est labore rem! 
-                                    Possimus officia harum nemo sunt dolor impedit itaque aspernatur!
+                                <p>
+                                Atomic Internet is the Leading Internet service provider in Nairobi North Area.
+                                Since back in 2017, we have strived to provide 
+                                the best and most affordable internet around Nairobi with much success.
+                                We have invested in good values and work ethics to create a network of more than satisfied customers.
+                              
                                 </p>
                             </div>
                         </div>

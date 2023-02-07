@@ -11,12 +11,12 @@ import { parseRequestUrl } from "./utils";
 
 const routes = {
     '/': Home,
-    '/home': Home,
-    '/about': About,
-    '/contact': Contact,
-    '/project': Project,
-    '/service': Service,
-    '/staff': Staff
+    //'/home': Home,
+    //'/about': About,
+    //'/contact': Contact,
+    //'/project': Project,
+    //'/service': Service,
+    //'/staff': Staff
 };
 
 const router = async()=>{

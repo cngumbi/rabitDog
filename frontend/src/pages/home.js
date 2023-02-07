@@ -9,10 +9,9 @@ const Home ={
                     <div class="home-info padding">
                         <h3 class="welcome"> Hello Welcome to <span class="atomic">Atomic internet</span></h3>
                         <h3 class="job">We deal with <span class="typing">Fiber internet connections</span></h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-                            Laboriosam qui eveniet placeat facilis neque nam iste ipsa 
-                            debitis possimus accusantium praesentium quidem, esse mollitia v
-                            elit beatae dolorem sed harum enim!
+                        <p>
+                        We as Atomic Internet have invested in affordable and accessible internet ranging from fibre to wireless.
+                        We welcome all current and potential customers to <a href="#contact" >contact us</a> for more details
                         </p>
                         <a href="#contact" class="btn hire-us">Hire Us</a>
                     </div>
