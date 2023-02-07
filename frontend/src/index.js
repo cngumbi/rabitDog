@@ -7,17 +7,16 @@ import Home from "./pages/home";
 import Project from "./pages/project";
 import Service from "./pages/service";
 import Staff from "./pages/staff";
-import { parseRequestUrl } from "./utils";
 
 
 const routes = {
     "/": Home,
     "/home": Home,
-    //'/about': About,
-    //'/contact': Contact,
-    //'/project': Project,
-    //'/service': Service,
-    //'/staff': Staff
+    '/about': About,
+    '/contact': Contact,
+    '/project': Project,
+    '/service': Service,
+    '/staff': Staff
 };
 
 const router = async()=>{
