@@ -20,7 +20,6 @@ const About = {
                                 Since back in 2017, we have strived to provide 
                                 the best and most affordable internet around Nairobi with much success.
                                 We have invested in good values and work ethics to create a network of more than satisfied customers.
-                              
                                 </p>
                             </div>
                         </div>

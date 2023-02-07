@@ -1,5 +1,6 @@
 import Aside from "./components/aside";
 import Error404 from "./components/errors/error404";
+import ParseRequestUrl from "./config/parseUrl";
 import About from "./pages/about";
 import Contact from "./pages/contact";
 import Home from "./pages/home";
@@ -10,8 +11,8 @@ import { parseRequestUrl } from "./utils";
 
 
 const routes = {
-    '/': Home,
-    //'/home': Home,
+    "/": Home,
+    "/home": Home,
     //'/about': About,
     //'/contact': Contact,
     //'/project': Project,
@@ -20,7 +21,7 @@ const routes = {
 };
 
 const router = async()=>{
-    const request =  parseRequestUrl();
+    const request =  ParseRequestUrl();
     const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
     const page = request[parseUrl] ? routes[parseUrl] : Error404;
 
