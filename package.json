@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/atomicnt/khondak#readme",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "mongoose": "^6.9.1"
   }
 }

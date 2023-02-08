@@ -28,8 +28,8 @@ const router = async()=>{
     aside.innerHTML = await Aside.render();
     await Aside.after_render();
     const main = document.getElementById('atomic-content');
-    main.innerHTML = await page.render();
-    await page.after_render();
+    main.innerHTML = await Home.render();
+    await Home.after_render();
  
 }
 window.addEventListener('load', router);
