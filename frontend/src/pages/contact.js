@@ -1,5 +1,26 @@
+import { messages } from "../api";
+import { setContactInfo } from "../localStorage";
+
 const Contact = {
-    after_render: ()=>{},
+    after_render: ()=>{
+        document
+            .getElementById('contactForm')
+            .addEventListener('submit', async(q)=>{
+                q.preventDefault();
+                const data = await messages({
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    number: document.getElementById('number').value,
+                    subject: document.getElementById('subject').value,
+                    message: document.getElementById('message').value
+                });
+                if(data.error){
+                    //error message
+                }else{
+                    setContactInfo();
+                }
+            })
+    },
     render: ()=>{
         return`
         <!--=========================contact section-->
@@ -19,32 +40,32 @@ const Contact = {
                             <i class="fa fa-phone"></i>
                         </div>
                         <h4>Call Us On</h4>
-                        <p>+254722139039</p>
+                        <p>+254712719781</p>
                     </div>
                     <div class="contact-info-item padding">
                         <div class="icon">
                             <i class="fa fa-envelope"></i>
                         </div>
                         <h4>Email</h4>
-                        <p>atomicniternet@gmail.com</p>
+                        <p>cngumbi35@gmail.com</p>
                     </div>
                     <div class="contact-info-item padding">
                         <div class="icon">
                             <i class="fa fa-map-marker-alt"></i>
                         </div>
                         <h4>Office</h4>
-                        <p>atomic internet</p>
+                        <p>Quick One Office</p>
                     </div>                        
                 </div>
                 <h3 class="contact-title padding">SEND US AN EMAIL</h3>
                 <h4 class="contact-sub-title padding-15">INSTANT RESPOSE TO MESSAGE</h4>
                 <!--contact form-->
                 <div class="row">                    
-                    <form class="contact-form padding">
+                    <form id="contactForm" class="contact-form padding">
                         <div class="row">
                             <div class="form-item col-6 padding">
                                 <div class="form-group">
-                                    <input type="text" class="form-control"id="name" placeholder="Name">
+                                    <input type="text" class="form-control" id="name" placeholder="Name">
                                 </div>
                             </div>
                             <div class="form-item col-6 padding">
@@ -54,6 +75,11 @@ const Contact = {
                             </div>
                         </div>
                         <div class="row">
+                            <div class="form-item col-12 padding">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="number" placeholder="Phone Number">
+                                </div>
+                            </div>
                             <div class="form-item col-12 padding">
                                 <div class="form-group">
                                     <input type="text" class="form-control" id="subject" placeholder="Subject">
