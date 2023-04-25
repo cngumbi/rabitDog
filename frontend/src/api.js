@@ -4,7 +4,7 @@ import { apiUrl } from './config/config';
 export const messages = async({name, email, number, subject, message}) => {
     try{
         const response = await axios({
-            url: `${apiUrl}/api/contacts/messages`,
+            url: `${apiUrl}/api/contacts/contact`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
