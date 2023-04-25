@@ -14,12 +14,13 @@ const About = {
                     <div class="about-content padding">
                         <div class="row">
                             <div class="about-text padding">
-                                <h3 class="job">We deal with <span class="typing">Fiber internet connections</span></h3>
+                                <h3 class="job">We deal with <span class="typing">Tents Design, Tent Repair and Tents for Hire</span></h3>
                                 <p>
-                                Atomic Internet is the Leading Internet service provider in Nairobi North Area.
+                                Quick One Service is the Leading Tents service provider in Nairobi North Area.
                                 Since back in 2017, we have strived to provide 
-                                the best and most affordable internet around Nairobi with much success.
-                                We have invested in good values and work ethics to create a network of more than satisfied customers.
+                                the best and most affordable tents around Nairobi with much success.
+                                We have invested in good values and work ethics to create a network to satisfy our customers around Kahawa Ward and Kasarani.
+                                Soon we are expanding to Kiambu County as our customers increase.
                                 </p>
                             </div>
                         </div>
@@ -27,7 +28,7 @@ const About = {
                             <div class="company-info padding">
                                 <div class="row">
                                     <div class="info-item padding">
-                                        <p>Location : <span>kahawa west</span></p>
+                                        <p>Location : <span>Kahawa Ward</span></p>
                                     </div>
                                     <div class="info-item padding">
                                         <p>city : <span>Nairobi</span></p>
@@ -37,7 +38,7 @@ const About = {
                         </div>
                         <div class="row">
                             <div class="buttons padding">
-                                <a href="#contact" class="btn">Hire Us</a>
+                                <a href="/#/contact" class="btn">Hire Us</a>
                             </div>
                         </div>
                     </div>

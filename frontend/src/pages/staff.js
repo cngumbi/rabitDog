@@ -12,7 +12,7 @@ const Staff = {
                     </div>
                     <div class="row">
                         <div class="project-heading padding">
-                            <h2>Atomic Internet Staff :</h2>
+                            <h2>Quick One Service Staff :</h2>
                         </div>
                     </div>
                     <div class="row">
@@ -25,27 +25,8 @@ const Staff = {
                                 </div>
                             </div>
                         </div>
-                        <div class="project-item padding">
-                            <div class="project-item-inner shadow-dark">
-                                <div class="project-img">
-                                    <img src="images/1.jpeg" alt="project image">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-item padding">
-                            <div class="project-item-inner shadow-dark">
-                                <div class="project-img">
-                                    <img src="images/1.jpeg" alt="project image">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-item padding">
-                            <div class="project-item-inner shadow-dark">
-                                <div class="project-img">
-                                    <img src="images/1.jpeg" alt="project image">
-                                </div>
-                            </div>
-                        </div>
+                      
+                        
                     </div>
                 </div>
             </section>

@@ -4,7 +4,7 @@ import ParseRequestUrl from "./config/parseUrl";
 import About from "./pages/about";
 import Contact from "./pages/contact";
 import Home from "./pages/home";
-import Project from "./pages/project";
+import Product from "./pages/product";
 import Service from "./pages/service";
 import Staff from "./pages/staff";
 
@@ -13,7 +13,7 @@ const routes = {
   '/home': Home,
   '/about': About,
   '/contact': Contact,
-  '/project': Project,
+  '/product': Product,
   '/service': Service,
   '/staff': Staff,
 };
