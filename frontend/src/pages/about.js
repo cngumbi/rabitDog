@@ -1,7 +1,7 @@
 const About = {
-    after_render: ()=>{},
-    render: ()=>{
-        return `
+  after_render: () => {},
+  render: () => {
+    return `
         <!--=========================about section-->
         <section class="about section" id="about">
             <div class="container">
@@ -44,8 +44,8 @@ const About = {
                 </div>
             </div>
         </section>
-        `;
-    }
+    `;
+  },
 };
 
 export default About;

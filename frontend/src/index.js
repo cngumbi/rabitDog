@@ -8,29 +8,32 @@ import Project from "./pages/project";
 import Service from "./pages/service";
 import Staff from "./pages/staff";
 
-
 const routes = {
-    "/": Home,
-    "/home": Home,
-    '/about': About,
-    '/contact': Contact,
-    '/project': Project,
-    '/service': Service,
-    '/staff': Staff
+  '/': Home,
+  '/home': Home,
+  '/about': About,
+  '/contact': Contact,
+  '/project': Project,
+  '/service': Service,
+  '/staff': Staff,
 };
 
-const router = async()=>{
-    const request =  ParseRequestUrl();
-    const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
-    const page = request[parseUrl] ? routes[parseUrl] : Error404;
+const router = async () => {
+  const request = ParseRequestUrl();
+  const parseUrl =
+    (request.resource ? `/${request.resource}` : '/') +
+    (request.id ? '/:id' : '') +
+    (request.verb ? `/${request.verb}` : '');
+  const section = routes[parseUrl] ? routes[parseUrl] : Error404;
 
-    const aside = document.getElementById('aside-content');
-    aside.innerHTML = await Aside.render();
-    await Aside.after_render();
-    const main = document.getElementById('atomic-content');
-    main.innerHTML = await Home.render();
-    await Home.after_render();
- 
-}
-window.addEventListener('load', router);
-window.addEventListener('hashchange', router);
+  const aside = document.getElementById("aside-content");
+  aside.innerHTML = await Aside.render();
+  await Aside.after_render();
+  const main = document.getElementById("atomic-content");
+  main.innerHTML = await section.render();
+  if(section.after_render()) {
+    await section.after_render();
+  }
+};
+window.addEventListener("load", router);
+window.addEventListener("hashchange", router);
