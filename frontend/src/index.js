@@ -1,3 +1,7 @@
+import Dashboard from "./admin/Dashboard";
+import LoginSection from "./admin/login";
+import newServiceSection from "./admin/newServices";
+import RegistarSection from "./admin/registar";
 import Aside from "./components/aside";
 import Error404 from "./components/errors/error404";
 import ParseRequestUrl from "./config/parseUrl";
@@ -12,10 +16,14 @@ const routes = {
   '/': Home,
   '/home': Home,
   '/about': About,
+  '/dashboard': Dashboard,
   '/contact': Contact,
   '/product': Product,
   '/service': Service,
+  '/login': LoginSection,
+  '/adduser': RegistarSection,
   '/staff': Staff,
+  '/newService': newServiceSection
 };
 
 const router = async () => {

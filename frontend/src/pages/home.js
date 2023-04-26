@@ -24,7 +24,7 @@ const Home ={
                 <div class="row">
                     <div class="home-info padding">
                         <h3 class="welcome"> Hello Welcome to <span class="atomic">Quick One Service</span></h3>
-                        <h3 class="job">We deal with <span class="typing">Fiber internet connections</span></h3>
+                        <h3 class="job">We deal with <span class="typing"></span></h3>
                         <p>
                         We at Quick One Service have invested in affordable and accessible Tents designs ranging from medium to large Tents.
                         We welcome all current and potential customers to hire Tents from us. We are located in Kahawa Ward.

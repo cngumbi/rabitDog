@@ -5,6 +5,8 @@ const path = require("path");
 const db = require('./config/mongoosDB');
 const ContactRoute = require("./routes/contactRoutes");
 const config = require("./config/config");
+const ServiceRoute = require("./routes/serviceRoute");
+const UserRoute = require("./routes/userRoute");
 
 const app = express();
 
@@ -13,7 +15,9 @@ const app = express();
 //middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/api/users', UserRoute);
 app.use('/api/contacts', ContactRoute);
+app.use('/api/services', ServiceRoute);
 
 app.use(express.static(path.join(__dirname, "/../frontend")));
 app.get("*", (req, res) => {
