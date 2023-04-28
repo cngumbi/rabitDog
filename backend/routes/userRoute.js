@@ -1,6 +1,7 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
 const User = require('../models/userModel');
+const { generateToken } = require('../util');
 
 const UserRoute = express.Router();
 
@@ -33,7 +34,7 @@ UserRoute.post('/login', expressAsync(async(req, res)=>{
             name: signinUser.name,
             email: signinUser.email,
             isAdmin: signinUser.isAdmin,
-            //token: generateToken(signinUser)
+            token: generateToken(signinUser)
         });
     }
 }));
@@ -54,7 +55,7 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
             name: createdUser.name,
             email: createdUser.email,
             isAdmin: createdUser.isAdmin,
-            //token: generateToken(createdUser),
+            token: generateToken(createdUser),
         });
     }
 }));
