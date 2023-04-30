@@ -4,6 +4,7 @@
   "description": "marketing",
   "main": "index.js",
   "scripts": {
+    "build_1": "rm -rf dist && babel backend -d dist && cd frontend && npm run build",
     "build": "npm install && rm -rf dist && babel backend -d dist && cd frontend && npm install && npm run build",
     "start": "nodemon --watch backend --exec babel-node backend/server.js",
     "serve": "node dist/server.js",
