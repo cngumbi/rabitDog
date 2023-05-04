@@ -9,8 +9,8 @@ export const rerender = async (component) => {
 //------------------------------------------
 export const redirectUser = () => {
     if (!getUserInfo().name) {
-      window.location.assign('/');
+      document.location.hash = '/';
     } else {
-      window.location.assign('/#/dashboard');
+      document.location.hash = '/#/dashboard';
     }
 };

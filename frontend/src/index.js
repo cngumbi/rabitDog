@@ -8,8 +8,9 @@ import ParseRequestUrl from "./config/parseUrl";
 import About from "./pages/about";
 import Contact from "./pages/contact";
 import Home from "./pages/home";
-import Product from "./pages/product";
+//import Product from "./pages/product";
 import Service from "./pages/service";
+import ServicesInfo from "./pages/servicesInfo";
 import Staff from "./pages/staff";
 
 const routes = {
@@ -18,8 +19,9 @@ const routes = {
   '/about': About,
   '/dashboard': Dashboard,
   '/contact': Contact,
-  '/product': Product,
+  //'/product': Product,
   '/service': Service,
+  '/serviceInfo': ServicesInfo,
   '/login': LoginSection,
   '/adduser': RegistarSection,
   '/staff': Staff,
