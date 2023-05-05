@@ -17,7 +17,7 @@ const Service = {
                             <div class="icon">
                                 <i class="fa fa-laptop-code"></i>
                             </div>
-                            <h4><a href="/#//serviceInfo">internet conection</a></h4>
+                            <h4><a href="/#/serviceinfo">internet conection</a></h4>
                             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                         </div>
                     </div>

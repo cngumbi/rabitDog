@@ -21,7 +21,7 @@ const routes = {
   '/contact': Contact,
   //'/product': Product,
   '/service': Service,
-  '/serviceInfo': ServicesInfo,
+  '/serviceinfo': ServicesInfo,
   '/login': LoginSection,
   '/adduser': RegistarSection,
   '/staff': Staff,
