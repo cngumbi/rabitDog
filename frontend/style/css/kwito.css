@@ -10,11 +10,13 @@ body {
   padding: 0;
   outline: none;
   text-decoration: none;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 ::before, ::after {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 ul {
@@ -219,7 +221,8 @@ ul {
 }
 
 .btn:hover {
-  transform: scale(1.05);
+  -webkit-transform: scale(1.05);
+          transform: scale(1.05);
 }
 
 .section {
@@ -257,8 +260,11 @@ ul {
 }
 
 .row {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   margin-left: -1.5rem;
   margin-right: -1.5rem;
   position: relative;
@@ -274,13 +280,21 @@ ul {
 }
 
 .col-6 {
-  flex: 0 0 50%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 50%;
+          flex: 0 0 50%;
   max-width: 50%;
 }
 
 .col-12 {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
+}
+
+.block-display {
+  display: block;
 }
 
 .btn {
@@ -290,6 +304,7 @@ ul {
   display: inline-block;
   white-space: nowrap;
   border: none;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 
@@ -298,7 +313,9 @@ ul {
 }
 
 .contact-form {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
 }
 .contact-form .form-item {
@@ -314,10 +331,12 @@ ul {
   background: #fdf9ff;
   border: 0.1rem solid #e8dfec;
   padding: 1rem 2.5rem;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 .contact-form .form-control:focus {
-  box-shadow: 0 0 2rem rgba(48, 46, 77, 0.15);
+  -webkit-box-shadow: 0 0 2rem rgba(48, 46, 77, 0.15);
+          box-shadow: 0 0 2rem rgba(48, 46, 77, 0.15);
 }
 
 .aside {
@@ -330,9 +349,15 @@ ul {
   z-index: 10;
   height: 100%;
   border-right: 0.1rem solid #e8dfec;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 @media (max-width: 75em) {
   .aside {
@@ -396,8 +421,12 @@ ul {
   border-radius: 0.5rem;
   background: #fdf9ff;
   display: none;
-  align-items: center;
-  justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 .aside__nav-toggler span {
   height: 0.2rem;
@@ -447,10 +476,14 @@ ul {
 
 .home {
   min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
 }
 .home .home-info {
-  flex: 0 0 60%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 60%;
+          flex: 0 0 60%;
   max-width: 60%;
 }
 .home .home-info p {
@@ -462,7 +495,9 @@ ul {
   }
 }
 .home .home-image {
-  flex: 0 0 40%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 40%;
+          flex: 0 0 40%;
   max-width: 40%;
   position: relative;
 }
@@ -523,7 +558,9 @@ ul {
 }
 
 .section-title {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
   margin-bottom: 4rem;
 }
@@ -553,18 +590,24 @@ ul {
 }
 
 .about .about-content {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
 }
 .about .about-content .about-text {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
 }
 .about .about-content .about-text h3 {
   margin-bottom: 1.5rem;
 }
 .about .about-content .company-info {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
   margin-top: 4rem;
 }
@@ -574,7 +617,9 @@ ul {
   }
 }
 .about .about-content .company-info .info-item {
-  flex: 0 0 50%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 50%;
+          flex: 0 0 50%;
   max-width: 50%;
 }
 .about .about-content .company-info .info-item p {
@@ -591,7 +636,9 @@ ul {
 }
 .service .service-item {
   margin-bottom: 3rem;
-  flex: 0 0 33.33%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 33.33%;
+          flex: 0 0 33.33%;
   max-width: 33.33%;
 }
 .service .service-item .service-item-inner {
@@ -599,10 +646,12 @@ ul {
   border: 0.1rem solid #e8dfec;
   border-radius: 1rem;
   padding: 2rem 1rem;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
 .service .service-item .service-item-inner:hover {
-  box-shadow: 0 0 0.5rem rgba(48, 46, 77, 0.15);
+  -webkit-box-shadow: 0 0 0.5rem rgba(48, 46, 77, 0.15);
+          box-shadow: 0 0 0.5rem rgba(48, 46, 77, 0.15);
 }
 .service .service-item .service-item-inner .icon {
   height: 3rem;
@@ -628,7 +677,9 @@ ul {
   }
 }
 .project .container .project-heading {
-  flex: 0 0 100%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
   max-width: 100%;
   margin-bottom: 2rem;
 }
@@ -638,7 +689,9 @@ ul {
   }
 }
 .project .container .project-item {
-  flex: 0 0 33.33%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 33.33%;
+          flex: 0 0 33.33%;
   max-width: 33.33%;
   margin-bottom: 3rem;
 }
@@ -668,7 +721,9 @@ ul {
 }
 
 .contact-info-item {
-  flex: 0 0 30%;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 30%;
+          flex: 0 0 30%;
   max-width: 30%;
   margin-bottom: 2rem;
 }
@@ -689,19 +744,27 @@ ul {
   background: #fdf9ff;
   z-index: 101;
   border-radius: 0.5rem;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
-  transform: translateX(100%);
+  -webkit-transform: translateX(100%);
+          transform: translateX(100%);
 }
 .style-switcher .open {
-  transform: translateX(-1.5rem);
+  -webkit-transform: translateX(-1.5rem);
+          transform: translateX(-1.5rem);
 }
 .style-switcher h4 {
   margin: 0 0 0.5rem;
 }
 .style-switcher .themes {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 .style-switcher .themes span {
   display: inline-block;
@@ -732,6 +795,7 @@ ul {
   border: 0.1rem solid #e8dfec;
   margin-right: 1rem;
   cursor: pointer;
+  -webkit-transition: all 0.3s ease;
   transition: all 0.3s ease;
   border-radius: 50%;
 }
@@ -741,4 +805,4 @@ ul {
 
 .day-night {
   top: 2.5rem;
-}/*# sourceMappingURL=kwito.css.map */
+}

@@ -17,52 +17,7 @@ const Service = {
                             <div class="icon">
                                 <i class="fa fa-laptop-code"></i>
                             </div>
-                            <h4>internet conection</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        </div>
-                    </div>
-                    <div class="service-item padding">
-                        <div class="service-item-inner">
-                            <div class="icon">
-                                <i class="fa fa-laptop-code"></i>
-                            </div>
-                            <h4>internet conection</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        </div>
-                    </div>
-                    <div class="service-item padding">
-                        <div class="service-item-inner">
-                            <div class="icon">
-                                <i class="fa fa-laptop-code"></i>
-                            </div>
-                            <h4>internet conection</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        </div>
-                    </div>
-                    <div class="service-item padding">
-                        <div class="service-item-inner">
-                            <div class="icon">
-                                <i class="fa fa-laptop-code"></i>
-                            </div>
-                            <h4>internet conection</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        </div>
-                    </div>
-                    <div class="service-item padding">
-                        <div class="service-item-inner">
-                            <div class="icon">
-                                <i class="fa fa-laptop-code"></i>
-                            </div>
-                            <h4>internet conection</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        </div>
-                    </div>
-                    <div class="service-item padding">
-                        <div class="service-item-inner">
-                            <div class="icon">
-                                <i class="fa fa-laptop-code"></i>
-                            </div>
-                            <h4>internet conection</h4>
+                            <h4><a href="/#/serviceinfo">internet conection</a></h4>
                             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
                         </div>
                     </div>
