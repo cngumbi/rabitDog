@@ -4,8 +4,8 @@ node_modules
 package-lock.json
 
 #babel cli
-.babelrc
-.prettierrc
+#.babelrc
+#.prettierrc
 .vscode
 #--------------------------
 main.js
