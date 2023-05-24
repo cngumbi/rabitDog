@@ -1,0 +1,37 @@
+//media query manager
+//0-600px:      phone
+//600-900px:    tablets portrait
+//900-1200px:   tablets landscape
+//1200-1800px:  nomal style of the web pages(defalut style)
+//1800px and above big desktops
+//$breakpoints:
+// phone, tablet-portrait, tablet-landscape, big-desktop
+//use em for media queries
+//1em = 16px
+@mixin responsive($breakpoint) {
+    @if $breakpoint==phone {
+        @media (max-width: 37.5em) {
+            @content
+        }
+        ;
+        
+    }
+    @if $breakpoint==tablet-portrait {
+        @media (max-width: 56.25em) {
+            @content
+        }
+        ;
+    }
+    @if $breakpoint==tablet-landscape {
+        @media (max-width: 75em) {
+            @content
+        }
+        ;
+    }
+    @if $breakpoint==big-desktop {
+        @media (min-width: 112.5em) {
+            @content
+        }
+        ;
+    }
+}

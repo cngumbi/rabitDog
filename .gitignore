@@ -1,0 +1,12 @@
+node_modules
+.sass-cache
+
+package-lock.json
+
+#babel cli
+#.babelrc
+#.prettierrc
+.vscode
+#--------------------------
+main.js
+dist/

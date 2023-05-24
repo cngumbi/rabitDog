@@ -1,0 +1,40 @@
+{
+  "name": "khondak",
+  "version": "1.12.0",
+  "description": "marketing",
+  "main": "index.js",
+  "scripts": {
+    "build_1": "rm -rf dist && babel backend -d dist && cd frontend && npm run build",
+    "build": "npm install && rm -rf dist && babel backend -d dist && cd frontend && npm install && npm run build",
+    "start": "nodemon --watch backend --exec babel-node backend/server.js",
+    "serve": "node dist/server.js",
+    "qstart": "npm install && cd frontend && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atomicnt/khondak.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atomicnt/khondak/issues"
+  },
+  "homepage": "https://github.com/atomicnt/khondak#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-async-handler": "^1.2.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.9.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.21.0",
+    "@babel/core": "^7.10.3",
+    "@babel/node": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
+    "nodemon": "^2.0.21"
+  }
+}

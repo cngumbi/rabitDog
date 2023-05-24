@@ -1,0 +1,56 @@
+.section{
+    background: lighten(rgba($themeThree, 0.5), 45);
+    min-height: 100vh;
+    display: block;
+    padding: 0 3rem;
+    opacity: 1;
+    @include responsive(tablet-landscape){
+        padding: 0 2rem;
+    }
+}
+.hidden{
+    display: none !important;
+}
+.container{
+    max-width: 70rem;
+    width: 100%;
+    margin: auto;
+   
+   
+}
+
+.padding{
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    @include responsive(tablet-landscape){
+        padding-left: 1.3rem;
+        padding-right: 1.3rem;
+    }
+
+}
+
+.row{
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    position: relative;
+}
+.main-content{
+    padding-left: 15rem;
+    @include responsive(tablet-landscape){
+        padding-left: 12rem;
+    }
+}
+
+.col-6{
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+.col-12{
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+.block-display{
+    display: block;
+}
