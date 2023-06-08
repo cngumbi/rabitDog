@@ -1,0 +1,23 @@
+body{
+    line-height: 1.5;
+    font-size: 62.5%;
+    font-family: 'poppins' sans-serif;
+    color: $text-color;
+}
+*{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    scroll-padding-top: 3rem;
+}
+::before, ::after{
+    box-sizing: border-box;
+}
+
+img{
+    width: 100%;
+}
