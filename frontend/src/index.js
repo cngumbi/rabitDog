@@ -1,49 +1,46 @@
-import Dashboard from "./admin/Dashboard";
-import LoginSection from "./admin/login";
-import newServiceSection from "./admin/newServices";
-import RegistarSection from "./admin/registar";
-import Aside from "./components/aside";
-import Error404 from "./components/errors/error404";
+
+//import styles
+import './style/scss/kwito.scss';
+//images
+import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
-import About from "./pages/about";
-import Contact from "./pages/contact";
-import Home from "./pages/home";
-//import Product from "./pages/product";
-import Service from "./pages/service";
-import ServicesInfo from "./pages/servicesInfo";
-import Staff from "./pages/staff";
+import Error404 from "./components/errors/error404";
+import Header from './components/header';
+import Home from './components/pages/home';
+import About from './components/pages/about';
+import Services from './components/pages/services';
+import Properties from './components/pages/properties';
+import SignIn from './components/authentication/signIn';
+import Registration from './components/authentication/registration';
+
+
+//setting the favicon of the site
+const faviconImg = document.getElementById('favicon');
+faviconImg.href = favicon;
 
 const routes = {
-  '/': Home,
-  '/home': Home,
-  '/about': About,
-  '/dashboard': Dashboard,
-  '/contact': Contact,
-  //'/product': Product,
-  '/service': Service,
-  '/serviceinfo': ServicesInfo,
-  '/login': LoginSection,
-  '/adduser': RegistarSection,
-  '/staff': Staff,
-  '/newService': newServiceSection
+    '/': Home,
+    '/home': Home,
+    '/about': About,
+    '/services': Services,
+    '/properties': Properties,
+    '/user-current': SignIn,
+    '/new-user-create': Registration
 };
 
 const router = async () => {
-  const request = ParseRequestUrl();
-  const parseUrl =
-    (request.resource ? `/${request.resource}` : '/') +
-    (request.id ? '/:id' : '') +
-    (request.verb ? `/${request.verb}` : '');
-  const section = routes[parseUrl] ? routes[parseUrl] : Error404;
+    const request = ParseRequestUrl();
+    const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
+    const sessions = routes[parseUrl] ? routes[parseUrl] : Error404;
+    //the header of the site
+    const header = document.getElementById('header-content');
+    header.innerHTML = await Header.render();
+    await Header.vignette();
+    const main = document.getElementById('main-content');
+    main.innerHTML = await sessions.render();
+    if(sessions.vignette()) await sessions.vignette();
+}
+window.addEventListener('load', router);
+window.addEventListener('hashchange', router);
 
-  const aside = document.getElementById("aside-content");
-  aside.innerHTML = await Aside.render();
-  await Aside.after_render();
-  const main = document.getElementById("atomic-content");
-  main.innerHTML = await section.render();
-  if(section.after_render()) {
-    await section.after_render();
-  }
-};
-window.addEventListener("load", router);
-window.addEventListener("hashchange", router);
+

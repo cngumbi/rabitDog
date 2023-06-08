@@ -1,0 +1,59 @@
+ .header-section{
+    display: block;
+    width: 100%;
+    background: $bg-color;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+  }
+  .nav{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 35px;
+  }
+  .logo{
+    display: flex;
+    align-items: center;
+    column-gap: 0.5rem;
+    color: $main-color;
+    font-size: 1rem;
+    font-weight: 700;
+    columns: $text-color;
+    text-transform: uppercase;
+  }
+  .logo .bx{
+    font-size: 20px;
+    color: $main-color;
+  }
+  .navbar{
+    display: flex;
+  }
+  .navbar a{
+    padding: 8px 17px;
+    color: $text-color;
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .navbar a:hover{
+    color: $text-color;
+  }
+  #menu-icon{
+    font-size: 20px;
+    cursor: pointer;
+    display: none;
+  }
+  #menu{
+    display: none;
+  }
+  .btn{
+    padding: 8px 22px;
+    background: $main-color;
+    color: $bg-color;
+    border-radius: 1rem;
+  }
+  .btn:hover{
+    background: $hover-color;
+  }

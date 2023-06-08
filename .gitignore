@@ -10,3 +10,6 @@ package-lock.json
 #--------------------------
 main.js
 dist/
+#webpack configuration files
+webpack.config.js
+frontend1/

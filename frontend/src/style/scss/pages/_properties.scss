@@ -1,0 +1,72 @@
+.heading{
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.heading span{
+    font-weight: 500;
+    color: $main-color;
+    font-size: $font-smaller;
+}
+.heading h2{
+    font-size: $font-small;
+}
+.heading p{
+    font-size: $font-sm;
+}
+.properties{
+    background: #fbfbfb;
+    border-radius: 2rem;
+}
+.properties-container{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, auto));
+    gap: 3rem;
+    padding: 0 50px;
+}
+.properties-container .box{
+    background: $bg-color;
+    padding: 10px;
+    border-radius: 1rem;
+    box-shadow: $box-shadow;
+}
+.properties-container .box:hover{
+    transform: translateY(-10px);
+    transition: 0.5s;
+}
+.properties-container .box img{
+    border-radius: 1rem;
+    height: 220px;
+    object-fit: cover;
+    object-position: center;
+}
+.properties-container .box h3{
+    font-size: $font-smallest;
+    font-weight: 600;
+    float: right;
+}
+.properties-container .box .content{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+.properties-container .box .content .text h3{
+    font-weight: 500;
+}
+.properties-container .box .content .text p{
+    font-size: $font-sm;
+}
+.properties-container .box .content .icon{
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+}
+.properties-container .box .content .icon .bx{
+    display: flex;
+    align-items: center;
+    font-size: $font-smallest;
+}
+.properties-container .box .content .icon .bx span{
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 4px;
+}
