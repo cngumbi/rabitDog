@@ -17,9 +17,9 @@ app.use('/api/users', UserRoute);
 app.use('/api/contacts', ContactRoute);
 app.use('/api/services', ServiceRoute);
 
-app.use(express.static(path.join(__dirname, "/../frontend")));
+app.use(express.static(path.join(__dirname, "/../frontend/dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/../frontend/index.html"));
+  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
 });
 //middleware
 //error handling code to handle all errors in express instance
