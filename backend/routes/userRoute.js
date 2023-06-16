@@ -8,7 +8,9 @@ const UserRoute = express.Router();
 UserRoute.get('/createadmin', expressAsync(async(req, res) => {
     try {
         const user = new User({
-            name: 'admin',
+            name: 'SuperAdmin',
+            userName: 'admin',
+            phoneNumber: '+254712719781',
             email: 'quickoneadmin@quickoneservice.com',
             password: 'adminQuickOne',
             isAdmin: true
@@ -32,6 +34,8 @@ UserRoute.post('/login', expressAsync(async(req, res)=>{
         res.send({
             _id: signinUser._id,
             name: signinUser.name,
+            userName: signinUser.userName,
+            phoneNumber: signinUser.phoneNumber,
             email: signinUser.email,
             isAdmin: signinUser.isAdmin,
             token: generateToken(signinUser)
@@ -41,6 +45,8 @@ UserRoute.post('/login', expressAsync(async(req, res)=>{
 UserRoute.post('/register', expressAsync(async(req, res) => {
     const user = new User({
         name: req.body.name,
+        userName: req.body.userName,
+        phoneNumber: req.body.phoneNumber,
         email: req.body.email,
         password: req.body.password,
     });
@@ -53,6 +59,8 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
         res.send({
             _id: createdUser._id,
             name: createdUser.name,
+            userName: createdUser.userName,
+            phoneNumber: createdUser.phoneNumber,
             email: createdUser.email,
             isAdmin: createdUser.isAdmin,
             token: generateToken(createdUser),
