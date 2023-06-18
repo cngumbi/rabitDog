@@ -1,59 +1,94 @@
- .header-section{
-    display: block;
-    width: 100%;
-    background: $bg-color;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-  }
-  .nav{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 35px;
-  }
-  .logo{
-    display: flex;
-    align-items: center;
-    column-gap: 0.5rem;
-    color: $main-color;
-    font-size: 1rem;
-    font-weight: 700;
-    columns: $text-color;
-    text-transform: uppercase;
-  }
-  .logo .bx{
-    font-size: 20px;
-    color: $main-color;
-  }
-  .navbar{
-    display: flex;
-  }
-  .navbar a{
-    padding: 8px 17px;
-    color: $text-color;
-    font-size: 1rem;
-    text-transform: uppercase;
-    font-weight: 500;
-  }
-  .navbar a:hover{
-    color: $text-color;
-  }
-  #menu-icon{
-    font-size: 20px;
-    cursor: pointer;
-    display: none;
-  }
-  #menu{
-    display: none;
-  }
-  .btn{
-    padding: 8px 22px;
-    background: $main-color;
-    color: $bg-color;
-    border-radius: 1rem;
-  }
-  .btn:hover{
-    background: $hover-color;
-  }
+header-section{
+  display: block;
+  width: 100%;
+  background: $bg-color;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+.nav{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 35px;
+}
+.logo{
+  display: flex;
+  align-items: center;
+  column-gap: 0.5rem;
+  color: $main-color;
+  font-size: 1rem;
+  font-weight: 700;
+  columns: $text-color;
+  text-transform: uppercase;
+}
+.logo .bx{
+  font-size: 20px;
+  color: $main-color;
+}
+.navbar{
+  display: flex;
+}
+.navbar a{
+  padding: 8px 17px;
+  color: $text-color;
+  font-size: 1rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.navbar a:hover{
+  color: $text-color;
+}
+#menu-icon{
+  font-size: 20px;
+  cursor: pointer;
+  display: none;
+}
+#menu{
+  display: none;
+}
+.btn{
+  padding: 8px 22px;
+  background: $main-color;
+  color: $bg-color;
+  border-radius: 1rem;
+}
+.btn:hover{
+  background: $hover-color;
+}
+.nav-profile-img{
+  width: 50px;
+  border-radius: 50%;
+  display: block;
+  cursor: pointer;
+  position: relative;
+}
+.online{
+  position: relative;;
+}
+.online::after{
+  content: '';
+  width: 7px;
+  height: 7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  right: 0;
+  top: 0;
+  background: #41db51;
+  position: absolute;
+}
+.user-info{
+  display: flex;
+  align-items: center;
+}
+.user-info a{
+  font-weight: 600;
+  color: #c9dbf8;
+  font-size: $font-smallest;
+}
+.user-info a h3{
+  font-size: $font-sm;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
