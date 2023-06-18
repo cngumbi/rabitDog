@@ -1,0 +1,21 @@
+.overlay {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($main-color, 0.3);
+}
+.overlay>div {
+    background-color: $main-color;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    max-width: 40rem;
+}
+.overlay>div>* {
+    margin: 2rem;
+}
