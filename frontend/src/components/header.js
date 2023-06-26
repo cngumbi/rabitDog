@@ -4,20 +4,24 @@ import { clearUser, getUserInfo } from "../localStorage";
 const Header = {
     vignette: ()=>{
         //profile image
-        const profileImage = document.getElementById('profileImage');
-        profileImage.src = profileImg;
-        //signout
-        document.getElementById('signout').addEventListener('click', ()=>{
-            clearUser();
-            document.location.hash = '/';
-        })
+        const {name} = getUserInfo();
+        if(name !== ""){
+            const profileImage = document.getElementById('profileImage');
+            profileImage.src = profileImg;
+            //signout
+            document.getElementById('signout').addEventListener('click', ()=>{
+                clearUser();
+                document.location.hash = '/';
+            });
+        }
+        
     },
     render: ()=>{
-        const name  = getUserInfo();
+        const {name}  = getUserInfo();
         return `
             <div class="nav container">
                 <!--logo-->
-                <a href="/#/home" class="logo"><i class='bx bx-home'></i>Quick One Service</a>
+                <a href="/" class="logo"><i class='bx bx-home'></i>Quick One Service</a>
                 <!--Menu Icons-->
                 <input type="checkbox" name="" id="menu">
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
@@ -39,7 +43,8 @@ const Header = {
                         </div>
                     </div>
                     <!--Log in Button -->
-                    <a href="" id="signout">Sign Out</a>
+                    <button type="button" id="signout" class="btn">Sign Out</button>
+                    <!--<a href="" id="signout">Sign Out</a>-->
                     ` :` 
                     <ul class="navbar">
                         <li><a href="/#/home" class="navbar__links active">Home</a></li>
