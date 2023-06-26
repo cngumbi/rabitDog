@@ -4,7 +4,7 @@ import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
 const Registration = {
     vignette: ()=>{
-        document.getElementById('registration-form').addEventListener('submit', async(e)=>{
+        document.getElementById('register-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
             showLoading();
             const data = await register({
@@ -35,7 +35,7 @@ const Registration = {
                     <h2> Welcome, let's get started</h2>
                     <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>
                     <!--login form-->
-                    <form action="POST" id="registration-form">
+                    <form action="" id="register-form">
                         <span>Full Name</span>
                         <input type="text" name="fullName" id="fullName" placeholder="your Name PLease" required>
                         <span>User Name</span>
