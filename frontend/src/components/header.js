@@ -4,16 +4,16 @@ import { clearUser, getUserInfo } from "../localStorage";
 const Header = {
     vignette: ()=>{
         //profile image
-        const {name} = getUserInfo();
-        if(name !== ""){
-            const profileImage = document.getElementById('profileImage');
-            profileImage.src = profileImg;
-            //signout
-            document.getElementById('signout').addEventListener('click', ()=>{
-                clearUser();
-                document.location.hash = '/';
-            });
-        }
+        //const {name} = getUserInfo();
+        //if(name !== ""){
+        //    const profileImage = document.getElementById('profileImage');
+        //    profileImage.src = profileImg;
+        //    //signout
+        //    document.getElementById('signout').addEventListener('click', ()=>{
+        //        clearUser();
+        //        document.location.hash = '/';
+        //    });
+        //}
         
     },
     render: ()=>{
@@ -21,7 +21,7 @@ const Header = {
         return `
             <div class="nav container">
                 <!--logo-->
-                <a href="/" class="logo"><i class='bx bx-home'></i>Quick One Service</a>
+                <a href="/" class="logo"><i class='bx bx-home'></i>Mwendya</a>
                 <!--Menu Icons-->
                 <input type="checkbox" name="" id="menu">
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
@@ -53,7 +53,7 @@ const Header = {
                         <li><a href="/#/properties" class="navbar__links">Properties</a></li>
                     </ul>                   
                     <!--Log in Button -->
-                    <a href="/#/user-current" class="btn">Log In</a>
+                    <!--<a href="/#/user-current" class="btn">Log In</a>-->
                     `
                 }
             </div>
