@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="refresh" content="86400">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="repair tent rent hire tent design tent decoration">
-    <meta name="author" content="Softcraze Corporation">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="refresh" content="86400" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="repair tent rent hire tent design tent decoration" />
+    <meta name="author" content="Softcraze Corporation" />
     <title><%= htmlWebpackPlugin.options.title %></title>
     
     <!--boxicons style sheet-->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <link rel="stylesheet" href="./style/scss/kwitoscss">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" />
+    <link rel="stylesheet" href="./style/scss/kwitoscss" />
   <!-- or -->
     <!--favicon image-->
-    <link rel="icon" type="image/x-icon" id="favicon">
+    <link rel="icon" type="image/x-icon" id="favicon" />
 </head>
 <body>
-  
-    <!--message display-->
-    <div class="overlay" id="message-overlay"></div>
-    <!--Nav Navbar-->
-    <header class="header-section" id="header-content"></header>
-    <div id="main-content" class="main-section">
-      <!--loading display-->
-      <div class="overlay" id="loading-overlay">loading...</div>
-    </div>
+    <section>
+      <section>
+        <!--loading display-->
+        <div class="overlay" id="loading-overlay">loading...</div>
+        <!--message display-->
+        <div class="overlay" id="message-overlay"></div>
+      </section>
+      <main>
+        <section>
+          <!--Nav Navbar-->
+          <header class="header-section" id="header-content"></header>
+        </section>
+        <section>
+          <div id="main-content" class="main-section"></div>
+        </section>
+      </main>
+    </section>
     
 </body>
 </html>

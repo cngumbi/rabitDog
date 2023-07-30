@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-const db = require("./config/mongoosDB");
+const data = require("./data");
+//const db = require("./config/mongoosDB");
 //const ContactRoute = require("./routes/contactRoutes");
 const config = require("./config/config");
 //const ServiceRoute = require("./routes/serviceRoute");
@@ -16,7 +17,10 @@ app.use(bodyParser.json());
 app.use('/api/users', UserRoute);
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
-
+//send the data to client
+app.get('/api/properties', (req, res)=>{
+  res.send(data.properties);
+})
 app.use(express.static(path.join(__dirname, "/../frontend/dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));

@@ -1,17 +1,19 @@
-import propertiesImg from '../../assets/tent1.jpg';
-import tent2 from '../../assets/tent2.jpg';
+import axios from 'axios';
+
 const Properties = {
     vignette: ()=>{
-        const propertiesImage = document.getElementById('propertiesimage');
-        propertiesImage.src = propertiesImg;
-        const propImage = document.getElementById('propertyimg');
-        propImage.src = propertiesImg;
-        const tent2img = document.getElementById('propertiesimages');
-        tent2img.src = tent2;
-        const propertyImage = document.getElementById('propertiesimg');
-        propertyImage.src = tent2;
     },
-    render: ()=>{
+    render: async()=>{
+        const response = await axios({
+            url: 'http://localhost:5000/api/properties',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        if(!response || response.statusText !== 'OK'){
+            return `<div> error in geeting data</div>`;
+        }
+        const properties = response.data;
         return`
             <section class="properties container" id="properties">
                 <div class="heading">
@@ -20,62 +22,24 @@ const Properties = {
                     <p>This are all the product and services our organisation offer from the largest to <br> smallest, afordable for all kinds of parties and events.<br>Checkout our Products and Services Wel come</p>
                 </div>
                 <div class="properties-container container">
-                <!--box 1-->
-                    <div class="box">
-                        <img alt="" id="propertiesimage">
-                        <h3>Ksh 12,999</h3>
-                        <div class="content">
-                            <div class="text">
-                                <h3>The Tent</h3> 
-                                <p>For Tent</p>
-                            </div>
-                            <div class="icon">
-                                <i class='bx bx-user'><span>500</span></i>
-                            </div>
-                        </div>
-                    </div>
-                    <!--box 2-->
-                    <div class="box">
-                        <img alt="" id="propertiesimages">
-                        <h3>Ksh 12,999</h3>
-                        <div class="content">
-                            <div class="text">
-                                <h3>The Tent</h3>
-                                <p>For Tent</p>
-                            </div>
-                            <div class="icon">
-                                <i class='bx bx-user'><span>50</span></i>
+                    <!--property boxes-->
+                    ${properties.map( (property) => `
+                        <div class="box">
+                            <a href="/#/property/${property._id}>
+                                <img src="${property.image}"alt="${property.name}">
+                            </a>
+                            <h3>Ksh ${property.price}</h3>
+                            <div class="content">
+                                <div class="text">
+                                    <h3>${property.name}</h3> 
+                                    <p>${property.event}</p>
+                                </div>
+                                <div class="icon">
+                                    <i class='bx bx-user'><span>${property.capacity}</span></i>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!--box 3-->
-                    <div class="box">
-                        <img alt="" id="propertiesimg">
-                        <h3>Ksh 12,999</h3>
-                        <div class="content">
-                            <div class="text">
-                                <h3>The Tent</h3>
-                                <p>For Tent</p>
-                            </div>
-                            <div class="icon">
-                                <i class='bx bx-user'><span>1000</span></i>
-                            </div>
-                        </div>
-                    </div>
-                    <!--box 3-->
-                    <div class="box">
-                        <img alt="" id="propertyimg">
-                        <h3>Ksh 12,999</h3>
-                        <div class="content">
-                            <div class="text">
-                                <h3>The Tent</h3>
-                                <p>For Tent</p>
-                            </div>
-                            <div class="icon">
-                                <i class='bx bx-user'><span>200</span></i>
-                            </div>
-                        </div>
-                    </div>
+                    `).join('\n')}
                 </div>
             </section>
         `;
