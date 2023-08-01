@@ -1,7 +1,7 @@
 .header-section{
   display: block;
   width: 100%;
-  background: $bg-color;
+  background: var(--bg-color, #ffffff);
   position: fixed;
   top: 0;
   left: 0;
@@ -17,28 +17,28 @@
   display: flex;
   align-items: center;
   column-gap: 0.5rem;
-  color: $main-color;
+  color: var( --main-color, #2aaf83);
   font-size: 1.3rem;
   font-weight: 700;
-  columns: $text-color;
+  columns: var(--text-color, #314862);
   text-transform: uppercase;
 }
 .logo .bx{
   font-size: 20px;
-  color: $main-color;
+  color: var( --main-color, #2aaf83);;
 }
 .navbar{
   display: flex;
 }
 .navbar a{
   padding: 8px 17px;
-  color: $text-color;
+  color: var(--text-color, #314862);
   font-size: 1rem;
   text-transform: uppercase;
   font-weight: 500;
 }
 .navbar a:hover{
-  color: $text-color;
+  color: var(--text-color, #314862);
 }
 #menu-icon{
   font-size: 20px;
@@ -50,12 +50,12 @@
 }
 .btn{
   padding: 8px 22px;
-  background: $main-color;
-  color: $bg-color;
+  background: var( --main-color, #2aaf83);;
+  color: var(--bg-color, #ffffff);
   border-radius: 1rem;
 }
 .btn:hover{
-  background: $hover-color;
+  background: var(--hover-color, #1ddb9c);
 }
 .nav-profile-img{
   width: 50px;

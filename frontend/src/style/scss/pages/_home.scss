@@ -13,7 +13,7 @@
     padding-left: 35px;
 }
 .home-text h1{
-    color: $text-color;
+    color: var(--text-color, #314862);
     font-size: 2rem;
     margin-bottom: 1rem;
 }

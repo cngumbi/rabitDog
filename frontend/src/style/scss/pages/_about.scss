@@ -10,7 +10,7 @@
     font-size: $font-medium;
     text-transform: uppercase;
     font-weight:900;
-    color: $main-color;
+    color: var( --main-color, #2aaf83);;
 }
 .about-text h2{
     font-size: $font-default;

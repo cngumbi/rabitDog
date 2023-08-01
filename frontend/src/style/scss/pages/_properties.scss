@@ -4,7 +4,7 @@
 }
 .heading span{
     font-weight: 500;
-    color: $main-color;
+    color: var( --main-color, #2aaf83);;
     font-size: $font-smaller;
 }
 .heading h2{
@@ -19,15 +19,15 @@
 }
 .properties-container{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, auto));
-    gap: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, auto));
+    gap: 2rem;
     padding: 0 50px;
 }
 .properties-container .box{
-    background: $bg-color;
+    background: var(--bg-color, #ffffff);
     padding: 10px;
     border-radius: 1rem;
-    box-shadow: $box-shadow;
+    box-shadow: var(--box-shadow, 2px 2px 18px rgb(14 52 54 / 15%));
 }
 .properties-container .box:hover{
     transform: translateY(-10px);

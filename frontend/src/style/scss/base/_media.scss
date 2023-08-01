@@ -32,7 +32,7 @@
         left: 0;
         display: flex;
         flex-direction: column;
-        background: $second-color;
+        background: var(--second-color, #196a38);
         text-align: center;
         clip-path: circle(0% at 100% 1%);
         transition: 0.6s;
@@ -41,11 +41,11 @@
         display: block;
         margin: 1rem;
         padding: 20px;
-        color: $bg-color !important;
+        color: var(--bg-color, #ffffff);
     }
     .navbar a:hover{
-        background: $main-color;
-        color: $bg-color !important;
+        background: var( --main-color, #2aaf83);
+        color: var(--bg-color, #ffffff);
         transition: 0.2s;
     }
     #menu:checked ~ .navbar{

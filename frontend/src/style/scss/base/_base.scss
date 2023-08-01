@@ -1,8 +1,8 @@
 body{
     line-height: 1.5;
     font-size: 62.5%;
-    font-family: 'poppins' sans-serif;
-    color: $text-color;
+    font-family: var( --main-font, sans-serif);
+    color: var(--text-color, #314862);
 }
 *{
     margin: 0;

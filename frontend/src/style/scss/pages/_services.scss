@@ -5,21 +5,22 @@
 }
 .services .box{
     padding: 20px;
-    background: $bg-color;
-    box-shadow: $box-shadow;
+    background: var(--bg-color, #ffffff);
+    box-shadow: var(--box-shadow, 2px 2px 18px rgb(14 52 54 / 15%));
     text-align: center;
     border-radius: 2rem;
 }
 .services .box:hover{
-    background: $main-color;
-    color: $bg-color;
+    background: var( --main-color, #2aaf83);;
+    color: var(--bg-color, #ffffff);
+    ;
     transition: 0.4s all linear;
 }
 .services .box .bx{
     padding: 20px;
     border-radius: 50%;
     background: #f6f6fe;
-    color: $main-color;
+    color: var( --main-color, #2aaf83);
     font-size: 20px;
 }
 .services .box h3{

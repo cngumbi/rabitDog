@@ -29,13 +29,13 @@
         outline: none;
         padding: 6px;
         margin-bottom: .5rem;
-        background: $bg-color;
+        background: var(--bg-color, #ffffff);
     }
     .login-container form .button{
         outline: none;
         border: none;
-        background: $main-color;
-        color: $bg-color;
+        background: var( --main-color, #2aaf83);;
+        color: var(--bg-color, #ffffff);
         font-size: $font-sm;
         font-weight: 700;
     }

@@ -32,7 +32,7 @@ const Header = {
                     <li><a href="/#/properties" class="navbar__links">Properties</a></li>
                 </ul>                   
                 <!--Log in Button -->
-                <a href="/#/user-current" class="btn">Log In</a>
+                <!--<a href="/#/user-current" class="btn">Log In</a>-->
             </div>
         `;
     }

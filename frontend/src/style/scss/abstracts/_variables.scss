@@ -1,5 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Clicker+Script&family=Poppins:wght@200;300;400;500;600;700;900&display=swap');
 
+:root{
+    --main-font: 'poppins' sans-serif;
+    --box-shadow: 2px 2px 18px rgb(14 52 54 / 15%);
+    --main-color: #2aaf83;
+    --second-color: #196a38;
+    --text-color: #314862;
+    --bg-color: #ffffff;
+    --hover-color: #1ddb9c;
+    --skin-color: #ff0000;
+}
+ //#fa5b0f;//#0aa524;  //#ec1839;
 $font-weights: ( "regular": 400, "medium": 700, "bold": 900);
 //
 //-----------------------------------------------------------------
@@ -20,18 +31,3 @@ $font-medium-6: 5.0rem; //50px
 $font-big: 6.0rem; //60px
 $font-bigger: 7.2rem; //72px
 $font-biggest: 8.4rem; //84px
-
-//colors 
-$main-color: #2aaf83;
-$second-color: #196a38;
-$text-color: #314862;
-$bg-color: #ffffff;
-$hover-color: #1ddb9c;
-$skin-color: #ff0000; //#fa5b0f;//#0aa524;  //#ec1839;
-
-/*box shadow*/
-$box-shadow: 2px 2px 18px rgb(14 52 54 / 15%);
-//theme colors
-//$themeOne:#ec1839;
-//$themeTwo: #fa5b0f;
-//$themeThree: #37b182;
