@@ -1,6 +1,5 @@
 body{
     line-height: 1.5;
-    font-size: 62.5%;
     font-family: var( --main-font, sans-serif);
     color: var(--text-color, #314862);
 }
@@ -12,7 +11,7 @@ body{
     list-style: none;
     box-sizing: border-box;
     scroll-behavior: smooth;
-    scroll-padding-top: 3rem;
+    scroll-padding-top: 2em;
 }
 ::before, ::after{
     box-sizing: border-box;
