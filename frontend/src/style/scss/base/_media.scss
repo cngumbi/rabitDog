@@ -52,10 +52,10 @@
         clip-path: circle(144% at 100% 1%);
     }
     .about-text span{
-        font-size: $font-smallest;
+        font-size: 0.94rem;
     }
     .about-text h2{
-        font-size: $font-small;
+        font-size: 1.4rem;
     }
 }
 @include responsive(phone){
@@ -77,10 +77,10 @@
         padding-left: 14px;
     }
     .home-text h1{
-        font-size: $font-default;
+        font-size: 1.6rem;
     }
     .about-text h2{
-        font-size: $font-smaller;
+        font-size: 1.2em;
     }
     .properties-container{
         padding: 0;

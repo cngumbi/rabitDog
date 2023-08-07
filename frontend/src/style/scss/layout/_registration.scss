@@ -10,17 +10,17 @@
         row-gap: .5rem;
     }
     .login-container h2{
-        font-size: $font-smaller;
+        font-size: 1.2rem;
     }
     .login-container p{
-        font-size: $font-sm;
+        font-size: 0.7rem;
     }
     .login-container form{
         display: flex;
         flex-direction: column;
     }
     .login-container form span{
-        font-size: $font-sm;
+        font-size: 0.7rem;
         color: #8a8a8a;
         margin-bottom: 4px;
     }
@@ -36,16 +36,16 @@
         border: none;
         background: var( --main-color, #2aaf83);;
         color: var(--bg-color, #ffffff);
-        font-size: $font-sm;
+        font-size: 0.7rem;
         font-weight: 700;
     }
     .login-container form a{
-        font-size: $font-sm;
+        font-size: 0.7rem;
         text-align: right;
     }
     .login-container .btn{
         border-radius: 0;
         text-align: center;
-        font-size: $font-sm;
+        font-size: 0.7rem;
         font-weight: 700;
     }

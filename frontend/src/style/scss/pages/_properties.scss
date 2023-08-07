@@ -5,13 +5,13 @@
 .heading span{
     font-weight: 500;
     color: var( --main-color, #2aaf83);;
-    font-size: $font-smaller;
+    font-size: 1.2rem;
 }
 .heading h2{
-    font-size: $font-small;
+    font-size: 1.4rem;
 }
 .heading p{
-    font-size: $font-sm;
+    font-size: 0.7rem;
 }
 .properties{
     background: #fbfbfb;
@@ -40,7 +40,7 @@
     object-position: center;
 }
 .properties-container .box h3{
-    font-size: $font-smallest;
+    font-size: 0.94rem;
     font-weight: 600;
     float: right;
 }
@@ -53,7 +53,7 @@
     font-weight: 500;
 }
 .properties-container .box .content .text p{
-    font-size: $font-sm;
+    font-size: 0.7rem;
 }
 .properties-container .box .content .icon{
     display: flex;
@@ -63,7 +63,7 @@
 .properties-container .box .content .icon .bx{
     display: flex;
     align-items: center;
-    font-size: $font-smallest;
+    font-size: 0.94rem;
 }
 .properties-container .box .content .icon .bx span{
     font-size: 12px;
