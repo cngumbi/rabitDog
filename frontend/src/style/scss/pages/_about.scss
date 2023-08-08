@@ -1,10 +1,10 @@
 .about{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18rem, auto));
-    gap: 2rem;
+    gap: 2em;
 }
 .image{
-    border-radius: 2rem 0 2rem 2rem;
+    border-radius: 2em 0 2em 2em;
 }
 .about-text span{
     font-size: 1.8rem;
@@ -17,5 +17,5 @@
 }
 .about-text p{
     font-size: 0.94rem;
-    margin: 1rem 0 1rem;
+    margin: 1em 0 1em;
 }
