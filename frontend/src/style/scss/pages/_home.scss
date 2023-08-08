@@ -1,19 +1,19 @@
 .home {
-    margin-top: 2rem;
+    margin-top: 2em;
     background-image: url("../assets/tent2.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     height: 500px;
-    border-radius: 1.5rem;
+    border-radius: 1.5em;
     display: flex;
     align-items: center;
 }
 .home-text{
-    padding-left: 35px;
+    padding-left: 2em;
 }
 .home-text h1{
     color: var(--text-color, #314862);
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
 }

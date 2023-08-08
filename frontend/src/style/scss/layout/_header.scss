@@ -11,12 +11,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 35px;
+  padding: 0.8em 0.5em;
 }
 .logo{
   display: flex;
   align-items: center;
-  column-gap: 0.5rem;
+  column-gap: 0.5em;
   color: var( --main-color, #2aaf83);
   font-size: 1.3rem;
   font-weight: 700;
@@ -24,14 +24,14 @@
   text-transform: uppercase;
 }
 .logo .bx{
-  font-size: 20px;
+  font-size: 0.8rem;
   color: var( --main-color, #2aaf83);;
 }
 .navbar{
   display: flex;
 }
 .navbar a{
-  padding: 8px 17px;
+  padding: 0.5em 1em;
   color: var(--text-color, #314862);
   font-size: 1rem;
   text-transform: uppercase;
@@ -41,7 +41,7 @@
   color: var(--text-color, #314862);
 }
 #menu-icon{
-  font-size: 20px;
+  font-size: 0.8rem        ;
   cursor: pointer;
   display: none;
 }
@@ -49,10 +49,10 @@
   display: none;
 }
 .btn{
-  padding: 8px 22px;
+  padding: 0.5em 0.9em;
   background: var( --main-color, #2aaf83);;
   color: var(--bg-color, #ffffff);
-  border-radius: 1rem;
+  border-radius: 1em;
 }
 .btn:hover{
   background: var(--hover-color, #1ddb9c);
@@ -90,5 +90,5 @@
 .user-info a h3{
   font-size: 0.7rem;
   font-weight: 500;
-  margin-bottom: 15px;
+  margin-bottom: 0.7em;
 }
