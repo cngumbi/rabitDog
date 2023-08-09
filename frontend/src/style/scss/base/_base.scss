@@ -1,7 +1,5 @@
-body{
-    line-height: 1.5;
-    font-family: var( --main-font, sans-serif);
-    color: var(--text-color, #314862);
+:root{
+    box-sizing: border-box;
 }
 *{
     margin: 0;
@@ -9,13 +7,20 @@ body{
     outline: none;
     text-decoration: none;
     list-style: none;
-    box-sizing: border-box;
     scroll-behavior: smooth;
     scroll-padding-top: 2em;
 }
-::before, ::after{
-    box-sizing: border-box;
+*, ::before, ::after{
+    box-sizing: inherit;
 }
+body{
+    line-height: 1.5;
+    font-family: var( --main-font, sans-serif);
+    color: var(--text-color, #314862);
+}
+/*body * + * {
+    margin-top: 1em;
+}*/
 
 img{
     width: 100%;

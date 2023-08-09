@@ -31,8 +31,8 @@ const Header = {
                     <li><a href="/#/services" class="navbar__links">Services</a></li>
                     <li><a href="/#/properties" class="navbar__links">Properties</a></li>
                 </ul>                   
-                <!--Log in Button -->
-                <a href="/#/user-current" class="btn">Log In</a>
+                <!--Log in Button 
+                <a href="/#/user-current" class="btn">Log In</a> -->
             </div>
         `;
     }
