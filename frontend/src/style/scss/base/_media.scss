@@ -1,18 +1,18 @@
 @include responsive(big-desktop){
     .container{
-        margin-left: 1rem;
-        margin-right: 1rem;
+        margin-left: 1em;
+        margin-right: 1em;
     }
 }
 
 @include responsive(tablet-landscape){
     section{
-        padding: 4rem 0 3rem;
+        padding: 4em 0 3em;
     }
     .properties-container{
-        grid-template-columns: repeat(auto-fit, minmax(200px, auto));
-        gap: 1rem;
-        padding: 0 10px;
+        grid-template-columns: repeat(auto-fit, minmax(12.5em, auto));
+        gap: 1em;
+        padding: 0 0.6em;
     }
     .login{
         grid-template-columns: 0.6fr 1fr;
@@ -20,7 +20,7 @@
 }
 @include responsive(tablet-portrait){
     .nav{
-        padding: 10px 0;
+        padding: 0.6em 0;
     }
     #menu-icon{
         display: initial !important;
@@ -39,8 +39,8 @@
     }
     .navbar a{
         display: block;
-        margin: 1rem;
-        padding: 20px;
+        margin: 1em;
+        padding: 1.3em;
         color: var(--bg-color, #ffffff);
     }
     .navbar a:hover{
@@ -67,14 +67,14 @@
     }
     .login{
         grid-template-columns: 1fr !important;
-        margin-top: 3rem !important;
+        margin-top: 3em !important;
         justify-content: center;
     }
     .login-image{
         display: none;
     }
     .home-text{
-        padding-left: 14px;
+        padding-left: 0.9em;
     }
     .home-text h1{
         font-size: 1.6rem;
