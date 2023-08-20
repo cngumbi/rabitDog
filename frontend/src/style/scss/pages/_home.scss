@@ -1,16 +1,20 @@
 .home {
-    margin-top: 2em;
-    background-image: url("../assets/tent2.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    height: 500px;
-    border-radius: 1.5em;
-    display: flex;
+    margin-top: .5em;
+    height: 550px;
+    @include display-flex;
     align-items: center;
+}
+.home-image{
+    position: absolute;
+    width: 66%;
+}
+.home-image > img{
+    height: 550px;
+    border-radius: 1.5em;
 }
 .home-text{
     padding-left: 2em;
+    z-index: 1;
 }
 .home-text h1{
     color: var(--text-color, #314862);

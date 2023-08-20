@@ -11,7 +11,7 @@
 .overlay>div {
     background-color: var( --main-color, #2aaf83);
     border-radius: 0.5rem;
-    display: flex;
+    @include display-flex;
     flex-direction: column;
     justify-content: space-around;
     max-width: 40rem;

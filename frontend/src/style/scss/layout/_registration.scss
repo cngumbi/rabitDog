@@ -5,7 +5,7 @@
         max-height: 80vh;
     }
     .login-container{
-        display: flex;
+        @include display-flex;
         flex-direction: column;
         row-gap: .5rem;
     }
@@ -16,7 +16,7 @@
         font-size: 0.7rem;
     }
     .login-container form{
-        display: flex;
+        @include display-flex;
         flex-direction: column;
     }
     .login-container form span{

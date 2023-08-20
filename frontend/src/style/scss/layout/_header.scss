@@ -8,13 +8,13 @@
   z-index: 100;
 }
 .nav{
-  display: flex;
+  @include display-flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.8em 0.5em;
 }
 .logo{
-  display: flex;
+  @include display-flex;
   align-items: center;
   column-gap: 0.5em;
   color: var( --main-color, #2aaf83);
@@ -28,7 +28,7 @@
   color: var( --main-color, #2aaf83);;
 }
 .navbar{
-  display: flex;
+  @include display-flex;
 }
 .navbar a{
   padding: 0.5em 1em;
@@ -36,6 +36,9 @@
   font-size: 1rem;
   text-transform: uppercase;
   font-weight: 500;
+}
+.navbar > li{
+  margin-top: 0;
 }
 .navbar a:hover{
   color: var(--text-color, #314862);
@@ -79,7 +82,7 @@
   position: absolute;
 }
 .user-info{
-  display: flex;
+  @include display-flex;
   align-items: center;
 }
 .user-info a{

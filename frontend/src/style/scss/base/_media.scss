@@ -30,7 +30,7 @@
         top: 100%;
         right: 0;
         left: 0;
-        display: flex;
+        @include display-flex;
         flex-direction: column;
         background: var(--second-color, #196a38);
         text-align: center;
