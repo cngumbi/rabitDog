@@ -22,8 +22,9 @@
     .nav{
         padding: 0.6em 0;
     }
-    #menu-icon{
-        display: initial;
+    .nav #menu-icon{
+        display: block;
+        font-size: 1.8rem;
     }
     .navbar{
         position: absolute;
@@ -41,12 +42,16 @@
         display: block;
         margin: 1em;
         padding: 1.3em;
+        
+    }
+    .navbar .navbar__links{
         color: var(--bg-color, #ffffff);
     }
-    .navbar a:hover{
+    .navbar .navbar__links:hover{
         background: var( --main-color, #2aaf83);
-        color: var(--bg-color, #ffffff);
-        transition: 0.2s;
+        color: var(--hover-text, #dad3d3);
+        transform: translateY(-5px);
+        transition: 0.6s;
     }
     #menu:checked ~ .navbar{
         clip-path: circle(144% at 100% 1%);

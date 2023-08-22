@@ -1,7 +1,7 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
 const User = require('../models/userModel');
-const { generateToken } = require('../util');
+const { generateToken, isAuth } = require('../util');
 
 const UserRoute = express.Router();
 
@@ -56,6 +56,32 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
             message: 'Invalid User Data',
         });
     } else {
+        user.name = req.body.name || user.name;
+        user.userName = req.body.userName || user.userName;
+        user.phoneNumber = req.body.phoneNumber || user.phoneNumbe;
+        user.email = req.body.email || user.email;
+        user.password = req.body.password || user.password;
+
+        const updateUser = await user.save();
+
+        res.send({
+            _id: updateUser._id,
+            name: updateUser.name,
+            userName: updateUser.userName,
+            phoneNumber: updateUser.phoneNumber,
+            email: updateUser.email,
+            isAdmin: updateUser.isAdmin,
+            token: generateToken(updateUser),
+        });
+    }
+}));
+UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        res.status(401).send({
+            message: 'User not found',
+        });
+    } else {
         res.send({
             _id: createdUser._id,
             name: createdUser.name,
@@ -67,5 +93,6 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
         });
     }
 }));
+
 
 module.exports = UserRoute;

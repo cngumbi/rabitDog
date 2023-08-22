@@ -54,10 +54,16 @@ module.exports = {
                 }
             },
             {
-                test: /\.(png|jpg|jpeg|gif|svg|ico)$/i,
+                test: /\.(png|jpg|jpe?g|gif|svg|ico)$/i,
                 use:{
-                    loader: 'file-loader'
-                }
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                        name: '[path][name].[ext]',
+                        outputPath: 'uploads'
+                    },
+                },
+                
             }
         ],
     }, 
