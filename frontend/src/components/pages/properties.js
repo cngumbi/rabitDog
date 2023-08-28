@@ -1,19 +1,22 @@
-import axios from 'axios';
+import Rating from '../rating';
+import { getProducts } from '../../connection/api';
+import ParseRequestUrl  from '../../config/parseUrl';
+
 
 const Properties = {
     vignette: ()=>{
+        document.getElementById('search-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const searchKeyword = document.getElementById('q').value;
+            document.location.hash = `/?q=${searchKeyword}`;
+        });
     },
     render: async()=>{
-        const response = await axios({
-            url: 'http://localhost:5000/api/properties',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        if(!response || response.statusText !== 'OK'){
-            return `<div> error in geeting data</div>`;
+        const { value } = ParseRequestUrl();
+        const products = await getProducts({ searchKeyword: value });
+        if(products.error){
+            return `<div>${products.error}</div>`;
         }
-        const properties = response.data;
         return`
             <section class="properties container" id="properties">
                 <div class="heading">
@@ -21,22 +24,34 @@ const Properties = {
                     <h2>Our Featured Tents</h2>
                     <p>This are all the product and services our organisation offer from the largest to <br> smallest, afordable for all kinds of parties and events.<br>Checkout our Products and Services Wel come</p>
                 </div>
+                <div class="search">
+                    <form class="search-form"  id="search-form">
+                      <input type="text" name="q" id="q" value="${value || ''}" /> 
+                      <button type="submit"><i class="fa fa-search"></i></button>
+                    </form>        
+                </div>
                 <div class="properties-container container">
                     <!--property boxes-->
-                    ${properties.map( (property) => `
+                    ${products.map( (product) => `
                         <div class="box">
-                            <a href="/#/property/${property._id}>
-                                <img src="${property.image}"alt="${property.name}">
+                            <a href="/#/property/${product._id}">
+                                <img src="${product.image}" alt="${product.name}">
                             </a>
-                            <h3>Ksh ${property.price}</h3>
+                            <h3>Ksh ${product.price}</h3>
                             <div class="content">
                                 <div class="text">
-                                    <h3>${property.name}</h3> 
-                                    <p>${property.event}</p>
+                                    <h3>${product.name}</h3> 
+                                    <p>${product.brand}</p>
                                 </div>
                                 <div class="icon">
-                                    <i class='bx bx-user'><span>${property.capacity}</span></i>
+                                    <i class='bx bx-user'><span>${property.category}</span></i>
                                 </div>
+                            </div>
+                            <div class="properties-rating">
+                                ${Rating.render({
+                                    value: product.rating,
+                                    text: `${product.numReviews} reviews`,
+                                })}
                             </div>
                         </div>
                     `).join('\n')}

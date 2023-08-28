@@ -5,14 +5,14 @@ const { generateToken, isAuth } = require('../util');
 
 const UserRoute = express.Router();
 
-UserRoute.get('/createadmin', expressAsync(async(req, res) => {
+/*UserRoute.get('/createadmin', expressAsync(async(req, res) => {
     try {
         const user = new User({
             name: 'SuperAdmin',
             userName: 'admin',
             phoneNumber: '+254712719781',
-            email: 'quickoneadmin@quickoneservice.com',
-            password: 'adminQuickOne',
+            email: 'Mwandyaadmin@kyalo.store',
+            password: 'adminMwandya@12',
             isAdmin: true
         });
         const createdUser = await user.save();
@@ -20,7 +20,7 @@ UserRoute.get('/createadmin', expressAsync(async(req, res) => {
     } catch (err) {
         res.status(500).send({ message: err.message });
     }
-}));
+}));*/
 UserRoute.post('/login', expressAsync(async(req, res)=>{
     const signinUser = await User.findOne({
         email: req.body.email,

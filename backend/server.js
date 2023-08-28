@@ -7,19 +7,19 @@ const db = require("./config/mongoosDB");
 const config = require("./config/config");
 //const ServiceRoute = require("./routes/serviceRoute");
 const UserRoute = require("./routes/userRoute");
-const orderRoute = require("./routes/ordrerRoute");
-const productRoute = require("./routes/productRoute");
-const uploadRoute = require("./routes/uploadRoute");
+const OrderRoute = require("./routes/ordrerRoute");
+const UploadRoute = require("./routes/uploadRoute");
+const ProductRoute = require("./routes/productRoute");
 
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/api/uploads', uploadRoute);
+app.use('/api/uploads', UploadRoute);
 app.use('/api/users', UserRoute);
-app.use('/api/product', productRoute);
-app.use('/api/order', orderRoute);
+app.use('/api/products', ProductRoute);
+app.use('/api/orders', OrderRoute);
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
 /*app.get('/api/paypal/clientId', (req, res)=>{
@@ -33,7 +33,8 @@ app.get("*", (req, res) => {
 //middleware
 //error handling code to handle all errors in express instance
 app.use((err, req, res, next) => {
-  const status = err.name && err.name === "Validation Error";
+  const status = err.name && err.name === "Validation Error" ? 400 : 500;
+  console.log(`Internal Server Error code status ${status}`);
   res.status(status).send({ message: err.message });
 });
 //-0000000000000000000000000000000000000000000000000000000000

@@ -1,7 +1,6 @@
 
 //import styles
 import './style/scss/kwito.scss';
-//images
 import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
@@ -12,6 +11,13 @@ import Services from './components/pages/services';
 import Properties from './components/pages/properties';
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
+import CartPage from './components/order/cartpage';
+import Profile from './components/profile/profilePage';
+import Dashboard from './components/profile/admin/dashboard/dashboard';
+import ProductPage from './components/product/productPage';
+import ListingProduct from './components/product/listingProduct';
+import EditProduct from './components/product/editProduct';
+import AddProduct from './components/product/addProdut';
 
 
 //setting the favicon of the site
@@ -25,7 +31,15 @@ const routes = {
     '/services': Services,
     '/properties': Properties,
     '/user-current': SignIn,
-    '/new-user-create': Registration
+    '/new-user-create': Registration,
+    '/profile': Profile,
+    '/dashboard': Dashboard,
+    '/product/:id': ProductPage,
+    '/product/:id/edit': EditProduct,
+    '/listproduct': ListingProduct,
+    '/createproduct': AddProduct,
+    '/cart': CartPage,
+    '/cart/:id': CartPage
 };
 
 const router = async () => {

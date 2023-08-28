@@ -6,7 +6,7 @@ const About = {
     },
     render: ()=>{
         return `
-            <section class="about container" id="about>
+            <section class="about container" id="about">
                 <div class="about-img">
                     <img id="aboutimage" alt="about image" class="image">
                 </div>

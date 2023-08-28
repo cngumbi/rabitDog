@@ -1,5 +1,5 @@
 import profileImg from '../assets/account.png';
-import { clearUser, getUserInfo } from "../localStorage";
+import { getUserInfo } from "../localStorage";
 
 const Header = {
     vignette: ()=>{
@@ -17,6 +17,7 @@ const Header = {
         
     },
     render: ()=>{
+        const { userName, isAdmin } = getUserInfo();
         return `
             <div class="nav container">
                 <!--logo-->
@@ -30,9 +31,13 @@ const Header = {
                     <li><a href="/#/about" class="navbar__links">About Us</a></li>
                     <li><a href="/#/services" class="navbar__links">Services</a></li>
                     <li><a href="/#/properties" class="navbar__links">Properties</a></li>
-                </ul>                   
-                <!--Log in Button -->
-                <a href="/#/user-current" class="btn">Log In</a>
+                </ul>  
+                ${
+                    userName ? `<a href="/#/profile" class="">${userName}</a>
+                    <a href="/#/cart" class="">Cart</a>` : `<a href="/#/user-current" class="btn">Log In</a>`
+                }               
+                
+                ${ isAdmin ? `<a href="/#/dashboard" class="">Dashboard</a>` : ''}
             </div>
         `;
     }

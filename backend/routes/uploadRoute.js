@@ -12,10 +12,10 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-const uploadRoute = express.Router();
+const UploadRoute = express.Router();
 
-uploadRoute.post('/', isAuth, isAdmin, upload.single('image'), (req, res) => {
+UploadRoute.post('/', isAuth, isAdmin, upload.single('image'), (req, res) => {
     res.status(201).send({ image: `/${req.file.path}`})
 });
 
-module.exports = uploadRoute;
+module.exports = UploadRoute;

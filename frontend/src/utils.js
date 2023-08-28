@@ -1,14 +1,6 @@
-import { getUserInfo } from "./localStorage";
+import { getCartItems, getUserInfo } from "./localStorage";
 
-export const pasrseRequest = ()=>{
-    const url = document.location.hash.toLowerCase();
-    const request =url.split('/');
-    return{
-        resource: request[1],
-        id: request[2],
-        verb: request[3]
-    };
-};
+
 //rerender function
 export const vitalize = async(componet)=>{
     document.getElementById('main-content').innerHTML = await componet.render();
@@ -48,9 +40,13 @@ export const showMessage = (message, callback)=>{
 };
 //redirect function
 export const veer = ()=>{
-    if(!getUserInfo().name){
-        window.location.assign('/');
+    if(getCartItems().lenght !== 0){
+        if(!getUserInfo().name){
+            document.location.hash = '/user-current';
+        }else{
+            document.location.hash = '/shipping';
+        }
     }else{
-        window.location.assign('/home');
+        document.location.hash = '/'
     }
 }

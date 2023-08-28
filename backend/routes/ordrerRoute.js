@@ -5,9 +5,9 @@ const Order = require('../models/orderModel');
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
 
-const orderRoute = express.Router();
+const OrderRoute = express.Router();
 
-orderRoute.get('/summary', isAuth, isAdmin, expressAsync(async(req, res) =>{
+OrderRoute.get('/summary', isAuth, isAdmin, expressAsync(async(req, res) =>{
     const orders = await Order.aggregate([
         {
             $group: {
@@ -49,15 +49,15 @@ orderRoute.get('/summary', isAuth, isAdmin, expressAsync(async(req, res) =>{
         productCategories,
     });
 }));
-orderRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
+OrderRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
     const orders = await Order.find({}).populate('user');
     res.send(orders);
 }));
-orderRoute.get('/mine', isAuth, expressAsync(async(req, res) => {
+OrderRoute.get('/mine', isAuth, expressAsync(async(req, res) => {
     const orders = await Order.find({ user: req.user_id });
     res.send(orders);
 }));
-orderRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
+OrderRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
     const order = await Order.findById(req.params.id);
     if(order){
         res.send(order);
@@ -66,7 +66,7 @@ orderRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
     }
     
 }));
-orderRoute.post('/', isAuth, expressAsync(async(req, res) => {
+OrderRoute.post('/', isAuth, expressAsync(async(req, res) => {
     const order = new Order({
         orderItems: req.body.orderItems,
         user: req.user._id,
@@ -84,7 +84,7 @@ orderRoute.post('/', isAuth, expressAsync(async(req, res) => {
         });
     }
 }));
-orderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
+OrderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const order = await Order.findById(req.params.id);
     if(order){
         const deleteOrder = await order.remove();
@@ -93,7 +93,7 @@ orderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
         res.status(404).send({ message:' Order Not Found' });
     }
 }));
-orderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
+OrderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
     const order = await Order.findById(req.params.id);
     if (order){
         order.isPaid = true;
@@ -109,7 +109,7 @@ orderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
         res.status(404).send({ message:' Order Not Found' });
     }
 }));
-orderRoute.put('/:id/deliver', isAuth, expressAsync(async(req, res)=>{
+OrderRoute.put('/:id/deliver', isAuth, expressAsync(async(req, res)=>{
     const order = await Order.findById(req.params.id);
     if(order){
         order.isDelivered = true;
@@ -121,4 +121,4 @@ orderRoute.put('/:id/deliver', isAuth, expressAsync(async(req, res)=>{
     }
 }));
 
-module.exports = orderRoute;
+module.exports = OrderRoute;

@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
         unique: true
     },
     password: { type: String, required: true },
-    isAdmin: { type: Boolean, required: true, default: false },
+    isAdmin: { type: Boolean, required: true, default: true },
 }, { timestamps: true });
 
 //create the user model
