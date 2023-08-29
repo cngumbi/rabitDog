@@ -1,5 +1,5 @@
 import ParseRequestUrl from "../../config/parseUrl";
-import { createProduct, getProduct, uploadProductImage } from "../../connection/api";
+import { createProduct, uploadProductImage } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
 
@@ -48,7 +48,6 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
     },
     render: async () => {
       const request = ParseRequestUrl();
-      const product = await getProduct(request.id);
       return `
       <div class="dashboard">
         ${DashboardMenu.render({ selected: "createproducts" })}

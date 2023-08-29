@@ -15,6 +15,10 @@ module.exports = {
         clean: true,
         assetModuleFilename: '[name][ext]'
     },
+    target: 'node',
+    node: {
+        __dirname: true,
+    },
     devtool: 'source-map',
     devServer: {
         static: {
@@ -64,7 +68,15 @@ module.exports = {
                     },
                 },
                 
-            }
+            },
+            //{
+            //    test: /\.(png|jpg|jpe?g|gif|svg|ico)$/i,
+            //    include: path.resolve(__dirname, 'src'),
+            //    type: "assets/resource",
+            //      generator: {
+            //          filename: "assets/[name][ext]",
+            //      }
+            //}
         ],
     }, 
     plugins: [

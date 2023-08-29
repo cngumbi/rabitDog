@@ -34,7 +34,7 @@ app.get("*", (req, res) => {
 //error handling code to handle all errors in express instance
 app.use((err, req, res, next) => {
   const status = err.name && err.name === "Validation Error" ? 400 : 500;
-  console.log(`Internal Server Error code status ${status}`);
+  console.log(`Status Code ${status}`);
   res.status(status).send({ message: err.message });
 });
 //-0000000000000000000000000000000000000000000000000000000000
