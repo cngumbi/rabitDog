@@ -4,7 +4,7 @@ const { isAuth, isAdmin } = require('../util');
 
 const storage = multer.diskStorage({
     destination(req, file, cb){
-        cb(null, 'upload/');
+        cb(null, 'uploads/');
     },
     filename(req, file, cb){
         cb(null, `${Data.now()}.jpg`);

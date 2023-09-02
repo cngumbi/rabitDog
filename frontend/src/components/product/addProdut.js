@@ -1,4 +1,3 @@
-import ParseRequestUrl from "../../config/parseUrl";
 import { createProduct, uploadProductImage } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
@@ -6,14 +5,12 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
  
   const AddProduct = {
     vignette: () => {
-      const request = ParseRequestUrl();
       document
         .getElementById('add-product-form')
         .addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoading();
           const data = await createProduct({
-            _id: request.id,
             name: document.getElementById('name').value,
             price: document.getElementById('price').value,
             image: document.getElementById('image').value,
@@ -47,7 +44,6 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
         });
     },
     render: async () => {
-      const request = ParseRequestUrl();
       return `
       <div class="dashboard">
         ${DashboardMenu.render({ selected: "createproducts" })}

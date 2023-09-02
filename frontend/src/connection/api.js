@@ -99,7 +99,7 @@ export const getProduct = async(id)=>{
         const response = await axios({
             url: `${apiURL}/api/products/${id}`,
             method: "GET",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
             },
         });
@@ -118,7 +118,7 @@ export const createProduct = async(name, price, image, brand, category, countInS
         const response = await axios({
             url: `${apiURL}/api/products/createdproducts`,
             method: 'POST',
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -147,7 +147,7 @@ export const createReview = async(productId, review)=>{
         const response = await axios({
             url: `${apiURL}/api/products/${productId/reviews}`,
             method: "POST",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -168,7 +168,7 @@ export const deleteProduct = async(productId)=>{
         const response = await axios({
             url: `${apiURL}/api/products/${productId}`,
             method: "DELETE",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -188,7 +188,7 @@ export const updateProduct = async(product)=>{
         const response = await axios({
             url: `${apiURL}/api/products/${product._id}`,
             method: "PUT",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -209,7 +209,7 @@ export const uploadProductImage = async(formData)=>{
         const response = await axios({
             url: `${apiURL}/api/uploads`,
             method: "POST",
-            header: {
+            headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "multipart/form-data",
             },
@@ -230,7 +230,7 @@ export const createOrder = async(order)=>{
         const response = await axios({
             url: `${apiURL}/api/orders`,
             method: "POST",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -251,7 +251,7 @@ export const getOrders = async()=>{
         const response = await axios({
             url: `${apiURL}/api/orders`,
             method: "GET",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -271,7 +271,7 @@ export const deleteOrder = async(orderId)=>{
         const response = await axios({
             url: `${apiURL}/api/order/${orderId}`,
             method: "DELETE",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -290,7 +290,7 @@ export const getOrder = async(id)=>{
         const { token } = getUserInfo();
         const response = await axios({
             url: `${apiURL}/api/orders/${id}`,
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -309,7 +309,7 @@ export const getMyOrders = async()=>{
         const { token } = getUserInfo();
         const response = await axios({
             url: `${apiURL}/api/orders/mine`,
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -327,7 +327,7 @@ export const getPaypalClientId = async()=>{
     try{
         const response = await axios({
             url: `${apiURL}/api/paypal/clientId`,
-            header: {
+            headers: {
                 "Content-Type": "application/json",
             },
         });
@@ -346,7 +346,7 @@ export const payOrder = async(orderId, paymentResult)=>{
         const response = await axios({
             url: `${apiURL}/api/orders/${orderId}/pay`,
             method: "PUT",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -367,7 +367,7 @@ export const deliverOrder = async(orderId)=>{
         const response = await axios({
             url: `${apiURL}/api/orders/${orderId}/deliver`,
             method: "PUT",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
@@ -387,7 +387,7 @@ export const getSemmary = async()=>{
         const response = await axios({
             url: `${apiURL}/api/orders/summary`,
             method: "PUT",
-            header: {
+            headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },

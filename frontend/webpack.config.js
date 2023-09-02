@@ -59,14 +59,15 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|jpe?g|gif|svg|ico)$/i,
-                use:{
-                    loader: 'url-loader',
-                    options: {
-                        limit: 8192,
-                        name: '[path][name].[ext]',
-                        outputPath: 'uploads'
-                    },
-                },
+                type: 'asset/resource',
+                //use:{
+                //    loader: 'url-loader',
+                //    options: {
+                //        limit: 8192,
+                //        name: '[path][name].[ext]',
+                //        outputPath: 'uploads'
+                //    },
+                //},
                 
             },
             //{
