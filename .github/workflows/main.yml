@@ -22,14 +22,10 @@ jobs:
 
             #Run a single command using the runners shell
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
+              uses: actions/setup-node@v18
               with:
                 node-version: ${{ matrix.node-version }}
             - run: |
-                npm i
-                rm -rf dist
-                babel backend -d dist
-                npm audit fix --force
                 npm i
                 rm -rf dist
                 babel backend -d dist
