@@ -15,19 +15,40 @@ jobs:
         #the type of runnner that the job will run on
         runs-on: self-hosted
 
+        #setting up the matrix version
+        strategy:
+            matrix:
+                node-version: [ 18 ]
         #steps represents a sequence of tasks that will be executed as part of the job
         steps:
             #checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-            - uses: actions/checkout@v2
+            - name: checkout
+              uses: actions/checkout@v2
+              with:
+                presist-credentials: false
 
             #Run a single command using the runners shell
             - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v18
+              uses: actions/setup-node@v3
               with:
                 node-version: ${{ matrix.node-version }}
-            - run: |
+
+            - name: Install
+              run: |
                 npm i
+            #delete dist folder if it exist
+            - name: remove
+              run: |
                 rm -rf dist
+            #start up babel
+            - name: babel
+              run: |
                 babel backend -d dist
+            # move to frontend
+            - name: changeDIR
+              run: |
                 cd frontend
+            #run build of the frontend
+            - name: build
+              run: |
                 npm run build           
