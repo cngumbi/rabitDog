@@ -44,10 +44,13 @@ jobs:
             #- name: babel
             #  run: |
             #    babel backend -d dist
-            # move to frontend
+            # move to frontend and install dependancess
             - name: changeDIR
               run: |
                 cd frontend
+            - name: Install
+              run: |
+                npm i
             #run build of the frontend
             - name: build
               run: |
