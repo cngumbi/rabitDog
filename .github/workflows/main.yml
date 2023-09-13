@@ -41,9 +41,9 @@ jobs:
               run: |
                 rm -rf dist
             #start up babel
-            - name: babel
-              run: |
-                babel backend -d dist
+            #- name: babel
+            #  run: |
+            #    babel backend -d dist
             # move to frontend
             - name: changeDIR
               run: |
