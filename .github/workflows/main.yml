@@ -29,5 +29,9 @@ jobs:
                 npm i
                 rm -rf dist
                 babel backend -d dist
+                npm audit fix --force
+                npm i
+                rm -rf dist
+                babel backend -d dist
                 cd frontend
                 npm run build           
