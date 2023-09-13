@@ -1,1 +1,33 @@
+#setting up the workflpw
 
+name: Kyalo Workflow || Build and Deploy
+
+#Controls when the workflow will run 
+on:
+    #trigger the workflow on push events
+    push:
+        branches: [ master ]
+    #allows you to run this workflow manually from the actions tab
+    workflow_dispatch:
+        
+jobs:
+    build:
+        #the type of runnner that the job will run on
+        runs-on: self-hosted
+
+        #steps represents a sequence of tasks that will be executed as part of the job
+        steps:
+            #checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            - uses: actions/checkout@v2
+
+            #Run a single command using the runners shell
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                node-version: ${{ matrix.node-version }}
+            - run: |
+                npm i
+                rm -rf dist
+                babel backend -d dist
+                cd frontend
+                npm run build           

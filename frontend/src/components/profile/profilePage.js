@@ -1,5 +1,5 @@
 import { getMyOrders } from "../../connection/api";
-import { clearUser, getUserInfo } from "../../localStorage";
+import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
 
 const Profile = {
     vignette: ()=>{
