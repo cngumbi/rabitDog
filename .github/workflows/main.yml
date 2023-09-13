@@ -33,25 +33,10 @@ jobs:
               with:
                 node-version: ${{ matrix.node-version }}
 
-            - name: Install
+            - name: Install & build
               run: |
-                npm i
-            #delete dist folder if it exist
-            - name: remove
-              run: |
-                rm -rf dist
-            #start up babel
-            #- name: babel
-            #  run: |
-            #    babel backend -d dist
-            # move to frontend and install dependancess
-            - name: changeDIR
-              run: |
-                cd frontend
-            - name: Install
-              run: |
-                npm i
-            #run build of the frontend
-            - name: build
-              run: |
-                npm run build           
+                npm run build
+                pm2 stop 0
+                pm2 start 0
+                pm2 save
+                sudo systemctl restart nginx
