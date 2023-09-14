@@ -1,6 +1,6 @@
 .home {
     margin-top: .5em;
-    height: 30em;
+    height: 25em;
     @include display-flex;
     align-items: center;
 }
@@ -9,7 +9,7 @@
     width: 76%;
 }
 .home-image > img{
-    height: 30em;
+    height: 25em;
     border-radius: 1.5em;
 }
 .home-text{
