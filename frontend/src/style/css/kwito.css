@@ -270,11 +270,14 @@ img {
 }
 @media (max-width: 56.25em) {
   .nav {
-    padding: 0.6em 0;
+    padding: 0.4em 0;
+  }
+  .logo {
+    font-size: 0.8rem;
   }
   .nav #menu-icon {
     display: block;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   .navbar {
     position: absolute;
@@ -291,8 +294,9 @@ img {
   }
   .navbar a {
     display: block;
-    margin: 1em;
-    padding: 1.3em;
+    margin: 0.8em;
+    padding: 1.2em;
+    font-size: 0.6rem;
   }
   .navbar .navbar__links {
     color: var(--bg-color, #ffffff);
@@ -307,6 +311,9 @@ img {
     -webkit-clip-path: circle(144% at 100% 1%);
             clip-path: circle(144% at 100% 1%);
   }
+  .home-text h1 {
+    font-size: 0.4rem;
+  }
   .about-text span {
     font-size: 0.94rem;
   }
@@ -315,9 +322,6 @@ img {
   }
 }
 @media (max-width: 37.5em) {
-  .home-text h1 {
-    font-size: 0.2rem;
-  }
   .about {
     text-align: center;
   }
@@ -494,7 +498,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8em 0.5em;
+  padding: 0.6em 0.4em;
 }
 
 .logo {
@@ -503,7 +507,7 @@ button {
   -moz-column-gap: 0.5em;
        column-gap: 0.5em;
   color: var(--main-color, #2aaf83);
-  font-size: 1.3rem;
+  font-size: 1rem;
   font-weight: 700;
   -moz-columns: var(--text-color, #314862);
        columns: var(--text-color, #314862);
@@ -511,7 +515,7 @@ button {
 }
 
 .logo .bx {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: var(--main-color, #2aaf83);
 }
 
@@ -522,7 +526,7 @@ button {
 .navbar a {
   padding: 0.5em 1em;
   color: var(--text-color, #314862);
-  font-size: 1rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   font-weight: 500;
 }
@@ -536,7 +540,7 @@ button {
 }
 
 #menu-icon {
-  font-size: 0.8rem;
+  font-size: 0.6rem;
   cursor: pointer;
   display: none;
 }
