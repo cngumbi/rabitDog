@@ -92,6 +92,7 @@ const ListingProduct = {
     }catch(err){
       showMessage("Error fetching products")
       return "";
+      
     }
   },
 };
