@@ -44,7 +44,7 @@ export const veer = ()=>{
         if(!getUserInfo().name){
             document.location.hash = '/user-current';
         }else{
-            document.location.hash = '/shipping';
+            document.location.hash = '/';
         }
     }else{
         document.location.hash = '/'

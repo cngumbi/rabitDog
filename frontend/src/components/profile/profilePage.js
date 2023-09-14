@@ -25,7 +25,7 @@ const Profile = {
                 document.location.hash = '/';
               }
             });
-    },
+          },
     render: async()=>{
         const {name, email} = getUserInfo();
         if(!name){

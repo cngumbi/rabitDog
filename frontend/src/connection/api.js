@@ -29,7 +29,7 @@ export const register = async({ name, userName, phoneNumber, email, password })=
 export const signIn = async({email, password})=>{
     try{
         const response =await axios({
-            url: `${apiURL}/api/users/sigin`,
+            url: `${apiURL}/api/users/signin`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

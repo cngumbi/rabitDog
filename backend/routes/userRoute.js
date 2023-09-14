@@ -21,7 +21,7 @@ const UserRoute = express.Router();
         res.status(500).send({ message: err.message });
     }
 }));*/
-UserRoute.post('/login', expressAsync(async(req, res)=>{
+UserRoute.post('/signin', expressAsync(async(req, res)=>{
     const signinUser = await User.findOne({
         email: req.body.email,
         password: req.body.password
@@ -55,6 +55,24 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
         res.status(401).send({
             message: 'Invalid User Data',
         });
+    }else {
+        res.send({
+            _id: createdUser._id,
+            name: createdUser.name,
+            userName: createdUser.userName,
+            phoneNumber: createdUser.phoneNumber,
+            email: createdUser.email,
+            isAdmin: createdUser.isAdmin,
+            token: generateToken(createdUser),
+        });
+    }
+}));
+UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        res.status(401).send({
+            message: 'User not found',
+        });
     } else {
         user.name = req.body.name || user.name;
         user.userName = req.body.userName || user.userName;
@@ -75,24 +93,5 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
         });
     }
 }));
-UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-        res.status(401).send({
-            message: 'User not found',
-        });
-    } else {
-        res.send({
-            _id: createdUser._id,
-            name: createdUser.name,
-            userName: createdUser.userName,
-            phoneNumber: createdUser.phoneNumber,
-            email: createdUser.email,
-            isAdmin: createdUser.isAdmin,
-            token: generateToken(createdUser),
-        });
-    }
-}));
-
 
 module.exports = UserRoute;
