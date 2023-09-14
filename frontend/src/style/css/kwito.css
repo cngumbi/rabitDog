@@ -312,6 +312,7 @@ img {
             clip-path: circle(144% at 100% 1%);
   }
   .btn {
+    margin-top: 0;
     padding: 0.2em 0.4em;
   }
   .home-text h1 {
@@ -553,7 +554,8 @@ button {
 }
 
 .btn {
-  padding: 0.5em 0.9em;
+  margin-top: 0;
+  padding: 0.4em 0.7em;
   background: var(--main-color, #2aaf83);
   color: var(--bg-color, #ffffff);
   border-radius: 1em;
