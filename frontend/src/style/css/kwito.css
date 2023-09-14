@@ -544,6 +544,7 @@ button {
 }
 
 #menu-icon {
+  margin-top: 0;
   font-size: 0.6rem;
   cursor: pointer;
   display: none;
