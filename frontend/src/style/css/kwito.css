@@ -275,12 +275,12 @@ img {
   .logo {
     font-size: 0.8rem;
   }
-  .nav > #menu-icon {
-    margin-top: 0;
+  .nav #menu-icon {
     display: block;
     font-size: 1.6rem;
   }
   .navbar {
+    margin-top: 0;
     position: absolute;
     top: 100%;
     right: 0;
