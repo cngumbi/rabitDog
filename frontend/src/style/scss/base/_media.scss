@@ -60,6 +60,9 @@
     #menu:checked ~ .navbar{
         clip-path: circle(144% at 100% 1%);
     }
+    .btn{
+        padding: 0.3em 0.6em;
+    }
     .home-text h1{
         font-size: .4rem;
     }
