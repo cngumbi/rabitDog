@@ -660,18 +660,18 @@ button {
 
 .home {
   margin-top: 0.5em;
-  height: 30em;
+  height: 27em;
   display: flex;
   align-items: center;
 }
 
 .home-image {
   position: absolute;
-  width: 76%;
+  width: 74%;
 }
 
 .home-image > img {
-  height: 30em;
+  height: 27em;
   border-radius: 1.5em;
 }
 
