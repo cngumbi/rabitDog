@@ -275,7 +275,7 @@ img {
   .logo {
     font-size: 0.8rem;
   }
-  .nav #menu-icon {
+  .nav > #menu-icon {
     margin-top: 0;
     display: block;
     font-size: 1.6rem;
