@@ -276,6 +276,7 @@ img {
     font-size: 0.8rem;
   }
   .nav #menu-icon {
+    margin-top: 0;
     display: block;
     font-size: 1.6rem;
   }
@@ -544,7 +545,6 @@ button {
 }
 
 #menu-icon {
-  margin-top: 0;
   font-size: 0.6rem;
   cursor: pointer;
   display: none;
