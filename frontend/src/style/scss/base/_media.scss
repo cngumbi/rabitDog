@@ -64,6 +64,9 @@
     }
 }
 @include responsive(phone){
+    .home-text h1{
+        font-size: 1rem;
+    }
     .about{
         text-align: center;
     }

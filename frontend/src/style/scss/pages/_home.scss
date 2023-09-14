@@ -1,15 +1,15 @@
 .home {
     margin-top: .5em;
-    height: 550px;
+    height: 30em;
     @include display-flex;
     align-items: center;
 }
 .home-image{
     position: absolute;
-    width: 66%;
+    width: 76%;
 }
 .home-image > img{
-    height: 550px;
+    height: 30em;
     border-radius: 1.5em;
 }
 .home-text{

@@ -1,6 +1,6 @@
 
 //import styles
-import './style/scss/kwito.scss';
+import './style/css/kwito.min.css';
 import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
