@@ -21,7 +21,7 @@ const Header = {
         return `
             <div class="nav container">
                 <!--logo-->
-                <a href="/" class="logo"><i class='bx bx-home'></i>Mwendya planners</a>
+                <a href="/" class="logo"><i class='bx bx-home'></i>Mwendya</a>
                 <!--Menu Icons-->
                 <input type="checkbox" name="" id="menu">
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
