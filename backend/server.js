@@ -1,10 +1,15 @@
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 const path = require("path");
-const db = require("./config/mongoosDB");
+const session = require("express-session");
+var passport = require("passport");
+var crypto = require("crypto");
+const  db = require("./config/mongoosDB");
 //const ContactRoute = require("./routes/contactRoutes");
 const config = require("./config/config");
+//mongoStore middleware
+const MongoStore = require("connect-mongo");
 //const ServiceRoute = require("./routes/serviceRoute");
 const UserRoute = require("./routes/userRoute");
 const OrderRoute = require("./routes/ordrerRoute");
@@ -12,12 +17,29 @@ const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 
 
+
 const app = express();
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use('/api/uploads', UploadRoute);
+//middleware
+app.use(cors()); 
+//app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+/*------------------SESSION SETUP------------------------*/
+const sessionStore = new MongoStore({
+  mongoUrl:config.MONGODB_URL,
+  ttl: 86400, // ttl set for a day
+  autoRemove: 'interval',
+  autoRemoveInterval: 10, // In minutes. Default
+  //dbName: 'test', 
+  collectionName: 'sessions',
+  touchAfter: 1 * 3600, // time period in seconds set for one hour
+});
+app.use(session({
+  store: sessionStore,
+}));
 app.use('/api/users', UserRoute);
+app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/orders', OrderRoute);
 //app.use('/api/contacts', ContactRoute);
