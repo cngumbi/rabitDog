@@ -41,6 +41,7 @@ jobs:
                 pm2 stop 0
                 pm2 start 0
                 pm2 save
+              #job status check if:success, always, failure can be used to check the status of the jobs
             - name: if Failure
               if: ${{ failure() }}
               run: |
