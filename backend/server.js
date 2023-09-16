@@ -17,7 +17,6 @@ const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 
 
-
 const app = express();
 
 //middleware
