@@ -28,15 +28,37 @@ app.use(express.urlencoded({extended: true}));
 const sessionStore = new MongoStore({
   mongoUrl:config.MONGODB_URL,
   ttl: 86400, // ttl set for a day
-  autoRemove: 'interval',
-  autoRemoveInterval: 10, // In minutes. Default
-  //dbName: 'test', 
+  autoRemove: 'native', // native, interval, disabled
+  //autoRemoveInterval: 10, // In minutes. Default
+  dbName: 'test', 
   collectionName: 'sessions',
   touchAfter: 1 * 3600, // time period in seconds set for one hour
 });
+//seting secure cookie for production
+var sess = {
+  secret: config.SESSION_SECRET,
+  cookie:{
+    maxAge: 1000 * 60 * 60 * 24 //equals 1 day (1 day * 24hr/1day * 60 min/1hr * 60sec/1min)
+  }
+}
+if(app.get('env') === 'production'){
+  app.set('trust proxy', 1) //trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
 app.use(session({
+  genid: function(req){
+    return genuuid() //use UUIDs for session IDs
+  },
+  secret:config.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
   store: sessionStore,
+  sess
+  //cookie:{
+  //  maxAge: 1000 * 60 * 60 * 24 //equals 1 day (1 day * 24hr/1day * 60 min/1hr * 60sec/1min)
+  //}
 }));
+/*--------------------------end of session setup------------------------*?
 app.use('/api/users', UserRoute);
 app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
