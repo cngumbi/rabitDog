@@ -23,7 +23,7 @@ jobs:
         steps:
             #checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - name: checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@master
               with:
                 presist-credentials: false
 
@@ -41,3 +41,18 @@ jobs:
                 pm2 stop 0
                 pm2 start 0
                 pm2 save
+            - name: if Failure
+              if: ${{ failure() }}
+              run: |
+                curl --requst POSt \
+                -- url https://api.github.com/repos/${{ github.repository }}/issues \
+                --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+                --header 'content-type: application/json' \
+                --data '{
+                  "title": "Issue Created due to workflow failure:
+                    ${{ github.run_id }}",
+                  "body": "Issue automatically Created by 
+                  GITHUB Action workflow **${{ github.workflow }}**. \n\n due
+                  to failure in run: _${{ github.run_id }}_."
+                }'
+                
