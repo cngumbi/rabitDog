@@ -9,6 +9,9 @@ package-lock.json
 .vscode
 #--------------------------
 main.js
+passport.js
+passWordUtils.js
+tes.js
 dist/
 #webpack configuration files
 #webpack.config.js

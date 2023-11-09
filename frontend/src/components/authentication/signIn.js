@@ -32,7 +32,7 @@ const SignIn = {
                     <h2> Login to continue</h2>
                     <p> use the data Created During registration</p>
                     <!--login form-->
-                    <form action="" id="signin-form">
+                    <form action="" method="post" id="signin-form">
                         <span>Enter your email address</span>
                         <input type="email" name="" id="email" placeholder="yourmail@gmail.com" required>
                         <span>Enter your Password</span>
