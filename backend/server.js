@@ -58,7 +58,7 @@ app.use(session({
   //  maxAge: 1000 * 60 * 60 * 24 //equals 1 day (1 day * 24hr/1day * 60 min/1hr * 60sec/1min)
   //}
 }));
-/*--------------------------end of session setup------------------------*?
+/*--------------------------end of session setup------------------------*/
 app.use('/api/users', UserRoute);
 app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
