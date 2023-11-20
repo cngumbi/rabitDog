@@ -14,14 +14,15 @@ const reviewSchema = new mongoose.Schema({
 }, { timestamps: true});
 
 const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    description: { type: String, required: true },
-    category: { type: String, required: true },
-    brand: { type: String, required: true },
-    image: { type: String, required: true },
-    price: { type: Number,default: 0.0, required: true },
-    rating: { type: Number, default: 0.0, required: true},
-    numReviews: { type: Number, default: 0, required: true},
+    name: { type: String },
+    description: { type: String },
+    category: { type: String },
+    brand: { type: String },
+    image: { type: String},
+    price: { type: Number,default: 0.0 },
+    rating: { type: Number, default: 0.0 },
+    countInStock: {type: Number, default: 0 },
+    numReviews: { type: Number, default: 0 },
     reviews: [reviewSchema],
 }, {timestamps: true});
 

@@ -28,6 +28,37 @@ export const getUserInfo = ()=>{
 export const clearUser = ()=>{
     localStorage.removeItem('userInfo');
 };
+/*set product info
+export const setProductInfo = ({
+    _id = '',
+    name = '',
+    price = '',
+    image = '',
+    brand = '',
+    category = '',
+    countInStock = '',
+    description = ''
+  }) => {
+    localStorage.setItem(
+      'userInfo',
+      JSON.stringify({
+        _id,
+        name,
+        price,
+        image,
+        brand,
+        category,
+        countInStock,
+        description
+      })
+    );
+  };
+  export const getProductInfo = () => {
+    return localStorage.getItem('userInfo')
+      ? JSON.parse(localStorage.getItem('userInfo'))
+      : { name: '', price: '', image: '', brand: '', category: '', countInStock: '', description: '' };
+  };
+  */
 export const getCartItems = ()=>{
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
     return cartItems;

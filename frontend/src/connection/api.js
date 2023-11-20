@@ -112,11 +112,11 @@ export const getProduct = async(id)=>{
         return {error: err.response.data.message || err.message };
     }
 };
-export const createProduct = async(name, price, image, brand, category, countInStock, description)=>{
+export const createProduct = async({name, price, brand, category, countInStock, description})=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
-            url: `${apiURL}/api/products/createdproducts`,
+            url: `${apiURL}/api/products/new`,
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
@@ -125,20 +125,19 @@ export const createProduct = async(name, price, image, brand, category, countInS
             data: {
                 name,
                 price,
-                image,
                 brand,
                 category,
                 countInStock,
                 description
             },
         });
-        if(response.statusText !== 'OK'){
+        if(response.statusText !== 'Created'){
             throw new Error(response.data.message);
         }
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return {error: err.message };
     }
 };
 export const createReview = async(productId, review)=>{
@@ -215,7 +214,7 @@ export const uploadProductImage = async(formData)=>{
             },
             data: formData,
         });
-        if(response.statusText !== 'OK'){
+        if(response.statusText !== 'Created'){
             throw new Error(response.data.message);
         }
         return response.data;

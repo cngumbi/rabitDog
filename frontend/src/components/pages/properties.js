@@ -44,7 +44,7 @@ const Properties = {
                                     <p>${product.brand}</p>
                                 </div>
                                 <div class="icon">
-                                    <i class='bx bx-user'><span>${property.category}</span></i>
+                                    <i class='bx bx-user'><span>${product.category}</span></i>
                                 </div>
                             </div>
                             <div class="properties-rating">

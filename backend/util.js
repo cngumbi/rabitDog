@@ -19,7 +19,7 @@ const isAuth = (req, res, next) => {
 
     } else {
         const token = bearerToken.slice(7, bearerToken.length);
-        jwt.verify(token, config.JWT_SECRET, (err, data) => {
+        jsonWT.verify(token, config.JWT_SECRET, (err, data) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
             } else {

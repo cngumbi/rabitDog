@@ -76,12 +76,10 @@ UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
     } else {
         user.name = req.body.name || user.name;
         user.userName = req.body.userName || user.userName;
-        user.phoneNumber = req.body.phoneNumber || user.phoneNumbe;
+        user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
         user.email = req.body.email || user.email;
         user.password = req.body.password || user.password;
-
         const updateUser = await user.save();
-
         res.send({
             _id: updateUser._id,
             name: updateUser.name,

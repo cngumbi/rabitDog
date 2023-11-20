@@ -18,6 +18,8 @@ import ProductPage from './components/product/productPage';
 import ListingProduct from './components/product/listingProduct';
 import EditProduct from './components/product/editProduct';
 import AddProduct from './components/product/addProdut';
+import ShippingPage from './shipping/Shipping';
+import PaymentMethods from './components/payment/payment';
 
 
 //setting the favicon of the site
@@ -39,7 +41,9 @@ const routes = {
     '/listproduct': ListingProduct,
     '/createproduct': AddProduct,
     '/cart': CartPage,
-    '/cart/:id': CartPage
+    '/cart/:id': CartPage,
+    '/shipping': ShippingPage,
+    '/payment': PaymentMethods
 };
 
 const router = async () => {
