@@ -51,7 +51,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
       return `
       <div class="content">
         <div>
-          <a href="/#/productlist">Back to products</a>
+          <a href="/#/listproduct">Back to products</a>
         </div>
         <div class="form-container">
           <form id="edit-product-form">

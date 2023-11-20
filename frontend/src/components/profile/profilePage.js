@@ -1,5 +1,6 @@
-import { getMyOrders } from "../../connection/api";
+import { update } from "../../connection/api";
 import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
+import { hideLoading, showLoading, showMessage } from "../../utils";
 
 const Profile = {
     vignette: ()=>{
@@ -14,6 +15,8 @@ const Profile = {
               showLoading();
               const data = await update({
                 name: document.getElementById('name').value,
+                userName: document.getElementById('userName').value,
+                phoneNumber: document.getElementById('phoneNumber').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value,
               });
@@ -27,11 +30,10 @@ const Profile = {
             });
           },
     render: async()=>{
-        const {name, email} = getUserInfo();
+        const {name, userName, phoneNumber, email} = getUserInfo();
         if(!name){
             document.location.hash = '/';
         }
-        const orders = await getMyOrders();
         return `
         <div class="content profile">
           <div class="profile-info">
@@ -44,6 +46,14 @@ const Profile = {
               <li>
                 <label for="name">Name</label>
                 <input type="name" name="name" id="name" value="${name}" />
+              </li>
+              <li>
+                <label for="userName">userName</label>
+                <input type="text" name="userName" id="userName" value="${userName}" />
+              </li>
+              <li>
+                <label for="phoneNumber">phoneNumber</label>
+                <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber}" />
               </li>
               <li>
                 <label for="email">Email</label>

@@ -1,4 +1,5 @@
 import { createProduct, uploadProductImage } from "../../connection/api";
+import { setProductInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
 
@@ -11,9 +12,8 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
           e.preventDefault();
           showLoading();
           const data = await createProduct({
-            name: document.getElementById('name').value,
+            name: document.getElementById('productName').value,
             price: document.getElementById('price').value,
-            image: document.getElementById('image').value,
             brand: document.getElementById('brand').value,
             category: document.getElementById('category').value,
             countInStock: document.getElementById('countInStock').value,
@@ -23,23 +23,8 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
           if (data.error) {
             showMessage(data.error);
           } else {
-            document.location.hash = '/productlist';
-          }
-        });
-      document
-        .getElementById('image-file')
-        .addEventListener('change', async (e) => {
-          const file = e.target.files[0];
-          const formData = new FormData();
-          formData.append('image', file);
-          showLoading();
-          const data = await uploadProductImage(formData);
-          hideLoading();
-          if (data.error) {
-            showMessage(data.error);
-          } else {
-            showMessage('Image uploaded successfully.');
-            document.getElementById('image').value = data.image;
+            //setProductInfo(data)
+            document.location.hash = '/listproduct';
           }
         });
     },
@@ -49,47 +34,24 @@ import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
         ${DashboardMenu.render({ selected: "createproducts" })}
         <div class="content">
           <div>
-            <a href="/#/productlist">Back to products</a>
+            <a href="/#/listproduct">Back to products</a>
           </div>
           <div class="form-container">
-            <form id="add-product-form">
-              <ul class="form-items">
-                <li>
-                  <h1>Add Product </h1>
-                </li>
-                <li>
-                  <label for="name">Name</label>
-                  <input type="text" name="name" id="name" />
-                </li>
-                <li>
-                  <label for="price">Price</label>
-                  <input type="number" name="price" id="price" />
-                </li>
-                <li>
-                  <label for="image">Image (680 x 830)</label>
-                  <input type="text" name="image" id="image" />
-                  <input type="file" name="image-file" id="image-file" />
-                </li>
-                <li>
-                  <label for="brand">Brand</label>
-                  <input type="text" name="brand" id="brand" />
-                </li>
-                <li>
-                  <label for="countInStock">Count In Stock</label>
-                  <input type="text" name="countInStock" id="countInStock" />
-                </li>
-                <li>
-                  <label for="category">Category</label>
-                  <input type="text" name="category" id="category" />
-                </li>
-                <li>
-                  <label for="description">Description</label>
-                  <input type="text" name="description" id="description" />
-                </li>
-                <li>
-                  <button type="submit" class="">Add</button>
-                </li>
-              </ul>
+            <form action="" id="add-product-form">
+                <span>Add Product </span>
+                <span>Name </span>
+                <input type="text" name="productName" id="productName" placeholder="Product Name" />
+                <span>price </span>
+                <input type="number" name="price" id="price" placeholder="price" />
+                <span>brand </span>
+                <input type="text" name="brand" id="brand" placeholder="brand" />
+                <span>count In Stock</span>
+                <input type="number" name="countInStock" id="countInStock" placeholder="Count In Stock" />
+                <span>category </span>
+                <input type="text" name="category" id="category" placeholder="category" />
+                <span>description </span>
+                <input type="text" name="description" id="description" placeholder="description" />
+                <input type="submit" class="button" value="Add Product">
             </form>
           </div>
         

@@ -9,6 +9,7 @@
   --hover-color: #1ddb9c;
   --skin-color: #ff0000;
   --hover-text: #dad3d3;
+  --box-color: #c0c0c0;
 }
 
 :root {
@@ -486,6 +487,136 @@ button {
 
 .overlay > div > * {
   margin: 2rem;
+}
+
+.checkout-steps {
+  display: flex;
+  justify-content: space-between;
+  width: 40rem;
+  margin: 1rem auto;
+}
+
+.checkout-steps > div {
+  border-top: 0.3rem var(--box-color) solid;
+  color: var(--box-color);
+  flex: 1 1;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.checkout-steps > div.active {
+  color: var(--second-color);
+  border-top-color: var(--second-color);
+}
+
+.shipping {
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  align-items: center;
+  max-height: 50vh;
+  padding-left: 25em;
+}
+
+.shipping-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.shipping-container form {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.shipping-container form span {
+  font-size: 1.7rem;
+  color: var(--second-color);
+  margin-bottom: 4px;
+}
+
+.shipping-container form input {
+  border: 1px solid #8a8a8a;
+  outline: none;
+  padding: 6px;
+  margin-bottom: 0.5rem;
+  background: var(--bg-color, #ffffff);
+}
+
+.shipping-container form .button {
+  outline: none;
+  border: none;
+  background: var(--main-color, #2aaf83);
+  color: var(--bg-color, #ffffff);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.shipping-container form a {
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+.shipping-container .btn {
+  border-radius: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.payment {
+  display: grid;
+  grid-template-columns: 0.4fr 1fr;
+  align-items: center;
+  max-height: 50vh;
+  padding-left: 25em;
+}
+
+.payment-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0.5rem;
+}
+
+.payment-container form {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.payment-container form span {
+  font-size: 1.7rem;
+  color: var(--second-color);
+  margin-bottom: 4px;
+}
+
+.payment-container form input {
+  border: 1px solid #8a8a8a;
+  outline: none;
+  padding: 6px;
+  margin-bottom: 0.5rem;
+  background: var(--bg-color, #ffffff);
+}
+
+.payment-container form .button {
+  outline: none;
+  border: none;
+  background: var(--main-color, #2aaf83);
+  color: var(--bg-color, #ffffff);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.payment-container form a {
+  font-size: 0.7rem;
+  text-align: right;
+}
+
+.payment-container .btn {
+  border-radius: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 
 .header-section {

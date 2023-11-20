@@ -1,7 +1,7 @@
 const Rating = {
     render:(cons)=>{
         if(!cons.value){
-            render `<div></div>`;
+            return `<div></div>`;
         }
         return `
         <div class="">

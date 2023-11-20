@@ -18,22 +18,29 @@ ProductRoute.get('/:id',expressAsync(async(req, res)=>{
     const product = await Product.findById(req.params.id);
     res.send(product);
 }));
-ProductRoute.post('/createdproducts', isAuth, isAdmin, expressAsync(async(req, res)=>{
+ProductRoute.post('/new', isAuth, isAdmin, expressAsync(async (req, res)=>{
     const product = new Product({
         name:  req.body.name,
         price:  req.body.price,
-        image:  req.body.image,
         brand:  req.body.brand,
         category:  req.body.category,
         countInStock:  req.body.countInStock,
         description:  req.body.description,
     });
     const createProduct = await product.save();
-    if(createProduct){
-        res.status(201).send({ message: 'Product created', product: createProduct });
-
-    }else{
+    if(!createProduct){
+        //res.status(201).send({ message: 'Product created', product: createProduct });
         res.status(500).send({ message: 'Error in creating Product'});
+    }else{
+        res.send({
+            _id: createProduct._id,
+            name: createProduct.name,
+            price: createProduct.price,
+            brand: createProduct.brand,
+            category: createProduct.category,
+            countInStock: createProduct.countInStock,
+            description: createProduct.description
+        });
     }
 }));
 ProductRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
