@@ -1,6 +1,6 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
-const { generateToken, isAuth, isAdmin } = require('../util');
+const { isAuth, isAdmin } = require('../util');
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
@@ -78,11 +78,16 @@ OrderRoute.post('/', isAuth, expressAsync(async(req, res) => {
         totalPrice: req.body.totalPrice,
     });
     const createOrder = await order.save();
-    if (!createdUser) {
-        res.status(201).send({
-            message: 'New Order Created', order: createOrder
-        });
-    }
+    res.status(201).send({
+        message: 'New Order Created', order: createOrder
+    });
+    //if (createOrder) {
+    //    res.status(201).send({
+    //        message: 'New Order Created', order: createOrder
+    //    });
+    //}else{
+    //    res.status(404).send({message: 'Order Not Created'});
+    //}
 }));
 OrderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const order = await Order.findById(req.params.id);

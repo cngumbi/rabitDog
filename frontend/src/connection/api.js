@@ -91,7 +91,7 @@ export const getProducts = async ({ searchKeyword = "" }) => {
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getProduct = async(id)=>{
@@ -109,7 +109,7 @@ export const getProduct = async(id)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const createProduct = async({name, price, brand, category, countInStock, description})=>{
@@ -137,7 +137,7 @@ export const createProduct = async({name, price, brand, category, countInStock, 
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const createReview = async(productId, review)=>{
@@ -158,7 +158,7 @@ export const createReview = async(productId, review)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const deleteProduct = async(productId)=>{
@@ -178,7 +178,7 @@ export const deleteProduct = async(productId)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const updateProduct = async(product)=>{
@@ -199,7 +199,7 @@ export const updateProduct = async(product)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const uploadProductImage = async(formData)=>{
@@ -220,7 +220,7 @@ export const uploadProductImage = async(formData)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const createOrder = async(order)=>{
@@ -241,7 +241,7 @@ export const createOrder = async(order)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getOrders = async()=>{
@@ -261,14 +261,14 @@ export const getOrders = async()=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const deleteOrder = async(orderId)=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
-            url: `${apiURL}/api/order/${orderId}`,
+            url: `${apiURL}/api/orders/${orderId}`,
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
@@ -281,7 +281,7 @@ export const deleteOrder = async(orderId)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getOrder = async(id)=>{
@@ -300,7 +300,7 @@ export const getOrder = async(id)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getMyOrders = async()=>{
@@ -319,7 +319,7 @@ export const getMyOrders = async()=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getPaypalClientId = async()=>{
@@ -336,7 +336,7 @@ export const getPaypalClientId = async()=>{
         return response.data.clientId;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const payOrder = async(orderId, paymentResult)=>{
@@ -357,7 +357,7 @@ export const payOrder = async(orderId, paymentResult)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const deliverOrder = async(orderId)=>{
@@ -377,7 +377,7 @@ export const deliverOrder = async(orderId)=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };
 export const getSemmary = async()=>{
@@ -397,6 +397,6 @@ export const getSemmary = async()=>{
         return response.data;
     }catch(err){
         console.log(err);
-        return {error: err.response.data.message || err.message };
+        return { error: err.response ? err.response.data.message : err.message };
     }
 };

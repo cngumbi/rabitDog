@@ -798,6 +798,20 @@ button {
   font-weight: 700;
 }
 
+.rating {
+  color: #ffc000;
+  font-size: 1.8rem;
+}
+
+.rating span:last-child {
+  color: #444444;
+  font-size: 1.4rem;
+}
+
+.content {
+  padding: 1rem;
+}
+
 .home {
   margin-top: 0.5em;
   height: 27em;

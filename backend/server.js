@@ -64,6 +64,9 @@ app.use('/api/users', UserRoute);
 app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/orders', OrderRoute);
+app.get('/api/paypal/clientId', (req, res)=>{
+  res.send({ clientId: config.PAYPAL_CLIENT_ID });
+});
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
 /*app.get('/api/paypal/clientId', (req, res)=>{

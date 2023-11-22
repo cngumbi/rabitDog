@@ -1,12 +1,7 @@
-import {
-  getCartItems,
-  getShipping,
-  getPayment,
-  cleanCart,
-} from '../localStorage';
-import CheckoutSteps from '../components/CheckoutSteps';
-import { showLoading, hideLoading, showMessage } from '../utils';
-import { createOrder } from '../api';
+import { createOrder } from "../../connection/api";
+import { cleanCart, getCartItems, getPayment, getShipping } from "../../localStorage";
+import { hideLoading, showLoading, showMessage } from "../../utils";
+import Checkout from "../Checkout";
 
 const convertCartToOrder = () => {
   const orderItems = getCartItems();
@@ -35,8 +30,8 @@ const convertCartToOrder = () => {
     totalPrice,
   };
 };
-const PlaceOrderScreen = {
-  after_render: async () => {
+const PlaceOrder = {
+  vignette: async () => {
     document
       .getElementById('placeorder-button')
       .addEventListener('click', async () => {
@@ -64,7 +59,7 @@ const PlaceOrderScreen = {
     } = convertCartToOrder();
     return `
     <div>
-      ${CheckoutSteps.render({
+      ${Checkout.render({
         step1: true,
         step2: true,
         step3: true,
@@ -131,4 +126,4 @@ const PlaceOrderScreen = {
     `;
   },
 };
-export default PlaceOrderScreen;
+export default PlaceOrder;

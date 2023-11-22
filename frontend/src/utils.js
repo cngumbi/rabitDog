@@ -1,4 +1,4 @@
-import { getCartItems, getUserInfo } from "./localStorage";
+import { getCartItems } from "./localStorage";
 
 
 //rerender function

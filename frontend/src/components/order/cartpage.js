@@ -4,6 +4,7 @@ import { getCartItems, setCartItems } from "../../localStorage";
 import { vitalize } from "../../utils";
 
 const addToCart = ( item, forceUpdate = false ) =>{
+    
     let cartItems = getCartItems();
     const existItem = cartItems.find( (x) => x.product === item.product );
     if(existItem){
@@ -73,11 +74,11 @@ const CartPage = {
                                         <img src="${item.image}"/>
                                     </div>
                                     <div class="">
-                                        <div><a href="/#/product/${item.product}">${item.name}</a></div>
+                                        <div><a href="/#//properties/${item.product}">${item.name}</a></div>
                                         <div>Qty: <select class="qty-select" id="${item.product}">
                                             ${[...Array(item.countInStock).keys()].map((x)=>item.qty === x + 1 ? `<option selected value="${x + 1}"> ${x + 1}</option>` : `<option value="${x + 1}"> ${x + 1}</option>`)}
                                         </select></div>
-                                        <button type="button" class="" id="${item.product}">Delete</button>
+                                        <button type="button" class="button" id="${item.product}">Delete</button>
                                     </div>
                                     <div class=""> Ksh ${item.price}</div>
                                 </li>

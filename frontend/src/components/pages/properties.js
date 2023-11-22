@@ -1,6 +1,6 @@
-import Rating from '../rating';
 import { getProducts } from '../../connection/api';
 import ParseRequestUrl  from '../../config/parseUrl';
+import Rating from '../rating';
 
 
 const Properties = {
@@ -34,7 +34,7 @@ const Properties = {
                     <!--property boxes-->
                     ${products.map( (product) => `
                         <div class="box">
-                            <a href="/#/property/${product._id}">
+                            <a href="/#/properties/${product._id}">
                                 <img src="${product.image}" alt="${product.name}">
                             </a>
                             <h3>Ksh ${product.price}</h3>
@@ -47,7 +47,8 @@ const Properties = {
                                     <i class='bx bx-user'><span>${product.category}</span></i>
                                 </div>
                             </div>
-                            <div class="properties-rating">
+                            <div class="">
+                                <div>${product.name}</div>
                                 ${Rating.render({
                                     value: product.rating,
                                     text: `${product.numReviews} reviews`,

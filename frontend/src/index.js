@@ -20,6 +20,8 @@ import EditProduct from './components/product/editProduct';
 import AddProduct from './components/product/addProdut';
 import ShippingPage from './shipping/Shipping';
 import PaymentMethods from './components/payment/payment';
+import PlaceOrder from './components/order/PlaceOrder';
+import OrderPage from './components/order/order';
 
 
 //setting the favicon of the site
@@ -32,18 +34,20 @@ const routes = {
     '/about': About,
     '/services': Services,
     '/properties': Properties,
+    '/properties/:id':ProductPage,
     '/user-current': SignIn,
     '/new-user-create': Registration,
     '/profile': Profile,
     '/dashboard': Dashboard,
-    '/product/:id': ProductPage,
     '/product/:id/edit': EditProduct,
     '/listproduct': ListingProduct,
     '/createproduct': AddProduct,
     '/cart': CartPage,
     '/cart/:id': CartPage,
+    '/order/:id':OrderPage,
     '/shipping': ShippingPage,
-    '/payment': PaymentMethods
+    '/payment': PaymentMethods,
+    '/placeorder': PlaceOrder,
 };
 
 const router = async () => {

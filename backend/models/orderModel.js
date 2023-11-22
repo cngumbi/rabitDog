@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     orderItems: [
         {
             name: {type: String, required: true},
-            image: {type: String, required: true},
+            image: {type: String},
             price: { type: Number, required: true },
             qty: { type: Number, required: true },
             product:{
@@ -33,9 +33,9 @@ const orderSchema = new mongoose.Schema({
     taxPrice: Number,
     shippingPrice: Number,
     totalPrice: Number,
-    isPaid: { type: Boolean, required: true},
+    isPaid: { type: Boolean},
     paidAt: Date,
-    isDelivered: { type: Boolean, required: true},
+    isDelivered: { type: Boolean},
     deliveredAt: Date,
 
 }, {timestamps: true});

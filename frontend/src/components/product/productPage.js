@@ -1,12 +1,12 @@
 import ParseRequestUrl from "../../config/parseUrl";
-import { createReview } from "../../connection/api";
+import { createReview, getProduct } from "../../connection/api";
 import { getUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
 import Rating from "../rating";
 
   
   const ProductPage = {
-    vingette: () => {
+    vignette: () => {
       const request = ParseRequestUrl();
       document.getElementById('add-button').addEventListener('click', () => {
         document.location.hash = `/cart/${request.id}`;
