@@ -67,15 +67,13 @@ app.use('/api/orders', OrderRoute);
 app.get('/api/paypal/clientId', (req, res)=>{
   res.send({ clientId: config.PAYPAL_CLIENT_ID });
 });
+
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
-/*app.get('/api/paypal/clientId', (req, res)=>{
-  res.send({ clientId: config.PAYPAL_CLIENT_ID});
-})*/
 app.use('/uploads', express.static(path.join(__dirname, '/../uploads')));
-app.use(express.static(path.join(__dirname, "/../frontend/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
+app.use(express.static(path.join(__dirname, "/../frontend")));
+app.get("/*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/../frontend/index.html"));
 });
 //middleware
 //error handling code to handle all errors in express instance

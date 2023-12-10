@@ -1,6 +1,6 @@
 import ParseRequestUrl from "../../config/parseUrl";
 import { deliverOrder, getOrder, getPaypalClientId, payOrder } from "../../connection/api";
-import { getUserInfo } from "../../localStorage";
+import { getPayment, getShipping, getUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
 
 const addPaypalSdk = async (totalPrice) => {
@@ -81,10 +81,12 @@ const addPaypalSdk = async (totalPrice) => {
     render: async () => {
       const { isAdmin } = getUserInfo();
       const request = ParseRequestUrl();
+      const shipping = getShipping();
+      const payment = getPayment();
       const {
         _id,
-        shipping,
-        payment,
+        
+        
         orderItems,
         itemsPrice,
         shippingPrice,
@@ -133,21 +135,19 @@ const addPaypalSdk = async (totalPrice) => {
                   <h2>Shopping Cart</h2>
                   <div>Price</div>
                 </li>
-                ${orderItems
-                  .map(
-                    (item) => `
-                  <li>
-                    <div class="cart-image">
-                      <img src="${item.image}" alt="${item.name}" />
-                    </div>
-                    <div class="cart-name">
-                      <div>
-                        <a href="/#/product/${item.product}">${item.name} </a>
-                      </div>
-                      <div> Qty: ${item.qty} </div>
-                    </div>
-                    <div class="cart-price"> $${item.price}</div>
-                  </li>
+                ${orderItems && orderItems.map((item) => `
+                      <li>
+                        <div class="cart-image">
+                          <img src="${item.image}" alt="${item.name}" />
+                        </div>
+                        <div class="cart-name">
+                          <div>
+                            <a href="/#/product/${item.product}">${item.name} </a>
+                          </div>
+                          <div> Qty: ${item.qty} </div>
+                        </div>
+                        <div class="cart-price"> $${item.price}</div>
+                      </li>
                   `
                   )
                   .join('\n')}
@@ -158,19 +158,19 @@ const addPaypalSdk = async (totalPrice) => {
              <ul>
                   <li>
                     <h2>Order Summary</h2>
-                   </li>
-                   <li><div>Items</div><div>$${itemsPrice}</div></li>
-                   <li><div>Shipping</div><div>$${shippingPrice}</div></li>
-                   <li><div>Tax</div><div>$${taxPrice}</div></li>
-                   <li class="total"><div>Order Total</div><div>$${totalPrice}</div></li>                  
-                   <li><div class="" id="paypal-button"></div></li>
-                   <li>
-                   ${
-                     isPaid && !isDelivered && isAdmin
-                       ? `<button id="deliver-order-button" class="primary fw">Deliver Order</button>`
-                       : ''
-                   }
-                   <li>
+                  </li>
+                  <li><div>Items</div><div>$${itemsPrice}</div></li>
+                  <li><div>Shipping</div><div>$${shippingPrice}</div></li>
+                  <li><div>Tax</div><div>$${taxPrice}</div></li>
+                  <li class="total"><div>Order Total</div><div>$${totalPrice}</div></li>                  
+                  <li><div class="" id="paypal-button"></div></li>
+                  <li>
+                     ${
+                       isPaid && !isDelivered && isAdmin
+                         ? `<button id="deliver-order-button" class="primary fw">Deliver Order</button>`
+                         : ''
+                     }
+                  </li>
                  
           </div>
         </div>

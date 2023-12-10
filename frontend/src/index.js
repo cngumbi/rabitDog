@@ -22,6 +22,7 @@ import ShippingPage from './shipping/Shipping';
 import PaymentMethods from './components/payment/payment';
 import PlaceOrder from './components/order/PlaceOrder';
 import OrderPage from './components/order/order';
+import OrderList from './components/order/listingOrder';
 
 
 //setting the favicon of the site
@@ -48,6 +49,7 @@ const routes = {
     '/shipping': ShippingPage,
     '/payment': PaymentMethods,
     '/placeorder': PlaceOrder,
+    '/orderlist': OrderList
 };
 
 const router = async () => {

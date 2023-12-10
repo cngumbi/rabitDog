@@ -16,3 +16,6 @@ dist/
 #webpack configuration files
 #webpack.config.js
 frontend1/
+#uploads files
+uploads/*.jpg
+uploads/*.png

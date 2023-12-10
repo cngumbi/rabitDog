@@ -5,11 +5,11 @@ import Rating from '../rating';
 
 const Properties = {
     vignette: ()=>{
-        document.getElementById('search-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const searchKeyword = document.getElementById('q').value;
-            document.location.hash = `/?q=${searchKeyword}`;
-        });
+        //document.getElementById('search-form').addEventListener('submit', async (e) => {
+        //    e.preventDefault();
+        //    const searchKeyword = document.getElementById('q').value;
+        //    document.location.hash = `/?q=${searchKeyword}`;
+        //});
     },
     render: async()=>{
         const { value } = ParseRequestUrl();

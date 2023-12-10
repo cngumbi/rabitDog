@@ -32,19 +32,16 @@ const convertCartToOrder = () => {
 };
 const PlaceOrder = {
   vignette: async () => {
-    document
-      .getElementById('placeorder-button')
-      .addEventListener('click', async () => {
+    document.getElementById('placeorder-button').addEventListener('click', async () => {
         const order = convertCartToOrder();
         showLoading();
         const data = await createOrder(order);
         hideLoading();
         if (data.error) {
           showMessage(data.error);
-        } else {
-          cleanCart();
-          document.location.hash = `/order/${data.order._id}`;
         }
+        cleanCart();
+        document.location.hash = `/order/${data.order._id}`;
       });
   },
   render: () => {
@@ -117,7 +114,7 @@ const PlaceOrder = {
                  <li><div>Tax</div><div>$${taxPrice}</div></li>
                  <li class="total"><div>Order Total</div><div>$${totalPrice}</div></li> 
                  <li>
-                 <button id="placeorder-button" class="primary fw">
+                 <button id="placeorder-button" class="button">
                  Place Order
                  </button>
         </div>

@@ -1,5 +1,5 @@
 import ParseRequestUrl from "../../config/parseUrl";
-import { getProduct, updateProduct } from "../../connection/api";
+import { getProduct, updateProduct, uploadProductImage } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 
  
@@ -25,7 +25,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
           if (data.error) {
             showMessage(data.error);
           } else {
-            document.location.hash = '/productlist';
+            document.location.hash = '/listproduct';
           }
         });
       document

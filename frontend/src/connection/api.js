@@ -380,7 +380,7 @@ export const deliverOrder = async(orderId)=>{
         return { error: err.response ? err.response.data.message : err.message };
     }
 };
-export const getSemmary = async()=>{
+export const getSummary = async()=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
