@@ -1,4 +1,3 @@
-
 //import styles
 import './style/css/kwito.min.css';
 import favicon from './assets/favicon.ico';

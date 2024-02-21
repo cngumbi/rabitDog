@@ -18,7 +18,7 @@ ProductRoute.get('/:id',expressAsync(async(req, res)=>{
     const product = await Product.findById(req.params.id);
     res.send(product);
 }));
-ProductRoute.post('/new', isAuth, isAdmin, expressAsync(async (req, res)=>{
+ProductRoute.post('/', isAuth, isAdmin, expressAsync(async (req, res)=>{
     const product = new Product({
         name:  req.body.name,
         price:  req.body.price,

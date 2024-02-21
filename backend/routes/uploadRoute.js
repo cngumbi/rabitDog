@@ -9,7 +9,7 @@ const { isAuth, isAdmin } = require('../util');
 
 const storageEngine = multer.diskStorage({
     destination: function(req, file, cb){
-        cb(null, 'uploads');
+        cb(null, 'uploads/');
     },
     filename: function(req, file, cb){
         let ext = path.extname(file.originalname);
@@ -38,7 +38,7 @@ const UploadRoute = express.Router();
 
 UploadRoute.post('/', isAuth, isAdmin, upload.single('image'), (req, res, next) => {
     //console.log(req.file);
-    res.status(201).send({ image: `\\${req.file.path}`});
+    res.status(201).send({ image: `${req.file.path}`});
     
 });
 

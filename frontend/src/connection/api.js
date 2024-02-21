@@ -116,7 +116,7 @@ export const createProduct = async({name, price, brand, category, countInStock, 
     try{
         const { token } = getUserInfo();
         const response = await axios({
-            url: `${apiURL}/api/products/new`,
+            url: `${apiURL}/api/products`,
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",

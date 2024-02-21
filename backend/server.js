@@ -2,15 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-//const session = require("express-session");
-//var passport = require("passport");
-//var crypto = require("crypto");
 const  db = require("./config/mongoosDB");
-//const ContactRoute = require("./routes/contactRoutes");
 const config = require("./config/config");
-//mongoStore middleware
-//const MongoStore = require("connect-mongo");
-//const ServiceRoute = require("./routes/serviceRoute");
 const UserRoute = require("./routes/userRoute");
 const OrderRoute = require("./routes/ordrerRoute");
 const UploadRoute = require("./routes/uploadRoute");
@@ -22,7 +15,6 @@ const app = express();
 //middleware
 app.use(cors()); 
 app.use(bodyParser.json());
-//app.use(express.json());
 app.use(bodyParser.urlencoded({extended: true}));
 /*------------------SESSION SETUP------------------------*/
 //const sessionStore = new MongoStore({
@@ -71,9 +63,9 @@ app.get('/api/paypal/clientId', (req, res)=>{
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
 app.use('/uploads', express.static(path.join(__dirname, '/../uploads')));
-app.use(express.static(path.join(__dirname, "/../frontend/")));
+app.use(express.static(path.join(__dirname, "/../frontend/dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/../frontend/index.html"));
+  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
 });
 //middleware
 //error handling code to handle all errors in express instance
