@@ -71,9 +71,9 @@ app.get('/api/paypal/clientId', (req, res)=>{
 //app.use('/api/contacts', ContactRoute);
 //app.use('/api/services', ServiceRoute);
 app.use('/uploads', express.static(path.join(__dirname, '/../uploads')));
-app.use(express.static(path.join(__dirname, "/../frontend/dist")));
-app.get("/*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
+app.use(express.static(path.join(__dirname, "/../frontend/")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/../frontend/index.html"));
 });
 //middleware
 //error handling code to handle all errors in express instance

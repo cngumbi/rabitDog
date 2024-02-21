@@ -415,3 +415,52 @@ class SymmetricMatrix extends Matrix {
 let matrix = new SymmetricMatrix(5, (x, y) => `${x},${y}`);
 console.log(matrix.get(2, 3));
 */
+/*
+const fs = require('fs');
+const { callbackify } = require('util');
+// check the statistics of the file
+fs.stat('index.html', function(err, stats){
+    if(err){ throw err;}
+    console.log(stats);
+});
+
+function openAndWriteToLogs(writeBuffer, callback){
+    fs.open('./logs/log.txt', 'a+', function opened(err, fd){
+        if(err){ throw err; }
+        function notifyError(err){
+            fs.close(fd, function(){
+                callback(err);
+            });
+        }
+        const bufferOffset = 0,
+              bufferLength = writeBuffer.length,
+              filePosition = null;
+        fs.write(fd, writeBuffer, bufferOffset, bufferLength, filePosition,
+            function wrote(err, writeBytes){
+            if(err){ return notifyError(err); }
+            fs.close(fd, function(){
+                callback(err);
+            });
+        });
+    });
+}
+openAndWriteToLogs(new Buffer.from('writing system logs'), function done(err){
+    if(err){
+        console.log("error while opening and writing:", err.message);
+        return;
+    }
+    console.log('All done with no errors')
+})
+*/
+const Data = {
+    render: ()=>{
+        return `
+            <html>
+                <title> hello</title>
+                <body> test the system</body>
+            </html>
+        `;
+    }
+};
+
+module.exports = Data;

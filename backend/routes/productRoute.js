@@ -22,6 +22,7 @@ ProductRoute.post('/new', isAuth, isAdmin, expressAsync(async (req, res)=>{
     const product = new Product({
         name:  req.body.name,
         price:  req.body.price,
+        image: req.body.image,
         brand:  req.body.brand,
         category:  req.body.category,
         countInStock:  req.body.countInStock,
@@ -36,6 +37,7 @@ ProductRoute.post('/new', isAuth, isAdmin, expressAsync(async (req, res)=>{
             _id: createProduct._id,
             name: createProduct.name,
             price: createProduct.price,
+            image: createProduct.image,
             brand: createProduct.brand,
             category: createProduct.category,
             countInStock: createProduct.countInStock,

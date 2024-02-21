@@ -19,3 +19,19 @@ frontend1/
 #uploads files
 uploads/*.jpg
 uploads/*.png
+
+#test file for learning
+test.js
+plus_one.js
+plus_one_test.js
+parent.js
+child.js
+chat_server.js
+client_tcp_server.js
+http_r_server.js
+http_server.js
+server_one.js
+logs/
+
+#webpack
+webpack.config-1.js

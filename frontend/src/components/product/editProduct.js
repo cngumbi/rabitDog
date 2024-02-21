@@ -54,7 +54,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
           <a href="/#/listproduct">Back to products</a>
         </div>
         <div class="form-container">
-          <form id="edit-product-form">
+          <form id="edit-product-form" enctype="multipart/form-data">
             <ul class="form-items">
               <li>
                 <h1>Edit Product ${product._id.substring(0, 8)}</h1>
