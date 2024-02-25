@@ -1,0 +1,6 @@
+# let's support old IE
+IE 8
+
+# let's support moder browsers
+> 1%                     # Browser usage over 1%
+last 2 versions          # or last two versions
