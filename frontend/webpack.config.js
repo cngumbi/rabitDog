@@ -1,75 +1,43 @@
+const { mode } = require('webpack-nano/argv');
 const path = require('path');
-//const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { merge } = require('webpack-merge');
+const commonParts = require('./config/webpack.common');
+const devParts = require('./config/webpack.dev');
+const prodParts = require('./config/webpack.prod');
 
 
-module.exports = {
-    mode: 'development',
-    entry: {
-        main: path.resolve(__dirname, 'src', 'index.js'),
-        //publicPath: path.resolve(__dirname, '../uploads')
-    },
-    output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: '[name].[contenthash].js',
-        clean: true,
-        assetModuleFilename: '[name][ext]'
-    },
-    devtool: 'source-map',
-    devServer: {
-        static: {
-            directory: path.resolve(__dirname, 'dist')
-        },
-        port: 4000,
-        open: true,
-        hot: true,
-        compress: true,
-        historyApiFallback: true
-    },
-    optimization: {
-        splitChunks: {
-            chunks: "all"
-        }
-    },
-    plugins: [
-        new HtmlWebpackPlugin({
-            title: 'For a fordable Tents design, Tent repair, tent for hire and other services visit | Quick One Service',
-            filename: 'index.html',
-            template: 'src/template.html'
-        }),
-        new MiniCssExtractPlugin({
-            filename: 'kyalo.[contenthash].css',
-        }),
-    ],
-    module: {
-        rules: [
-            {
-                test: /\.css$/i,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    
-                ],
-            },
-            /*
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env'
-                        ]
-                    }
-                }
-            },*/
-            {
-                test: /\.(png|jpg|jpe?g|gif|svg|ico)$/i,
-                type: 'asset/resource',
-                
-            },
-        ],
-    }, 
-}
+const cssLoaders = [commonParts.autoprefix()];
+
+const commonConfig = merge([
+    commonParts.clean(),
+    commonParts.startPoint,
+    commonParts.extractCSS({ loaders: cssLoaders }),
+    commonParts.loadImages({ limit: 15000 }),
+    commonParts.loadFonts({ limit: 50000}),
+    commonParts.page(),
+    commonParts.loadJavascript(),
+]);
+const productionConfig = merge([
+    //prodParts.purgeProduction(), //has an error
+    commonParts.generateSourceMaps({ type: "source-map" }),
+    prodParts.prodServer(),
+    commonParts.attachRevision(),
+    commonParts.minifyJavascript(),
+    commonParts.minifyCSS({ options: { preset: ["default"]}})
+]);
+
+const developmentConfig = merge([
+    devParts.devServer(),
+]);
+const getConfig = (mode)=>{
+    switch (mode){
+        case "production":
+            return merge(commonConfig, productionConfig, { mode });
+        case "development":
+            return merge(commonConfig, developmentConfig, { mode });
+        default:
+            throw new Error(`Trying to Use an Unknown ENV:mode, ${ mode }`);
+    }
+};
+
+module.exports = getConfig(mode);

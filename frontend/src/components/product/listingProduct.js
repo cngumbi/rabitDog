@@ -55,12 +55,10 @@ const ProductList = {
             <tr>
           </thead>
           <tbody>
-            ${products
-              .map(
-                (product) => `
+            ${products.map((product) => `
             <tr>
               <td>${product._id}</td>
-              <td>${product.image}</td>
+              <td><img src="${product.image}" alt="${product.name}"/></td>
               <td>${product.name}</td>
               <td>${product.price}</td>
               <td>${product.category}</td>

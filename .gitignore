@@ -34,4 +34,5 @@ server_one.js
 logs/
 
 #webpack
-webpack.config-1.js
+records.json
+stats.json
