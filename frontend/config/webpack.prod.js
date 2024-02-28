@@ -2,9 +2,9 @@ const path = require('path');
 const glob = require('glob');
 const { PurgeCSSPlugin } = require("purgecss-webpack-plugin");
 
-const ALL_FILES = glob.sync(path.join(__dirname, "src/*.js"));
 
-//has an error to be handled 
+const ALL_FILES = glob.sync(path.join(__dirname, "src/*.js"));
+//purgeProduction has an error to be handled 
 exports.purgeProduction = () => ({
     plugins: [
         new PurgeCSSPlugin({
@@ -19,6 +19,7 @@ exports.purgeProduction = () => ({
         }),
     ]
 });
+//--------------------------------------------------------
 exports.prodServer = () => ({
     optimization: { 
         splitChunks: {
