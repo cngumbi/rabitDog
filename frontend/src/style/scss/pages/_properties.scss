@@ -28,7 +28,7 @@
     background: var(--bg-color, #ffffff);
     padding: 0.7em;
     border-radius: 1em;
-    box-shadow: var(--box-shadow, 2px 2px 18px rgb(14 52 54 / 15%));
+    box-shadow: var(--box-shadow);
 }
 .properties-container .box:hover{
     transform: translateY(-10px);
