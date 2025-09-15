@@ -14,7 +14,10 @@
     box-sizing: inherit;
 }
 body{
-    line-height: 1.5;
+    display: flex;
+    background: #f4f6f9;
+    color: #333;
+    line-height: 1;
     font-family: var( --main-font, sans-serif);
     color: var(--text-color, #314862);
 }

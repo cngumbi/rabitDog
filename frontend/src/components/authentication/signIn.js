@@ -40,7 +40,6 @@ const SignIn = {
                         <input type="submit" value="Sign In" class="button">
                         <a href="#">Forget Password?</a>
                     </form>
-                    <a href="/#/new-user-create" class="btn">Sign Up</a>
                 </div>
                 <div class="login-image">
                     <img alt="" id="loginImage">

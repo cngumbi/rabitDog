@@ -1,5 +1,5 @@
 main{
-    display: block;
+    display: flex;
 }
 .container{
     max-width: 1068px;
@@ -7,10 +7,11 @@ main{
     margin-right: auto;
 }
 .main-section{
-    padding: 0.8em 0.5em;
+    top: 10;
+    padding: 0;
 }
 section{
-    padding: .8em;
+    padding: 0;
 }
 //.active{
 //    background: $main-color;

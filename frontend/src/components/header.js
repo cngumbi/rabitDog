@@ -2,19 +2,7 @@ import profileImg from '../assets/account.png';
 import { getUserInfo } from "../localStorage";
 
 const Header = {
-    vignette: ()=>{
-        //profile image
-        //const {name} = getUserInfo();
-        //if(name !== ""){
-        //    const profileImage = document.getElementById('profileImage');
-        //    profileImage.src = profileImg;
-        //    //signout
-        //    document.getElementById('signout').addEventListener('click', ()=>{
-        //        clearUser();
-        //        document.location.hash = '/';
-        //    });
-        //}
-        
+    vignette: ()=>{        
     },
     render: ()=>{
         const { userName, isAdmin } = getUserInfo();
@@ -25,19 +13,11 @@ const Header = {
                 <!--Menu Icons-->
                 <input type="checkbox" name="" id="menu">
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
-                <!--Nav List -->
-                <ul class="navbar">
-                    <li><a href="/#/home" class="navbar__links active">Home</a></li>
-                    <li><a href="/#/about" class="navbar__links">About Us</a></li>
-                    <li><a href="/#/services" class="navbar__links">Services</a></li>
-                    <li><a href="/#/properties" class="navbar__links">Properties</a></li>
-                </ul>  
                 ${
-                    userName ? `<a href="/#/profile" class="">${userName}</a>
-                    <a href="/#/cart" class="">Cart</a>` : `<a href="/#/user-current" class="btn">Log In</a>`
+                    userName ? `<a href="/#/profile" class="">${userName}</a>` : ``
                 }               
                 
-                ${ isAdmin ? `<a href="/#/dashboard" class="">Dashboard</a>` : ''}
+                ${ isAdmin ? `<a href="/#/new-user-create" class="">Sign Up new User</a>` : ''}
             </div>
         `;
     }

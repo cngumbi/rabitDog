@@ -41,12 +41,7 @@ export const showMessage = (message, callback)=>{
 //redirect function
 export const veer = ()=>{
     if(getCartItems().lenght !== 0){
-        document.location.hash = '/shipping';
-        //if(!getUserInfo().name){
-        //    document.location.hash = '/user-current';
-        //}else{
-        //    document.location.hash = '/';
-        //}
+        document.location.hash = '/dashboard';
     }else{
         document.location.hash = '/'
     }

@@ -1,3 +1,4 @@
+//abstracts
 @import 'abstracts/functions';
 @import 'abstracts/mixins';
 @import 'abstracts/variables';
@@ -8,21 +9,11 @@
 @import 'base/media';
 @import 'base/utilities';
 //components
-@import 'components/buttons';
-@import 'components/forms';
-@import 'components/loading';
-@import 'components/checkout';
-@import 'components/shipping';
-@import 'components/payment';
 //layout
+@import 'layout/dashboardMenu';
+@import 'layout/dashboard';
 @import 'layout/header';
+@import 'layout/main';
 @import 'layout/registration';
-@import 'layout/footer';
-@import 'layout/rating';
-
+//@import 'layout/footer';
 //pages
-@import 'pages/home';
-@import 'pages/about';
-@import 'pages/services';
-@import 'pages/properties';
-@import 'pages/contact';

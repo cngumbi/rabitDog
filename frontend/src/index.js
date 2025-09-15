@@ -4,7 +4,6 @@ import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
 import Header from './components/header';
-import Home from './components/pages/home';
 import About from './components/pages/about';
 import Services from './components/pages/services';
 import Properties from './components/pages/properties';
@@ -29,8 +28,7 @@ const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
 
 const routes = {
-    '/': Home,
-    '/home': Home,
+    '/': SignIn,
     '/about': About,
     '/services': Services,
     '/properties': Properties,

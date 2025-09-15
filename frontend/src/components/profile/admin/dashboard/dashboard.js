@@ -4,12 +4,13 @@ const Dashboard = {
     vignette: ()=>{},
     render: ()=>{
         return `
-        ${DashboardMenu.render({selected: 'dashboard'})}
-        <section class="dashboard container" id="dashboard">
-            <div class="">
-                <h3> dashboard</h3>
-            </div>
-        </section>
+        <div class="wrap">
+            ${DashboardMenu.render({selected: 'dashboard'})}
+            <main class="main" id="dashboard">
+                <h1> dashboard</h1>
+                
+            </main>
+        </div>
         `;
     }
 };

@@ -26,9 +26,10 @@ const Registration = {
         signupImage.src = signupImg;
     },
     render: ()=>{
-        if(getUserInfo().name){
+        /*if(getUserInfo().name){
             veer();
-        }
+        }*/
+       if(getUserInfo().isAdmin){
         return`
             <section class="login container">
                 <div class="login-container">
@@ -56,7 +57,7 @@ const Registration = {
                 </div>
             </section>
         
-        `;
+        `;}
     }
 };
 
