@@ -448,6 +448,7 @@ section {
 /*sidebar*/
 .sidebar {
   width: 200px;
+  top: -100px;
   background: #2c3e50;
   color: #fff;
   display: -webkit-box;
@@ -460,6 +461,9 @@ section {
   padding-top: .5em;
   border-radius: 0 10px 10px 0;
   min-height: 100v;
+  position: -webkit-sticky;
+  position: sticky;
+  /*keeps sidebar fixed*/
 }
 
 .sidebar nav {
@@ -507,11 +511,81 @@ nav .nav-item.selected {
   color: #f08040;
 }
 
-.wrap {
+/*main area*/
+.main {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding: 2em;
+}
+
+/* Topbar Styling (Sticky Header) */
+.topbar {
+  position: relative;
+  /* sticks to top */
+  overflow: hidden;
+  top: -35px;
+  left: 190px;
+  z-index: 1000;
+  width: 1100px;
+  height: 100%;
+  border-radius: 5px;
+  background: #fff;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+h4 {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  position: relative;
+  padding: 10px;
+  z-index: 1;
+  margin: 10px;
+}
+
+.search {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  width: 100%;
+  height: 5em;
+  margin-top: 0;
+  width: 100vw;
+}
+
+.text-box {
+  border: none;
+  padding: 5px;
+  width: 700px;
+  height: 32px;
+  color: #494949;
+  border: #1abc9c 1px solid;
+  outline: none;
+}
+
+.button {
+  background: #1abc9c;
+  color: white;
+  padding: 6px;
+  margin-top: .75em;
+  width: 15em;
+  height: 32px;
+  right: 10px;
+  text-align: center;
+  font-size: 1.1em;
+  margin-right: 10px;
+  border: none;
+}
+
+.button:hover {
+  cursor: pointer;
 }
 
 .header-section {
@@ -649,12 +723,13 @@ nav .nav-item.selected {
   margin-bottom: 0.7em;
 }
 
-/*main area*/
-.main {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  padding: 2em;
+.wrap {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  position: fixed;
+  top: 48px;
 }
 
 .login {

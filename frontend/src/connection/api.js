@@ -112,7 +112,59 @@ export const getProduct = async(id)=>{
         return { error: err.response ? err.response.data.message : err.message };
     }
 };
-export const createProduct = async({name, price, brand, category, countInStock, description})=>{
+//export const createProduct = async({name, price, brand, category, countInStock, description})=>{
+//    try{
+//        const { token } = getUserInfo();
+//        const response = await axios({
+//            url: `${apiURL}/api/products`,
+//            method: 'POST',
+//            headers: {
+//                "Content-Type": "application/json",
+//                Authorization: `Bearer ${token}`,
+//            },
+//            data: {
+//                name,
+//                price,
+//                brand,
+//                category,
+//                countInStock,
+//                description
+//            },
+//        });
+//        if(response.statusText !== 'Created'){
+//            throw new Error(response.data.message);
+//        }
+//        return response.data;
+//    }catch(err){
+//        console.log(err);
+//        return { error: err.response ? err.response.data.message : err.message };
+//    }
+//};
+export const createSubscriber = async(
+    {
+        title, 
+        firstName, 
+        middleName,
+        surName, 
+        accountType, 
+        telePhone, 
+        installationContact,
+        City, 
+        apartmentNumber,
+        floorNumber,
+        Estate,
+        area,
+        road,
+        GPS,
+        buildingName,
+        billingFrequency,
+        email,
+        contactPerson,
+        contactNumber,
+        dateCreated,
+        timeCreated
+
+    })=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
@@ -123,12 +175,27 @@ export const createProduct = async({name, price, brand, category, countInStock, 
                 Authorization: `Bearer ${token}`,
             },
             data: {
-                name,
-                price,
-                brand,
-                category,
-                countInStock,
-                description
+                title, 
+                firstName, 
+                middleName,
+                surName, 
+                accountType, 
+                telePhone, 
+                installationContact,
+                City, 
+                apartmentNumber,
+                floorNumber,
+                Estate,
+                area,
+                road,
+                GPS,
+                buildingName,
+                billingFrequency,
+                email,
+                contactPerson,
+                contactNumber,
+                dateCreated,
+                timeCreated
             },
         });
         if(response.statusText !== 'Created'){
@@ -140,6 +207,7 @@ export const createProduct = async({name, price, brand, category, countInStock, 
         return { error: err.response ? err.response.data.message : err.message };
     }
 };
+
 export const createReview = async(productId, review)=>{
     try{
         const { token } = getUserInfo();

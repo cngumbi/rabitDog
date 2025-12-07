@@ -2,6 +2,7 @@
 /*sidebar*/
 .sidebar{
   width: 200px;
+  top: -100px;
   background: #2c3e50;
   color: #fff;
   display: flex;
@@ -9,7 +10,7 @@
   padding-top: .5em;
   border-radius: 0 10px 10px 0;
   min-height: 100v;
-  //position: sticky; /*keeps sidebar fixed*/
+  position: sticky; /*keeps sidebar fixed*/
 }
 .sidebar nav{
   display: flex;

@@ -4,9 +4,7 @@ import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
 import Header from './components/header';
-import About from './components/pages/about';
-import Services from './components/pages/services';
-import Properties from './components/pages/properties';
+import Services from './components/profile/pages/services';
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
 import CartPage from './components/order/cartpage';
@@ -21,7 +19,9 @@ import PaymentMethods from './components/payment/payment';
 import PlaceOrder from './components/order/PlaceOrder';
 import OrderPage from './components/order/order';
 import OrderList from './components/order/listingOrder';
-
+//import NewSubscriber from './components/profile/pages/newSubscriber';
+import AllSubscribers from './components/profile/pages/allSubscribers';
+import NewSubscriber from './components/profile/pages/newSubscriber';
 
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
@@ -29,9 +29,9 @@ faviconImg.href = favicon;
 
 const routes = {
     '/': SignIn,
-    '/about': About,
+    '/newsubscriber': NewSubscriber,
+    '/allsubscribers': AllSubscribers,
     '/services': Services,
-    '/properties': Properties,
     '/properties/:id':ProductPage,
     '/user-current': SignIn,
     '/new-user-create': Registration,
