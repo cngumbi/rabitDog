@@ -38,6 +38,7 @@ const Registration = {
                         <span>Confirm Password</span>
                         <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
                         <input type="submit" value="SignIn" class="button">
+                        <a href="/#/user-current">Have an account, Login.</a>
                     </form>
                 </div>
                 <!--<div class="login-image">
