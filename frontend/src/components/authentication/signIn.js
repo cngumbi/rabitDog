@@ -1,11 +1,11 @@
-import loginImage from '../../assets/welcome.jpg';
+//import loginImage from '../../assets/welcome.jpg';
 import { signIn } from '../../connection/api';
 import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
 const SignIn = {
     vignette: ()=>{
         const loginImg = document.getElementById('loginImage');
-        loginImg.src = loginImage;
+        //loginImg.src = loginImage;
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
             showLoading();
@@ -41,9 +41,9 @@ const SignIn = {
                         <a href="#">Forget Password?</a>
                     </form>
                 </div>
-                <div class="login-image">
+                <!--<div class="login-image">
                     <img alt="" id="loginImage">
-                </div>
+                </div>-->
             </section>
         
         `;

@@ -1,4 +1,4 @@
-import signupImg from '../../assets/account.png';
+//import signupImg from '../../assets/account.png';
 import {register} from '../../connection/api';
 import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
@@ -23,7 +23,7 @@ const Registration = {
             }
         });
         const signupImage = document.getElementById('signupImage');
-        signupImage.src = signupImg;
+       // signupImage.src = signupImg;
     },
     render: ()=>{
         /*if(getUserInfo().name){
@@ -52,9 +52,9 @@ const Registration = {
                         <input type="submit" value="SignIn" class="button">
                     </form>
                 </div>
-                <div class="login-image">
+                <!--<div class="login-image">
                     <img alt="" id="signupImage">
-                </div>
+                </div>-->
             </section>
         
         `;}

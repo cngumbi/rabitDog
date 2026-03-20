@@ -685,24 +685,33 @@ h4 {
 }
 
 .login {
-  display: grid;
+  display: flex;
   grid-template-columns: 0.4fr 1fr;
   align-items: center;
   max-height: 80vh;
+  margin-top: 5em;
+  margin-left: 33em;
+  border: 0.1em solid #2aaf83;
+  border-radius: 2%;
 }
 
 .login-container {
   display: flex;
   flex-direction: column;
   row-gap: 0.5rem;
+  margin: 0.2em;
+  padding: 2em;
 }
 
 .login-container h2 {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  text-decoration: underline;
+  text-transform: uppercase;
 }
 
 .login-container p {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 .login-container form {
@@ -711,15 +720,16 @@ h4 {
 }
 
 .login-container form span {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: #8a8a8a;
   margin-bottom: 4px;
 }
 
 .login-container form input {
-  border: 1px solid #8a8a8a;
+  border: 1px solid #e6e4e4;
   outline: none;
-  padding: 6px;
+  padding: 10px;
+  border-radius: 1em;
   margin-bottom: 0.5rem;
   background: var(--bg-color, #ffffff);
 }
