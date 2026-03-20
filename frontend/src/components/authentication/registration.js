@@ -1,4 +1,3 @@
-//import signupImg from '../../assets/account.png';
 import {register} from '../../connection/api';
 import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
@@ -8,9 +7,9 @@ const Registration = {
             e.preventDefault();
             showLoading();
             const data = await register({
-                name: document.getElementById('fullName').value,
-                userName: document.getElementById('userName').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
+                //name: document.getElementById('fullName').value,
+                //userName: document.getElementById('userName').value,
+                //phoneNumber: document.getElementById('phoneNumber').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             });
@@ -26,10 +25,6 @@ const Registration = {
        // signupImage.src = signupImg;
     },
     render: ()=>{
-        /*if(getUserInfo().name){
-            veer();
-        }*/
-       //if(getUserInfo().isAdmin){
         return`
             <section class="login container">
                 <div class="login-container">
@@ -50,7 +45,7 @@ const Registration = {
                 </div>-->
             </section>
         
-        `;//}
+        `;
     }
 };
 
