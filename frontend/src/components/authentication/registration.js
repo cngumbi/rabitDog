@@ -22,7 +22,6 @@ const Registration = {
             }
         });
         const signupImage = document.getElementById('signupImage');
-       // signupImage.src = signupImg;
     },
     render: ()=>{
         return`
@@ -41,9 +40,6 @@ const Registration = {
                         <a href="/#/user-current">Have an account, Login.</a>
                     </form>
                 </div>
-                <!--<div class="login-image">
-                    <img alt="" id="signupImage">
-                </div>-->
             </section>
         
         `;
