@@ -22,6 +22,7 @@ import OrderList from './components/order/listingOrder';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
 import AllSubscribers from './components/profile/pages/allSubscribers';
 import NewSubscriber from './components/profile/pages/newSubscriber';
+import Forget from './components/authentication/forget';
 
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
@@ -35,6 +36,7 @@ const routes = {
     '/properties/:id':ProductPage,
     '/user-current': SignIn,
     '/new-user-create': Registration,
+    '/forget': Forget,
     '/profile': Profile,
     '/dashboard': Dashboard,
     '/product/:id/edit': EditProduct,

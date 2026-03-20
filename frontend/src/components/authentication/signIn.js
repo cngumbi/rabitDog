@@ -38,8 +38,8 @@ const SignIn = {
                         <span>Enter your Password</span>
                         <input type="password" name="" id="password" placeholder="Password" required>
                         <input type="submit" value="Sign In" class="button">
-                        <a href="#">Forget Password?</a>
-                        <a href="#">Register for an Account.</a>
+                        <a href="/#/forget">Forget Password?</a>
+                        <a href="/#/new-user-create">Register for an Account.</a>
                     </form>
                 </div>
                 <!--<div class="login-image">
