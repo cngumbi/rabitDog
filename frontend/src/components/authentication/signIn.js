@@ -39,6 +39,7 @@ const SignIn = {
                         <input type="password" name="" id="password" placeholder="Password" required>
                         <input type="submit" value="Sign In" class="button">
                         <a href="#">Forget Password?</a>
+                        <a href="#">Register for an Account.</a>
                     </form>
                 </div>
                 <!--<div class="login-image">
