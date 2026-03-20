@@ -18,6 +18,7 @@
   @include display-flex;
   align-items: center;
   column-gap: 0.5em;
+  padding: .5em;
   color: var( --main-color, #2aaf83);
   font-size: 1rem;
   font-weight: 700;
