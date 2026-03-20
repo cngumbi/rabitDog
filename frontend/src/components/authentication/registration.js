@@ -29,7 +29,7 @@ const Registration = {
         /*if(getUserInfo().name){
             veer();
         }*/
-       if(getUserInfo().isAdmin){
+       //if(getUserInfo().isAdmin){
         return`
             <section class="login container">
                 <div class="login-container">
@@ -37,13 +37,6 @@ const Registration = {
                     <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>
                     <!--login form-->
                     <form action="" id="register-form">
-                        <span>Full Name</span>
-                        <input type="text" name="fullName" id="fullName" placeholder="your Name PLease" required>
-                        <span>User Name</span>
-                        <input type="text" name="userName" id="userName" placeholder="User Name PLease" required>
-                        <span>Phone Number</span>
-                        <input type="text" name="phoneNumber" id="phoneNumber" placeholder="+254720123456" required>
-                        <span>Enter your email address</span>
                         <input type="email" name="email" id="email" placeholder="yourmail@gmail.com" required>
                         <span>Enter your Password</span>
                         <input type="password" name="password" id="password" placeholder="At least 8" required>
@@ -57,7 +50,7 @@ const Registration = {
                 </div>-->
             </section>
         
-        `;}
+        `;//}
     }
 };
 

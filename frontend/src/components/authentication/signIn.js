@@ -1,11 +1,9 @@
-//import loginImage from '../../assets/welcome.jpg';
 import { signIn } from '../../connection/api';
 import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
 const SignIn = {
     vignette: ()=>{
         const loginImg = document.getElementById('loginImage');
-        //loginImg.src = loginImage;
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
             showLoading();
@@ -42,9 +40,6 @@ const SignIn = {
                         <a href="/#/new-user-create">Register for an Account.</a>
                     </form>
                 </div>
-                <!--<div class="login-image">
-                    <img alt="" id="loginImage">
-                </div>-->
             </section>
         
         `;
