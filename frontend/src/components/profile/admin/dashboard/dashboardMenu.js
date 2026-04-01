@@ -8,7 +8,7 @@ const DashboardMenu = {
                 <h3>Sales Dispath</h3>
                 <div class="nav-item ${cons.selected === 'dashboard' ? 'selected':''}"><a href="/#/dashboard">Paid(Sales Dispatch)</a></div>
                 <div class="nav-item ${cons.selected === 'products' ? 'selected':''}"><a href="/#/listproduct">My Dispatch Subs</a></div>
-                <h3>Subscribers</h3>
+                <!--<h3>Subscribers</h3>
                 <div class="nav-item ${cons.selected === 'newsubscriber'?'selected':''}"><a href="/#/newsubscriber">New Subscriber</a></div>
                 <div class="nav-item ${cons.selected === 'allsubscribers'?'selected':''}"><a href="/#/allsubscribers">All Subscriber</a></div>
                 <div class="nav-item ${cons.selected === 'dashboard' ? 'selected':''}"><a href="/#/dashboard">Pendiing Approval</a></div>
@@ -21,6 +21,7 @@ const DashboardMenu = {
                 <div class="nav-item ${cons.selected === 'orderlist'?'selected':''}"><a href="/#/orderlist">Subscriber Report</a></div>
                 <div class="nav-item ${cons.selected === 'createproducts'?'selected':''}"><a href="/#/createproduct">Payment Report</a></div>
                 <div class="nav-item ${cons.selected === 'createproducts'?'selected':''}"><a href="/#/createproduct">Terms & Conditions</a></div>
+                -->
                 <h6> copy rigtht Softcraze Corporation</6>
                 
             </nav>

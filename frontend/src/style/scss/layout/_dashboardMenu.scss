@@ -2,7 +2,7 @@
 /*sidebar*/
 .sidebar{
   width: 200px;
-  top: -100px;
+  //top: -1px;
   background: #2c3e50;
   color: #fff;
   display: flex;
@@ -18,6 +18,7 @@
   padding: .3em;
   margin-left: .3em;
   width: 100%;
+  
   //display: inline-block;
 }
 .sidebar nav h3{
@@ -30,6 +31,7 @@
   padding: .3em;
   width: 90%;
   cursor: pointer;
+   z-index: 10;
 }
 
 nav a {

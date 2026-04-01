@@ -1,21 +1,23 @@
+@use "../abstracts/mixins" as D;
 .header-section{
   display: block;
   width: 100%;
-  height: 3em;
+  height: 3.5em;
   background: var(--bg-color, #ffffff);
   position: fixed;
   top: 0;
-  left: 0;
-  z-index: 100;
+  //left: 0;
+  //z-index: 100;
 }
 .nav{
-  @include display-flex;
+  @include D.display-flex;
   align-items: center;
+  left: 30em;
   justify-content: space-between;
   padding: 0.6em 0.4em;
 }
 .logo{
-  @include display-flex;
+  @include D.display-flex;
   align-items: center;
   column-gap: 0.5em;
   padding: .5em;
@@ -30,7 +32,7 @@
   color: var( --main-color, #2aaf83);;
 }
 .navbar{
-  @include display-flex;
+  @include D.display-flex;
 }
 .navbar a{
   padding: 0.5em 1em;
@@ -85,7 +87,7 @@
   position: absolute;
 }
 .user-info{
-  @include display-flex;
+  @include D.display-flex;
   align-items: center;
 }
 .user-info a{

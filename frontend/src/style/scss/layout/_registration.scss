@@ -1,4 +1,5 @@
-    .login{
+   @use "../abstracts/mixins" as D;
+   .login{
         display: flex;
         grid-template-columns: 0.4fr 1fr;
         align-items: center;
@@ -10,7 +11,7 @@
          box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
     }
     .login-container{
-        @include display-flex;
+        @include D.display-flex;
         flex-direction: column;
         row-gap: .5rem;
         margin: .2em;
@@ -29,7 +30,7 @@
         
     }
     .login-container form{
-        @include display-flex;
+        @include D.display-flex;
         flex-direction: column;
     }
     .login-container form span{

@@ -1,19 +1,18 @@
 //abstracts
-@import 'abstracts/functions';
-@import 'abstracts/mixins';
-@import 'abstracts/variables';
+@use 'abstracts/functions';
+@use 'abstracts/variables';
 //base
-@import 'base/base';
-@import 'base/typography';
-@import 'base/animations';
-@import 'base/media';
-@import 'base/utilities';
+@use 'base/base';
+@use 'base/typography';
+@use 'base/animations';
+@use 'base/media';
+@use 'base/utilities';
 //components
 //layout
-@import 'layout/dashboardMenu';
-@import 'layout/dashboard';
-@import 'layout/header';
-@import 'layout/main';
-@import 'layout/registration';
-//@import 'layout/footer';
+@use 'layout/dashboardMenu';
+@use 'layout/dashboard';
+@use 'layout/header';
+@use 'layout/main';
+@use 'layout/registration';
+//@use 'layout/footer';
 //pages
