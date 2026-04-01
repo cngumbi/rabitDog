@@ -4,7 +4,7 @@
   --box-shadow: 2px 2px 18px rgb(14 52 54 / 15%);
   --main-color: #2aaf83;
   --second-color: #196a38;
-  --text-color: #314862;
+  --text-color: #343435;
   --bg-color: #ffffff;
   --hover-color: #23c08c;
   --skin-color: #ff0000;
@@ -442,8 +442,8 @@ section {
 /*sidebar*/
 .sidebar {
   width: 200px;
-  background: #d7d7d8;
-  color: #fff;
+  background: #e9e9ee;
+  color: #4d4d4d;
   display: block;
   flex-direction: column;
   margin-top: -3em;
@@ -482,7 +482,7 @@ nav a {
   font-size: 0.9em;
   text-decoration: none;
   margin-left: 1em;
-  color: var(--bg-color, #fff);
+  color: var(--text-color, #c0c0c0);
   justify-content: space-between;
 }
 

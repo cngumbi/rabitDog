@@ -2,8 +2,8 @@
 /*sidebar*/
 .sidebar{
   width: 200px;
-  background: #d7d7d8;
-  color: #fff;
+  background: #e9e9ee;
+  color: #4d4d4d;
   display: block;
   flex-direction: column;
   margin-top: -3em;
@@ -41,7 +41,7 @@ nav a {
   font-size: .9em;
   text-decoration: none;
   margin-left: 1em;
-  color: var(--bg-color,  #fff);
+  color: var(--text-color,  #c0c0c0);
   justify-content: space-between;
 }
 nav .nav-item:hover {
