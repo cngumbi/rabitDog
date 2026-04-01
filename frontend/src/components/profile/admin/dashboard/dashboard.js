@@ -6,10 +6,10 @@ const Dashboard = {
         return `
         <div class="wrap">
             ${DashboardMenu.render({selected: 'dashboard'})}
-            <main class="main" id="dashboard">
+            <div class="main" id="dashboard">
                 <h1> dashboard</h1>
                 
-            </main>
+            </div>
         </div>
         `;
     }

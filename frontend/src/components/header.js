@@ -14,10 +14,9 @@ const Header = {
                 <input type="checkbox" name="" id="menu">
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
                 ${
-                    userName ? `<a href="/#/profile" class="">${userName}</a>` : ``
-                }               
-                
-                ${ isAdmin ? `<a href="/#/new-user-create" class="">Sign Up new User</a>` : ''}
+                    //userName ? `<a href="/#/profile" class="">${userName}</a>` : ``
+                    userName ? userName:``
+                }
             </div>
         `;
     }

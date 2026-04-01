@@ -8,7 +8,7 @@
         margin-left: 31em;
         border: .1em solid #2aaf83;
         border-radius: 2%;
-         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.7);
     }
     .login-container{
         @include D.display-flex;

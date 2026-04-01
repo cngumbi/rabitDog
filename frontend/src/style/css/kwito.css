@@ -442,12 +442,15 @@ section {
 /*sidebar*/
 .sidebar {
   width: 200px;
-  background: #2c3e50;
+  background: #d7d7d8;
   color: #fff;
-  display: flex;
+  display: block;
   flex-direction: column;
+  margin-top: -3em;
   padding-top: 0.5em;
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 5px 10px 0;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
   min-height: 100v;
   position: sticky; /*keeps sidebar fixed*/
 }
@@ -458,6 +461,8 @@ section {
   padding: 0.3em;
   margin-left: 0.3em;
   width: 100%;
+  height: 39.8em;
+  position: relative;
 }
 
 .sidebar nav h3 {
@@ -471,11 +476,10 @@ section {
   padding: 0.3em;
   width: 90%;
   cursor: pointer;
-  z-index: 10;
 }
 
 nav a {
-  font-size: 0.8em;
+  font-size: 0.9em;
   text-decoration: none;
   margin-left: 1em;
   color: var(--bg-color, #fff);
@@ -491,15 +495,43 @@ nav .nav-item.selected {
   color: #f08040;
 }
 
+nav h6 {
+  font-size: 0.7em;
+  position: absolute;
+  bottom: 9px;
+}
+
+nav .setting {
+  position: absolute;
+  bottom: 3em;
+  left: 5em;
+  text-transform: uppercase;
+  margin-top: 0.609em;
+  border-radius: 10px 10px 10px 10px;
+  padding: 0.3em;
+  width: 47%;
+  cursor: pointer;
+}
+
+nav .setting:hover {
+  background-color: var(--hover-color, #23c08c);
+}
+
+nav .setting.selected {
+  background-color: var(--hover-color, #23c08c);
+  color: #f08040;
+}
+
 /*main area*/
 .main {
   flex: 1;
   padding: 2em;
+  margin-left: 210px;
 }
 
-/* Topbar Styling (Sticky Header) */
+/* Topbar Styling (Sticky Header) 
 .topbar {
-  position: relative; /* sticks to top */
+  position: relative; /* sticks to top 
   overflow: hidden;
   top: -35px;
   left: 190px;
@@ -513,22 +545,19 @@ nav .nav-item.selected {
   padding: 10px 20px;
   border-bottom: 1px solid #ddd;
 }
-
-h4 {
-  flex: 1;
-  position: relative;
-  padding: 10px;
-  z-index: 1;
-  margin: 10px;
+h4{
+    flex: 1;
+    position: relative;
+    padding: 10px;
+    z-index: 1;
+    margin: 10px;
 }
-
-.search {
-  display: flex;
-  height: 5em;
-  margin-top: 0;
-  width: 100vw;
+.search{
+    display: flex;
+    height: 5em;
+    margin-top: 0;
+    width: 100vw;
 }
-
 .text-box {
   border: none;
   padding: 5px;
@@ -538,12 +567,11 @@ h4 {
   border: #1abc9c 1px solid;
   outline: none;
 }
-
 .button {
   background: #1abc9c;
   color: white;
   padding: 6px;
-  margin-top: 0.75em;
+  margin-top: .75em;
   width: 15em;
   height: 32px;
   right: 10px;
@@ -552,11 +580,9 @@ h4 {
   margin-right: 10px;
   border: none;
 }
-
-.button:hover {
-  cursor: pointer;
-}
-
+.button:hover{
+    cursor: pointer;
+}*/
 .header-section {
   display: block;
   width: 100%;
@@ -564,13 +590,15 @@ h4 {
   background: var(--bg-color, #ffffff);
   position: fixed;
   top: 0;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .nav {
   display: flex;
   align-items: center;
-  left: 30em;
+  z-index: -1;
   justify-content: space-between;
+  margin-left: 12em;
   padding: 0.6em 0.4em;
 }
 

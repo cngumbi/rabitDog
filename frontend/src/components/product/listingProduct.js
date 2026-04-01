@@ -34,9 +34,9 @@ const ProductList = {
   render: async () => {
     const products = await getProducts({});
     return `
-    <div class="dashboard">
+    <div class="wrap">
     ${DashboardMenu.render({ selected: "products" })}
-    <div class="dashboard-content">
+    <div class="main">
       <h1>Products</h1>
       <button id="create-product-button" class="primary">
         Create Product

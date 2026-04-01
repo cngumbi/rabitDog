@@ -1,6 +1,7 @@
 import { update } from "../../connection/api";
 import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
+import DashboardMenu from "./admin/dashboard/dashboardMenu";
 
 const Profile = {
     vignette: ()=>{
@@ -35,43 +36,49 @@ const Profile = {
             document.location.hash = '/';
         }
         return `
-        <div class="content profile">
-          <div class="profile-info">
-          <div class="form-container">
-          <form id="profile-form">
-            <ul class="form-items">
-              <li>
-                <h1>User Profile</h1>
-              </li>
-              <li>
-                <label for="name">Name</label>
-                <input type="name" name="name" id="name" value="${name}" />
-              </li>
-              <li>
-                <label for="userName">userName</label>
-                <input type="text" name="userName" id="userName" value="${userName}" />
-              </li>
-              <li>
-                <label for="phoneNumber">phoneNumber</label>
-                <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber}" />
-              </li>
-              <li>
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" value="${email}" />
-              </li>
-              <li>
-                <label for="password">Password</label>
-                <input type="password" name="password" id="password" />
-              </li>
-              <li>
-                <button type="submit" class="primary">Update</button>
-              </li>
-              <li>
-              <button type="button" id="signout-button" >Sign Out</button>
-            </li>        
-            </ul>
-          </form>
-        </div>`;
+        <div class="wrap">
+          ${DashboardMenu.render({selected: 'profile'})}
+          <div class="main" id="dashboard">
+            <div class="content profile">
+              <div class="profile-info">
+              <div class="form-container">
+              <form id="profile-form">
+                <ul class="form-items">
+                  <li>
+                    <h1>User Profile</h1>
+                  </li>
+                  <li>
+                    <label for="name">Name</label>
+                    <input type="name" name="name" id="name" value="${name}" />
+                  </li>
+                  <li>
+                    <label for="userName">userName</label>
+                    <input type="text" name="userName" id="userName" value="${userName}" />
+                  </li>
+                  <li>
+                    <label for="phoneNumber">phoneNumber</label>
+                    <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber}" />
+                  </li>
+                  <li>
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" value="${email}" />
+                  </li>
+                  <li>
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" />
+                  </li>
+                  <li>
+                    <button type="submit" class="primary">Update</button>
+                  </li>
+                  <li>
+                  <button type="button" id="signout-button" >Sign Out</button>
+                </li>        
+                </ul>
+              </form>
+            </div>
+          </div>
+        </div>  
+          `;
     }
 };
 export default Profile;
