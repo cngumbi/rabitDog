@@ -51,7 +51,7 @@ exports.autoprefix = () => ({
 exports.page = ()=>({
     plugins: [
         new HtmlWebpackPlugin({
-            title: "For a fordable Tents design, Tent repair, tent for hire and other services visit | Quick One Service",
+            title: "Agriculture Management System with POS (Point of Sale)",
             filename: 'index.html',
             template: 'src/template.html'
         })
