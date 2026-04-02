@@ -4,7 +4,7 @@ import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
 import Header from './components/header';
-import Services from './components/profile/pages/services';
+//import Services from './components/profile/pages/services';
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
 import CartPage from './components/order/cartpage';
@@ -20,9 +20,9 @@ import PlaceOrder from './components/order/PlaceOrder';
 import OrderPage from './components/order/order';
 import OrderList from './components/order/listingOrder';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
-import AllSubscribers from './components/profile/pages/allSubscribers';
-import NewSubscriber from './components/profile/pages/newSubscriber';
+//import NewSubscriber from './components/profile/pages/newSubscriber';
 import Forget from './components/authentication/forget';
+import Chicken from './components/pages/poultry/Chicken/chicken';
 
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
@@ -30,9 +30,9 @@ faviconImg.href = favicon;
 
 const routes = {
     '/': SignIn,
-    '/newsubscriber': NewSubscriber,
-    '/allsubscribers': AllSubscribers,
-    '/services': Services,
+   // '/newsubscriber': NewSubscriber,
+    '/chicken': Chicken,
+    //'/services': Services,
     '/properties/:id':ProductPage,
     '/user-current': SignIn,
     '/new-user-create': Registration,
