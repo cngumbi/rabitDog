@@ -2,7 +2,7 @@ const DashboardMenu = {
     render: (cons)=>{
         return `
         <!--Sidebar-->
-        <aside class="sidebar">
+        <div class="sidebar">
             <!--Main Navigation-->
             <nav>
                 <div class="nav-item ${cons.selected === 'dashboard' ? 'selected':''}"><a href="/#/dashboard">DASHBOARD</a></div>

@@ -53,6 +53,10 @@ h5 {
   font-style: 0.1em;
 }
 
+a {
+  text-decoration: none;
+}
+
 /*.aside{
     &__logo{
         font-size: $font-smaller;
@@ -387,6 +391,27 @@ section {
   padding: 0;
 }
 
+.aside-nav {
+  width: 200px;
+  height: 32em;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.aside-nav h5 {
+  margin-top: 1em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  width: 170px;
+}
+
+.aside {
+  margin: 1.1em;
+  font-size: 1rem;
+}
+
+.aside-item a {
+  text-decoration: none;
+}
+
 /* Dashboard */
 /*sidebar*/
 .sidebar {
@@ -477,7 +502,7 @@ nav .setting.selected {
 .main {
   flex: 1;
   padding: 2em;
-  margin-left: 210px;
+  display: block;
 }
 
 /* Topbar Styling (Sticky Header) 

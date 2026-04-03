@@ -5,15 +5,14 @@ const Chicken = {
         return`
             <div class="wrap">
                 ${DashboardMenu.render({selected: 'chicken'})}
-                <main class="main">
-                    <h5>Chicken management</h5>
-                    <aside>
-                        <ul>
-                            <li><a href="">Chick Care Log</a><li>
-                        </ul>
-                    </aside>
-                    
-                </main>
+                <div class="main">
+                    <div class="aside-nav">
+                        <h5>Chicken management</h5>
+                        <aside class="aside">
+                            <div class="aside-item"><a href="">Chick care log</a><div> 
+                        </aside>
+                    </div>    
+                </div>
             </div>
         `;
     }
