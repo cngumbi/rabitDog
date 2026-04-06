@@ -1,0 +1,30 @@
+<!--${Aside.render({selected: 'breeds'})}-->
+
+/* Tabs container */
+.tabs {
+    display: flex;
+    gap: 20px;
+    padding: 15px 20px;
+}
+
+/* Each tab */
+.tab {
+    text-decoration: none;
+    color: #333;
+    padding-bottom: 6px;
+    font-size: 15px;
+}
+
+/* Active tab (green underline like your screenshot) */
+.tab.active {
+    border-bottom: 3px solid #2bb673;
+    font-weight: bold;
+}
+
+/* Content area */
+.content {
+    padding: 20px;
+}
+
+
+
