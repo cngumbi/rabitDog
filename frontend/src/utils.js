@@ -1,4 +1,6 @@
-import { getCartItems } from "./localStorage";
+//import { getCartItems } from "./localStorage";
+
+import { getUserInfo } from "./localStorage";
 
 
 //rerender function
@@ -40,9 +42,32 @@ export const showMessage = (message, callback)=>{
 };
 //redirect function
 export const veer = ()=>{
-    if(getCartItems().lenght !== 0){
-        document.location.hash = '/dashboard';
+    //if(getCartItems().lenght !== 0){
+    //    document.location.hash = '/dashboard';
+    //}else{
+    //    document.location.hash = '/'
+    //}
+    const user = getUserInfo();
+    if(!user && !user.name && user.name.trim() !== ""){
+        document.location.hash='/';
+        return;
     }else{
-        document.location.hash = '/'
+        document.location.hash = '/dashboard';
     }
 }
+
+//export const veer = () => {
+//    const user = getUserInfo();
+//
+//    if (!user || !user.name?.trim()) {
+//        document.location.hash = '/';
+//        return;
+//    }
+//
+//    // If profile is not completed → treat as new user
+//    if (!user.profileCompleted) {
+//        document.location.hash = '/profile';
+//    } else {
+//        document.location.hash = '/dashboard';
+//    }
+//};

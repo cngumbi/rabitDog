@@ -3,7 +3,7 @@ import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
 const SignIn = {
     vignette: ()=>{
-        const loginImg = document.getElementById('loginImage');
+        //const loginImg = document.getElementById('loginImage');
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
             showLoading();

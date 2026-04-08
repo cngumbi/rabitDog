@@ -21,7 +21,7 @@ const Registration = {
                 veer();
             }
         });
-        const signupImage = document.getElementById('signupImage');
+        const signupImage = document.getElementById('signupImage'); 
     },
     render: ()=>{
         return`
@@ -31,13 +31,13 @@ const Registration = {
                     <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>
                     <!--login form-->
                     <form action="" id="register-form">
+                        <span>Enter your email address</span>
                         <input type="email" name="email" id="email" placeholder="yourmail@gmail.com" required>
                         <span>Enter your Password</span>
                         <input type="password" name="password" id="password" placeholder="At least 8" required>
                         <span>Confirm Password</span>
                         <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
                         <input type="submit" value="SignIn" class="button">
-                        <a href="/#/user-current">Have an account, Login.</a>
                     </form>
                 </div>
             </section>
