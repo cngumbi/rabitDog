@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const { validateRegister, validateUpdate } = require('../middleware/validateUser');
+const Profile = require('../models/profileModel');
 const UserRoute = express.Router();
 
 /*UserRoute.get('/createadmin', expressAsync(async(req, res) => {
@@ -31,17 +32,19 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         return res.status(401).send({
             message: 'Invalid Email or Password',
         });
-    }else{
-        res.send({
-            _id: signinUser._id,
-            //name: signinUser.name,
-            //userName: signinUser.userName,
-            //phoneNumber: signinUser.phoneNumber,
-            email: signinUser.email,
-            isAdmin: signinUser.isAdmin,
-            token: generateToken(signinUser)
-        });
     }
+    const profile = await Profile.findOne({ user: signinUser._id});
+    //else{
+    res.send({
+        _id: signinUser._id,
+        //name: signinUser.name,
+        //userName: signinUser.userName,
+        //phoneNumber: signinUser.phoneNumber,
+        email: signinUser.email,
+        isAdmin: signinUser.isAdmin,
+        token: generateToken(signinUser)
+    });
+    //}
 }));
 UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
         
@@ -58,6 +61,10 @@ UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
         password: bcrypt.hashSync(req.body.password, 8),
     });
     const createdUser = await user.save();
+    //create empty profile here
+    await Profile.create({
+        user: user._id
+    });
     if (!createdUser) {
         return res.status(401).send({
             message: 'Invalid User Data',
