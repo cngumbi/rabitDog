@@ -48,10 +48,17 @@ export const veer = ()=>{
     //    document.location.hash = '/'
     //}
     const user = getUserInfo();
-    if(!user && !user.name && user.name.trim() !== ""){
+    if(!user && !user.name && user.name.trim() !== "" && !user.id){
         document.location.hash='/';
         return;
-    }else{
+    }
+    // new user(just registered)
+    //if profile is not completed -> treat as new user
+    if(user.profileCompleted){
+        document.location.hash = '/profile'
+    }
+    //esisting user
+    else{
         document.location.hash = '/dashboard';
     }
 }

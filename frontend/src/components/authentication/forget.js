@@ -11,6 +11,7 @@ const Forget = {
                         <span>Email</span>
                         <input type="email" name="email" id="email" placeholder="yourmail@gmail.com" required>
                         <input type="submit" value="Submit" class="button">
+                        <a href="/#/user-current">Login.</a>
                     </form>
                 </div>
             </section>
