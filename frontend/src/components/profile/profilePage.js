@@ -32,7 +32,7 @@ const Profile = {
           },
     render: async()=>{
         const {name, userName, phoneNumber, email} = getUserInfo();
-        if(!name){
+        if(!email){
             document.location.hash = '/';
         }
         return `
