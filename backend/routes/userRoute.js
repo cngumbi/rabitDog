@@ -42,7 +42,8 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         //phoneNumber: signinUser.phoneNumber,
         email: signinUser.email,
         isAdmin: signinUser.isAdmin,
-        token: generateToken(signinUser)
+        token: generateToken(signinUser),
+        profileCompleted: profile.profileCompleted,
     });
     //}
 }));
