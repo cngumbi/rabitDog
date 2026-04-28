@@ -2,6 +2,7 @@ import { update } from "../../connection/api";
 import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "./admin/dashboard/dashboardMenu";
+import UserInfo from "./userUpadeInfo";
 
 const Profile = {
     vignette: ()=>{
@@ -29,12 +30,17 @@ const Profile = {
                 document.location.hash = '/';
               }
             });
+            //UserInfo.vignette();
           },
     render: async()=>{
         const {name, userName, phoneNumber, email} = getUserInfo();
         if(!email){
             document.location.hash = '/';
         }
+        //helper function
+        const renderUserInfo = async ()=>{
+          return await UserInfo.render();
+        };
         return `
         <div class="wrap">
           ${DashboardMenu.render({selected: 'profile'})}
@@ -59,7 +65,7 @@ const Profile = {
                     <label for="phoneNumber">phoneNumber</label>
                     <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber}" />
                   </li>
-                  <li>
+                  <!--<li>
                     <label for="email">Email</label>
                     <input type="email" name="email" id="email" value="${email}" />
                   </li>
@@ -71,10 +77,11 @@ const Profile = {
                     <button type="submit" class="primary">Update</button>
                   </li>
                   <li>
-                  <button type="button" id="signout-button" >Sign Out</button>
-                </li>        
+                    <button type="button" id="signout-button" >Sign Out</button>
+                  </li>  -->      
                 </ul>
               </form>
+              ${ await UserInfo.render() }
             </div>
           </div>
         </div>  
