@@ -43,14 +43,16 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         email: signinUser.email,
         isAdmin: signinUser.isAdmin,
         token: generateToken(signinUser),
-        profileCompleted: profile.profileCompleted,
+        //profileCompleted: profile.profileCompleted,
     });
     //}
 }));
 UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
         
     //check if email exist
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser = await User.findOne({
+        email: req.body.email,
+    });
     if(existingUser){
         return res.status(400).send({ message: 'Email already exists' });
     }
