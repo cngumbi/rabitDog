@@ -30,10 +30,10 @@ const Profile = {
                 document.location.hash = '/';
               }
             });
-            //UserInfo.vignette();
+            UserInfo.vignette();
           },
     render: async()=>{
-        const {name, userName, phoneNumber, email} = getUserInfo();
+        const { email } = getUserInfo();
         if(!email){
             document.location.hash = '/';
         }
