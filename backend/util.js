@@ -15,7 +15,7 @@ const generateToken =(user)=> {
 const isAuth = (req, res, next) => {
     const bearerToken = req.headers.authorization;
     if (!bearerToken) {
-        res.status(401).send({ message: 'Token not available' });
+        res.status(401).send({ message: 'Token not available: Access Denied' });
 
     } else {
         const token = bearerToken.slice(7, bearerToken.length);
