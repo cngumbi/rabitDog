@@ -118,6 +118,7 @@ const router = async () => {
     /*'old style' -> const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
             const sessions = routes[parseUrl] ? routes[parseUrl] : Error404;
     */
+    //new style -> for nested routes
     const basePath = request.resource ? `/${request.resource}` : '/';
     const sessions = routes[basePath];
 

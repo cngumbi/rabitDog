@@ -16,9 +16,9 @@ const Profile = {
               e.preventDefault();
               showLoading();
               const data = await update({
-                name: document.getElementById('name').value,
-                userName: document.getElementById('userName').value,
-                phoneNumber: document.getElementById('phoneNumber').value,
+                //name: document.getElementById('name').value,
+                //userName: document.getElementById('userName').value,
+                //phoneNumber: document.getElementById('phoneNumber').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value,
               });
@@ -30,7 +30,7 @@ const Profile = {
                 document.location.hash = '/';
               }
             });
-            UserInfo.vignette();
+            //UserInfo.vignette();
           },
     render: async()=>{
         const { email } = getUserInfo();
@@ -55,19 +55,19 @@ const Profile = {
                   </li>
                   <li>
                     <label for="name">Name</label>
-                    <input type="name" name="name" id="name" value="${name}" />
+                    <input type="name" name="name" id="name" value="${name || ''}" />
                   </li>
                   <li>
                     <label for="userName">userName</label>
-                    <input type="text" name="userName" id="userName" value="${userName}" />
+                    <input type="text" name="userName" id="userName" value="${userName || ''}" />
                   </li>
                   <li>
                     <label for="phoneNumber">phoneNumber</label>
-                    <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber}" />
+                    <input type="text" name="phoneNumber" id="phoneNumber" value="${phoneNumber || ''}" />
                   </li>
                   <!--<li>
                     <label for="email">Email</label>
-                    <input type="email" name="email" id="email" value="${email}" />
+                    <input type="email" name="email" id="email" value="${email || ''}" />
                   </li>
                   <li>
                     <label for="password">Password</label>

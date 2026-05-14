@@ -11,9 +11,9 @@ export const register = async({ name, userName, phoneNumber, email, password })=
                 'Content-Type': 'application/json',
             },
             data: {
-                name,
-                userName,
-                phoneNumber,
+                //name,
+                //userName,
+                //phoneNumber,
                 email,
                 password
             }
@@ -57,9 +57,9 @@ export const update = async({ name, userName, phoneNumber, email, password })=>{
                 Authorization: `Bearer ${token}`,
             },
             data: {
-                name,
-                userName,
-                phoneNumber,
+                //name,
+                //userName,
+                //phoneNumber,
                 email,
                 password
             }
