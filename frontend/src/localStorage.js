@@ -4,7 +4,7 @@ export const setUserInfo = ({
     //userName = '',
     //phoneNumber = '',
     email = '',
-    password = '',
+    //password = '',
     token = '',
     isAdmin = false
 })=>{
@@ -16,7 +16,7 @@ export const setUserInfo = ({
             //userName,
             //phoneNumber,
             email,
-            password,
+            //password,
             token,
             isAdmin
         })
