@@ -25,10 +25,21 @@ export const setUserInfo = ({
 export const getUserInfo = ()=>{
     return localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : { name:'', userName:'', phoneNumber:'', email:'',password:'' };
 };
-export const clearUser = ()=>{
+export const clearUser = async ()=>{
+    try {
+        await fetch('/api/users/signout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (error) {
+        console.error('Error occurred while signing out:', error);
+    }
     localStorage.removeItem('userInfo');
 };
-export const getCartItems = ()=>{
+/*export const getCartItems = ()=>{
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
     return cartItems;
 };
@@ -52,6 +63,7 @@ export const setPayment = ({ paymentMethod = 'paypal' })=>{
 export const cleanCart = ()=>{
     localStorage.removeItem('cartItems');
 };
+*/
 
 //########################################################################################################################################################################
 //########################################################################################################################################################################

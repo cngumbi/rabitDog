@@ -25,6 +25,13 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
             });
         }
         //const profile = await Profile.findOne({ user: signinUser._id});
+        //set token in httpOnly cookie
+        res.cookie('Authorization', 'Bearer' + generateToken(signinUser), {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 2 * 60 * 60 * 1000, // 2 hours  
+        }).send({ success: true, message: 'Sign in successful' });
         //send user info and token to client
         res.send({
             _id: signinUser._id,
@@ -123,6 +130,15 @@ UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
             message: 'User Profile Update failed'
         });
     }
+}));
+
+UserRoute.post('/signout', expressAsync(async(req, res)=>{
+    res.clearCookie('Authorization', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+    });
+    res.send({ success: true, message: 'Sign out successful' });
 }));
 
 module.exports = UserRoute;

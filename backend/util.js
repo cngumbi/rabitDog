@@ -17,13 +17,13 @@ const generateToken =(user)=> {
 
 };
 const isAuth = (req, res, next) => {
-    const bearerToken = req.headers.authorization;
+    const bearerToken = req.cookies.token || req.headers.authorization;
     if (!bearerToken) {
         res.status(401).send({ message: 'Token not available: Access Denied' });
 
     } else {
-        const token = bearerToken.slice(7, bearerToken.length);
-        jsonWT.verify(token, config.JWT_SECRET, (err, data) => {
+        //const token = bearerToken.slice(7, bearerToken.length);
+        jsonWT.verify(bearerToken, config.JWT_SECRET, (err, data) => {
             if (err) {
                 res.status(401).send({ message: 'Invalid Token' });
             } else {
