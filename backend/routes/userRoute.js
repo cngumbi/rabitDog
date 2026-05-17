@@ -3,7 +3,6 @@ const expressAsync = require('express-async-handler');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
-//const { validateRegister, validateUpdate } = require('../middleware/validateUser');
 const Profile = require('../models/profileModel');
 const { ValidateData } = require('../middleware/validateData');
 const UserRoute = express.Router();
