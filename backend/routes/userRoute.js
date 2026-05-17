@@ -5,15 +5,16 @@ const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
 const { ValidateData } = require('../middleware/validateData');
+const { ValidateUser } = require('../middleware/validateUser');
 const UserRoute = express.Router();
 
-UserRoute.post('/signin', expressAsync(async(req, res)=>{
+UserRoute.post('/signin', ValidateUser, expressAsync(async(req, res)=>{
     try{
         //validate user input
-        const { error, value } = ValidateData.validate(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        //const { error, value } = ValidateData.validate(req.body);
+        //if (error) {
+        //    return res.status(400).send({ message: error.details[0].message });
+        //}
         //find user by email
         const signinUser = await User.findOne({
             email: req.body.email,
@@ -39,13 +40,13 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         });
     }
 }));
-UserRoute.post('/register', expressAsync(async(req, res) => {
+UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
     try{    
         //validate user input
-        const { error } = ValidateData.validate(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
+        //const { error } = ValidateData.validate(req.body);
+        //if (error) {
+        //    return res.status(400).send({ message: error.details[0].message });
+        //}
         //check if email exist
         const existingUser = await User.findOne({
             email: req.body.email,
@@ -85,7 +86,7 @@ UserRoute.post('/register', expressAsync(async(req, res) => {
         });
     }
 }));
-UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
+UserRoute.put('/:id', isAuth, ValidateUser, expressAsync(async(req, res) => {
     try{
         //validate user input
         const { error } = ValidateData.validate(req.body);
