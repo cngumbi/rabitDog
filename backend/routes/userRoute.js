@@ -40,7 +40,7 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         });
     }
 }));
-UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
+UserRoute.post('/register', expressAsync(async(req, res) => {
     try{    
         //validate user input
         const { error } = ValidateData.validate(req.body);
@@ -86,7 +86,7 @@ UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
         });
     }
 }));
-UserRoute.put('/:id', isAuth, validateUpdate, expressAsync(async(req, res) => {
+UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
     try{
         //validate user input
         const { error } = ValidateData.validate(req.body);
