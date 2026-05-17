@@ -1,21 +1,25 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
-const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
 const { ValidateData } = require('../middleware/validateData');
-const { ValidateUser } = require('../middleware/validateUser');
+const { PassHash, PassCompare } = require('../util/passHash');
 const UserRoute = express.Router();
 
-UserRoute.post('/signin', ValidateUser, expressAsync(async(req, res)=>{
+UserRoute.post('/signin', expressAsync(async(req, res)=>{
     try{
+        //validate user input
+        const { error } = await ValidateData().validateAsync(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
         //find user by email
         const signinUser = await User.findOne({
             email: req.body.email,
         });
         //check if user exist and password match
-        if(!signinUser || !bcrypt.compareSync(req.body.password, signinUser.password)){
+        if(!signinUser || !PassCompare(req.body.password, signinUser.password)){
             return res.status(401).send({
                 message: 'Invalid Email or Password',
             });
@@ -35,8 +39,13 @@ UserRoute.post('/signin', ValidateUser, expressAsync(async(req, res)=>{
         });
     }
 }));
-UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
+UserRoute.post('/register', expressAsync(async(req, res) => {
     try{
+        // validate user input
+        const { error } = await ValidateData().validateAsync(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
         //check if email exist
         const existingUser = await User.findOne({
             email: req.body.email,
@@ -48,7 +57,7 @@ UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
         const user = new User({
             email: req.body.email,
             //Hash the password before saving to database
-            password: bcrypt.hashSync(req.body.password, 8),
+            password: PassHash(req.body.password, 8),
         });
         //save user to database
         const createdUser = await user.save();
@@ -76,8 +85,13 @@ UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
         });
     }
 }));
-UserRoute.put('/:id', isAuth, ValidateUser, expressAsync(async(req, res) => {
+UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
     try{
+        //validate user input
+        const { error } = await ValidateData().validateAsync(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
         //find user by id
         const user = await User.findById(req.params.id);
         //check if user exist
@@ -88,7 +102,7 @@ UserRoute.put('/:id', isAuth, ValidateUser, expressAsync(async(req, res) => {
         } else {
             //update user info
             user.email = req.body.email || user.email;
-            user.password = req.body.password ? bcrypt.hashSync(req.body.password, 8) : user.password; //|| user.password;
+            user.password = req.body.password ? PassHash(req.body.password, 8) : user.password; //|| user.password;
             //save updated user to database
             const updateUser = await user.save();
             //check if user updated successfully

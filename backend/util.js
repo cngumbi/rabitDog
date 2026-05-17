@@ -9,8 +9,12 @@ const generateToken =(user)=> {
             email: user.email,
             isAdmin: user.isAdmin,
         },
-        config.JWT_SECRET
+        config.JWT_SECRET,
+        {
+            expiresIn: '2h',
+        }
     );
+
 };
 const isAuth = (req, res, next) => {
     const bearerToken = req.headers.authorization;
