@@ -5,48 +5,35 @@ const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const { validateRegister, validateUpdate } = require('../middleware/validateUser');
 const Profile = require('../models/profileModel');
+const { ValidateData } = require('../middleware/validateData');
 const UserRoute = express.Router();
 
-/*UserRoute.get('/createadmin', expressAsync(async(req, res) => {
-    try {
-        const user = new User({
-            name: 'SuperAdmin',
-            userName: 'admin',
-            phoneNumber: '+254712719781',
-            email: 'Mwandyaadmin@kyalo.store',
-            password: 'adminMwandya@12',
-            isAdmin: true
-        });
-        const createdUser = await user.save();
-        res.send(createdUser);
-    } catch (err) {
-        res.status(500).send({ message: err.message });
-    }
-}));*/
 UserRoute.post('/signin', expressAsync(async(req, res)=>{
     try{
+        //validate user input
+        const { error, value } = ValidateData.validate(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
+        //find user by email
         const signinUser = await User.findOne({
             email: req.body.email,
-            //password: req.body.password
         });
+        //check if user exist and password match
         if(!signinUser || !bcrypt.compareSync(req.body.password, signinUser.password)){
             return res.status(401).send({
                 message: 'Invalid Email or Password',
             });
         }
-        else{
-            //const profile = await Profile.findOne({ user: signinUser._id});
-            res.send({
-                _id: signinUser._id,
-                //name: signinUser.name,
-                //userName: signinUser.userName,
-                //phoneNumber: signinUser.phoneNumber,
-                email: signinUser.email,
-                isAdmin: signinUser.isAdmin,
-                token: generateToken(signinUser),
-                //profileCompleted: profile.profileCompleted,
-            });
-        }
+        //const profile = await Profile.findOne({ user: signinUser._id});
+        //send user info and token to client
+        res.send({
+            _id: signinUser._id,
+            email: signinUser.email,
+            isAdmin: signinUser.isAdmin,
+            token: generateToken(signinUser),
+            //profileCompleted: profile.profileCompleted,
+        });
     }catch{
         return res.status(500).send({
             message: 'Authentication Failed'
@@ -55,6 +42,11 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
 }));
 UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
     try{    
+        //validate user input
+        const { error } = ValidateData.validate(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
         //check if email exist
         const existingUser = await User.findOne({
             email: req.body.email,
@@ -62,31 +54,30 @@ UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
         if(existingUser){
             return res.status(400).send({ message: 'Email already exists' });
         }
+        //create new user
         const user = new User({
-            //name: req.body.name,
-            //userName: req.body.userName,
-            //phoneNumber: req.body.phoneNumber,
             email: req.body.email,
+            //Hash the password before saving to database
             password: bcrypt.hashSync(req.body.password, 8),
         });
+        //save user to database
         const createdUser = await user.save();
         //create empty profile here
         //await Profile.create({
         //    user: user._id
         //});
+        //check if user created successfully
         if (!createdUser) {
             return res.status(401).send({
                 message: 'Invalid User Data',
             });
         }else {
+            //send user info and token to client
             res.send({
                 _id: createdUser._id,
-                //name: createdUser.name,
-                //userName: createdUser.userName,
-                //phoneNumber: createdUser.phoneNumber,
                 email: createdUser.email,
                 isAdmin: createdUser.isAdmin,
-                token: generateToken(createdUser),
+                token: generateToken(createdUser),  //generate token for the user
             });
         }
     }catch{
@@ -97,23 +88,32 @@ UserRoute.post('/register', validateRegister, expressAsync(async(req, res) => {
 }));
 UserRoute.put('/:id', isAuth, validateUpdate, expressAsync(async(req, res) => {
     try{
+        //validate user input
+        const { error } = ValidateData.validate(req.body);
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
+        //find user by id
         const user = await User.findById(req.params.id);
+        //check if user exist
         if (!user) {
             res.status(401).send({
                 message: 'User not found',
             });
         } else {
-            //user.name = req.body.name || user.name;
-            //user.userName = req.body.userName || user.userName;
-            //user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+            //update user info
             user.email = req.body.email || user.email;
             user.password = req.body.password ? bcrypt.hashSync(req.body.password, 8) : user.password; //|| user.password;
+            //save updated user to database
             const updateUser = await user.save();
+            //check if user updated successfully
+            if (!updateUser) {
+                return res.status(401).send({
+                    message: 'Invalid User Data',
+                });
+            }
             res.send({
                 _id: updateUser._id,
-                //name: updateUser.name,
-                //userName: updateUser.userName,
-                //phoneNumber: updateUser.phoneNumber,
                 email: updateUser.email,
                 isAdmin: updateUser.isAdmin,
                 token: generateToken(updateUser),
