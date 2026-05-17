@@ -10,11 +10,6 @@ const UserRoute = express.Router();
 
 UserRoute.post('/signin', ValidateUser, expressAsync(async(req, res)=>{
     try{
-        //validate user input
-        //const { error, value } = ValidateData.validate(req.body);
-        //if (error) {
-        //    return res.status(400).send({ message: error.details[0].message });
-        //}
         //find user by email
         const signinUser = await User.findOne({
             email: req.body.email,
@@ -41,12 +36,7 @@ UserRoute.post('/signin', ValidateUser, expressAsync(async(req, res)=>{
     }
 }));
 UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
-    try{    
-        //validate user input
-        //const { error } = ValidateData.validate(req.body);
-        //if (error) {
-        //    return res.status(400).send({ message: error.details[0].message });
-        //}
+    try{
         //check if email exist
         const existingUser = await User.findOne({
             email: req.body.email,
@@ -88,11 +78,6 @@ UserRoute.post('/register', ValidateUser, expressAsync(async(req, res) => {
 }));
 UserRoute.put('/:id', isAuth, ValidateUser, expressAsync(async(req, res) => {
     try{
-        //validate user input
-        const { error } = ValidateData.validate(req.body);
-        if (error) {
-            return res.status(400).send({ message: error.details[0].message });
-        }
         //find user by id
         const user = await User.findById(req.params.id);
         //check if user exist
