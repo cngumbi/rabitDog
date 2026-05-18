@@ -4,7 +4,6 @@ export const setUserInfo = ({
     //userName = '',
     //phoneNumber = '',
     email = '',
-    //password = '',
     token = '',
     isAdmin = false
 })=>{
@@ -16,14 +15,13 @@ export const setUserInfo = ({
             //userName,
             //phoneNumber,
             email,
-            //password,
             token,
             isAdmin
         })
     );
 };
 export const getUserInfo = ()=>{
-    return localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : { name:'', userName:'', phoneNumber:'', email:'',password:'' };
+    return localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : { email:'' };
 };
 export const clearUser = async ()=>{
     try {

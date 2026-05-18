@@ -1,49 +1,23 @@
 //the main js file index.js
 //import router engine
-
-/*import router from "./config/router";
-import routes from "./config/routes";
-
-
-
-
-
-
-const init = ()=>{
-    router(routes);
-};
-
-/*
-Listen for:
--Page load
--URL hash changes (#/something new)
-
-*
-window.addEventListener('load', init);
-window.addEventListener('hashchange', ()=>router(routes))
-*/
-
-
 //==========import styles===============
 import './style/css/kwito.min.css';
 import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
 import Header from './components/header';
-
 //pages
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
 import Profile from './components/profile/profilePage';
 import Forget from './components/authentication/forget';
 import Dashboard from './components/profile/admin/dashboard/dashboard';
-
 //Chicken (Nested Layout)
 import Chicken from './components/pages/poultry/Chicken/chicken';
 import MedicalLogs from './components/pages/utils/medicalLogs';
 import Breeds from './components/pages/utils/breeds';
+import { getUserInfo } from './localStorage';
 //import { session } from 'passport';
-
 //import CartPage from './components/order/cartpage';
 //import ProductPage from './components/product/productPage';
 //import ListingProduct from './components/product/listingProduct';
@@ -56,7 +30,6 @@ import Breeds from './components/pages/utils/breeds';
 //import OrderList from './components/order/listingOrder';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
-
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -113,7 +86,31 @@ const router = async () => {
 
     //Parse URL -> { resourece: 'chicken', verb: 'breeds', id: null}
     const request = ParseRequestUrl();
-
+    //get user info from local storage
+    const userInfo = getUserInfo();
+    //check if the user is trying to access an auth page while being logged in or trying to access a protected page while being logged out
+    const authPages = [
+        '/',
+        '/new-user-create',
+        '/forget',
+        '/user-current'
+    ];
+    const protectedPages = [
+        '/profile',
+        '/dashboard',
+    ];
+    //get the current path
+    const currentPath = request.resource ? `/${request.resource}` : '/';
+    //redirect to dashboard if the user is trying to access an auth page while being logged in 
+    if(userInfo._id !== '' && authPages.includes(currentPath)){
+        document.location.hash = '/dashboard';
+        return;
+    }
+    //redirect to home page if the user is trying to access a protected page while being logged out
+    if(userInfo._id === '' && protectedPages.includes(currentPath)){
+        document.location.hash = '/';
+        return;
+    }
     //Build base path -> '/chicken'
     /*'old style' -> const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
             const sessions = routes[parseUrl] ? routes[parseUrl] : Error404;
@@ -165,7 +162,7 @@ const router = async () => {
 
 
 
-}
+};
 window.addEventListener('load', router);
 window.addEventListener('hashchange', router);
 

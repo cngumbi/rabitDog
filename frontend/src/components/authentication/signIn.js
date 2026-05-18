@@ -21,7 +21,7 @@ const SignIn = {
         })
     },
     render: ()=>{
-        if(getUserInfo().name){
+        if(getUserInfo().email){
             veer();
         }
         return`

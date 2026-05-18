@@ -5,7 +5,7 @@ const Header = {
     vignette: ()=>{        
     },
     render: ()=>{
-        const { userName, isAdmin } = getUserInfo();
+        const { email, isAdmin } = getUserInfo();
         return `
             <div class="nav container">
                 <!--logo-->
@@ -15,7 +15,7 @@ const Header = {
                 <label for="menu"><i class="bx bx-menu" id="menu-icon"></i></label>
                 ${
                     //userName ? `<a href="/#/profile" class="">${userName}</a>` : ``
-                    userName ? userName:``
+                    email ? email:``
                 }
             </div>
         `;
