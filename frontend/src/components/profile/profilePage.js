@@ -6,8 +6,8 @@ import UserInfo from "./userUpadeInfo";
 
 const Profile = {
     vignette: ()=>{
-        document.getElementById('signout-button').addEventListener('click', () => {
-            clearUser();
+        document.getElementById('signout-button').addEventListener('click', async () => {
+            await clearUser();
             document.location.hash = '/';
           });
           document
