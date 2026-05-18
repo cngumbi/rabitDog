@@ -1,8 +1,5 @@
 export const setUserInfo = ({
     _id = '',
-    //name = '',
-    //userName = '',
-    //phoneNumber = '',
     email = '',
     token = '',
     isAdmin = false
@@ -11,9 +8,6 @@ export const setUserInfo = ({
         'userInfo',
         JSON.stringify({
             _id,
-            //name,
-            //userName,
-            //phoneNumber,
             email,
             token,
             isAdmin
@@ -21,7 +15,7 @@ export const setUserInfo = ({
     );
 };
 export const getUserInfo = ()=>{
-    return localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : { email:'' };
+    return localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : { _id: '', email:'', token:'', isAdmin: false, };
 };
 export const clearUser = async ()=>{
     try {

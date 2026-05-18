@@ -31,7 +31,7 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: 2 * 60 * 60 * 1000, // 2 hours  
-        }).send({ success: true, message: 'Sign in successful' });
+        });
         //send user info and token to client
         res.send({
             _id: signinUser._id,

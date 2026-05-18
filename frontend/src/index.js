@@ -102,12 +102,12 @@ const router = async () => {
     //get the current path
     const currentPath = request.resource ? `/${request.resource}` : '/';
     //redirect to dashboard if the user is trying to access an auth page while being logged in 
-    if(userInfo._id !== '' && authPages.includes(currentPath)){
+    if(userInfo.email && authPages.includes(currentPath)){
         document.location.hash = '/dashboard';
         return;
     }
     //redirect to home page if the user is trying to access a protected page while being logged out
-    if(userInfo._id === '' && protectedPages.includes(currentPath)){
+    if(!userInfo.email && protectedPages.includes(currentPath)){
         document.location.hash = '/';
         return;
     }

@@ -16,14 +16,14 @@ const SignIn = {
                 showMessage(data.error);
             }else{
                 setUserInfo(data);
-                veer();
+                document.location.hash = '/dashboard';
             }
         })
     },
     render: ()=>{
-        if(getUserInfo().email){
-            veer();
-        }
+        //if(getUserInfo().email){
+        //    veer();
+        //}
         return`
             <section class="login container">
                 <div class="login-container">
