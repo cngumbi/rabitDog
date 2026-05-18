@@ -3,7 +3,6 @@ import { getUserInfo, setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage, veer } from '../../utils';
 const SignIn = {
     vignette: ()=>{
-        //const loginImg = document.getElementById('loginImage');
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
             showLoading();
@@ -21,9 +20,6 @@ const SignIn = {
         })
     },
     render: ()=>{
-        //if(getUserInfo().email){
-        //    veer();
-        //}
         return`
             <section class="login container">
                 <div class="login-container">
@@ -41,7 +37,6 @@ const SignIn = {
                     </form>
                 </div>
             </section>
-        
         `;
     }
 };

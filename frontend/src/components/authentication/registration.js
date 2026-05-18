@@ -7,9 +7,6 @@ const Registration = {
             e.preventDefault();
             showLoading();
             const data = await register({
-                //name: document.getElementById('fullName').value,
-                //userName: document.getElementById('userName').value,
-                //phoneNumber: document.getElementById('phoneNumber').value,
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             });
@@ -18,7 +15,7 @@ const Registration = {
                 showMessage(data.error);
             }else{
                 setUserInfo(data);
-                veer();
+                document.location.hash = '/dashboard';
             }
         });
         const signupImage = document.getElementById('signupImage'); 
