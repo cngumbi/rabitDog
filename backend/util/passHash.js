@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 const PassHash = (value, saltValue)=>{
     const result = bcrypt.hashSync(value, saltValue);
@@ -10,5 +11,9 @@ const PassCompare = (value, hash)=>{
     return result;
 };
 
-module.exports = { PassHash, PassCompare };
+const HmacProcess = (value, secretKey)=>{
+    const result = crypto.createHmac('sha256', secretKey).update(value).digest('hex');
+    return result;
+};
 
+module.exports = { PassHash, PassCompare, HmacProcess };

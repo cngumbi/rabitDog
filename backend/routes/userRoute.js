@@ -4,8 +4,10 @@ const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
 const { ValidateData } = require('../middleware/validateData');
-const { PassHash, PassCompare } = require('../util/passHash');
+const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
+const config = require('../config/config');
+const transporter = require('../middleware/sendmail');
 
 UserRoute.post('/signin', expressAsync(async(req, res)=>{
     try{
@@ -139,6 +141,43 @@ UserRoute.post('/signout', expressAsync(async(req, res)=>{
         sameSite: 'strict',
     });
     res.send({ success: true, message: 'Sign out successful' });
+}));
+
+UserRoute.patch('/sendVerificationCode', expressAsync(async(req, res)=>{
+    try{
+        //check if email exist
+        const existingUser = await User.findOne({
+            email: req.body.email,
+        });
+        if(!existingUser){
+                return res.status(404).send({ message: 'User does not exist' });
+        }
+        if(existingUser.verified) {
+            return res.status(400).send({ message: 'User already verified' });
+        }
+        //generate a random 6-digit code
+        const verificationCodeValue = Math.floor(100000 + Math.random() * 900000).toString();
+        //send the code to user's email (for demonstration, we will just return the code in response)
+        let info = await transporter.sendMail({
+            from: config.NODE_CODE_EMAIL_ADDRESS,
+            to: existingUser.email,
+            subject: 'Email Verification Code',
+            text: `Your verification code is: ${verificationCodeValue}`
+        });
+        if(info.accepted[0] === existingUser.email){
+            const hashedVerificationCodeValue = HmacProcess(verificationCodeValue, config.MAC_VERIFICATION_CODE_SECRET);
+            existingUser.verificationToken = hashedVerificationCodeValue;
+            existingUser.verificationTokenValidation = Date.now() + 10 * 60 * 1000; // token valid for 10 minutes
+            await existingUser.save();
+            return res.status(200).send({ message: 'Verification code sent to email' });
+        }
+        return res.status(400).send({ message: 'Failed to send verification code' });
+    }catch(error){
+        console.log(error);
+        return res.status(500).send({
+            message: 'Failed to send verification code'
+        });
+    }
 }));
 
 module.exports = UserRoute;
