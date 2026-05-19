@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     isAdmin: { type: Boolean, required: true, default: false },
     verified: { type: Boolean, default: false },
     verificationToken: { type: String, select: false },
-    verificationTokenValidition: { type: Number, select: false },
+    verificationTokenValidation: { type: Number, select: false },
     forgotPasswordToken: { type: String, select: false },
     forgotPasswordTokenValidation: { type: Number, select: false }
 

@@ -3,7 +3,7 @@ const expressAsync = require('express-async-handler');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
-const { ValidateData } = require('../middleware/validateData');
+const { ValidateData, ValidateCode } = require('../middleware/validateData');
 const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
 const config = require('../config/config');
@@ -29,7 +29,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
         }
         //const profile = await Profile.findOne({ user: signinUser._id});
         //set token in httpOnly cookie
-        res.cookie('Authorization', 'Bearer' + generateToken(signinUser), {
+        res.cookie('Authorization', 'Bearer ' + generateToken(signinUser), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -179,6 +179,49 @@ UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, re
         return res.status(500).send({
             message: 'Failed to send verification code'
         });
+    }
+}));
+
+UserRoute.patch('/verifyEmail', authLimiter, expressAsync(async(req, res)=>{
+    try{
+        const { email, verificationCodeProvided } = req.body;
+        // validate user input
+        const { error, value } = ValidateCode().validate({ email, verificationCodeProvided });
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
+        //const codeValue = req.body.verificationCodeprovided;
+        const codeValue = verificationCodeProvided.toString();
+        //check if email exist
+        const existingUser = await User.findOne({
+            email: req.body.email,
+        }).select('+verificationToken +verificationTokenValidation');
+        if(!existingUser){
+            return res.status(404).send({ message: 'User does not exist' });
+        }
+        if(existingUser.verified) {
+            return res.status(400).send({ message: 'User already verified' });
+        }
+        //check if verification token exist and valid
+        if(!existingUser.verificationToken || !existingUser.verificationTokenValidation){
+            return res.status(400).send({ message: 'No verification code found, please request a new one' });
+        }
+        if(Date.now() > existingUser.verificationTokenValidation){
+            return res.status(400).send({ message: 'Verification code expired, please request a new one' });
+        }
+
+        const hashedCodeValue = HmacProcess(codeValue, config.MAC_VERIFICATION_CODE_SECRET);
+        if(hashedCodeValue === existingUser.verificationToken){
+            existingUser.verified = true;
+            existingUser.verificationToken = undefined;
+            existingUser.verificationTokenValidation = undefined;
+            await existingUser.save();
+            return res.status(200).send({ message: 'Email verified successfully' });
+        }
+        return res.status(400).send({ message: 'Invalid verification code!!' });
+    }catch(error){
+        console.log(error);
+        return res.status(500).send({ message: 'Email verification failed' });
     }
 }));
 

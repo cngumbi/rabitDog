@@ -10,4 +10,11 @@ const ValidateData = ()=>{
 });
 };
 
-module.exports = { ValidateData };
+const ValidateCode = ()=>{
+    return Joi.object({
+        email: Joi.string().min(6).max(60).email({ tlds: { allow: ['com', 'net', 'org'] } }).required(),
+        verificationCodeProvided: Joi.number(), 
+    });
+};
+
+module.exports = { ValidateData, ValidateCode };
