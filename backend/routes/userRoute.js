@@ -8,8 +8,9 @@ const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
 const config = require('../config/config');
 const transporter = require('../middleware/sendmail');
+const { authLimiter } = require('../middleware/rateLimiter');
 
-UserRoute.post('/signin', expressAsync(async(req, res)=>{
+UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
     try{
         //validate user input
         const { error } = await ValidateData().validateAsync(req.body);
@@ -48,7 +49,7 @@ UserRoute.post('/signin', expressAsync(async(req, res)=>{
         });
     }
 }));
-UserRoute.post('/register', expressAsync(async(req, res) => {
+UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
     try{
         // validate user input
         const { error } = await ValidateData().validateAsync(req.body);
@@ -143,7 +144,7 @@ UserRoute.post('/signout', expressAsync(async(req, res)=>{
     res.send({ success: true, message: 'Sign out successful' });
 }));
 
-UserRoute.patch('/sendVerificationCode', expressAsync(async(req, res)=>{
+UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, res)=>{
     try{
         //check if email exist
         const existingUser = await User.findOne({
