@@ -36,15 +36,55 @@ jobs:
               uses: actions/setup-node@v3
               with:
                 node-version: ${{ matrix.node-version }}
+            
+            - name: Install Dependencies
+              run: npm install
 
-            - name: Install & build
+            
+            - name: Check Last Deployment Status
+              id: deployment_status
               run: |
-                npm run build
+                LAST_DEPLOY_FILE=".last_deploy_status"
+
+                if [! -f "$LAST_DEPLOY_FILE" ]; then
+                  echo "No previous deployment status found. Assuming success."
+                  echo "deploy=true" >> $GITHUB_OUTPUT
+                  exit 0
+                fi
+
+                LAST_STATUS=$(cat "$LAST_DEPLOY_FILE")
+                CURRENT_STATUS=$(date +%s)
+
+                DAYS_40=$((40 * 24 * 60 * 60))
+
+                DIFF=$((CURRENT_STATUS - LAST_STATUS))
+
+                if [ "$DIFF" -ge "$DAYS_40" ]; then
+                  echo "40 days have passed since the last deployment. Proceeding with deployment."
+                  echo "deploy=true" >> $GITHUB_OUTPUT
+                else
+                  echo "Deployment blocked. 40 days have not passed since the last deployment."
+                  echo "deploy=false" >> $GITHUB_OUTPUT
+                fi
+              
+            - name: Build Application
+              if: steps.deployment_status.outputs.deploy == 'true'
+              run: |
                 npm audit fix --force
                 npm run build
-                pm2 stop 0
+            
+            - name: Restart Application
+              if: steps.deployment_status.outputs.deploy == 'true' 
+              run: |
+                pm2 stop 0 | true
                 pm2 start 0
                 pm2 save
+
+            - name: Update Last Deployment Status
+              if: steps.deployment_status.outputs.deploy == 'true'
+              run: |
+                date +%s > .last_deploy_status
+
               #job status check if:success, always, failure can be used to check the status of the jobs
             - name: if Failure
               if: ${{ failure() }}
