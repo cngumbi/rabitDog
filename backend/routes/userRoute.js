@@ -9,7 +9,7 @@ const UserRoute = express.Router();
 const config = require('../config/config');
 const transporter = require('../middleware/sendmail');
 const { authLimiter } = require('../middleware/rateLimiter');
-
+// User registration route
 UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
     try{
         //validate user input
@@ -134,7 +134,6 @@ UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
         });
     }
 }));
-
 UserRoute.post('/signout', expressAsync(async(req, res)=>{
     res.clearCookie('Authorization', {
         httpOnly: true,
@@ -143,7 +142,6 @@ UserRoute.post('/signout', expressAsync(async(req, res)=>{
     });
     res.send({ success: true, message: 'Sign out successful' });
 }));
-
 UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, res)=>{
     try{
         //check if email exist
@@ -181,7 +179,6 @@ UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, re
         });
     }
 }));
-
 UserRoute.patch('/verifyEmail', authLimiter, expressAsync(async(req, res)=>{
     try{
         const { email, verificationCodeProvided } = req.body;
@@ -224,5 +221,5 @@ UserRoute.patch('/verifyEmail', authLimiter, expressAsync(async(req, res)=>{
         return res.status(500).send({ message: 'Email verification failed' });
     }
 }));
-
+//TODO: add forgot password route
 module.exports = UserRoute;

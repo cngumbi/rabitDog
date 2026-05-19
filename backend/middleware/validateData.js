@@ -1,5 +1,5 @@
 const Joi = require('joi');
-
+//define validation schema for user input
 const ValidateData = ()=>{
     return Joi.object({
     email: Joi.string().min(6).max(60).email({ tlds: { allow: ['com', 'net', 'org'] } }).required(),
@@ -9,7 +9,6 @@ const ValidateData = ()=>{
     }),
 });
 };
-
 const ValidateCode = ()=>{
     return Joi.object({
         email: Joi.string().min(6).max(60).email({ tlds: { allow: ['com', 'net', 'org'] } }).required(),

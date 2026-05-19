@@ -38,7 +38,6 @@ const Registration = {
                     </form>
                 </div>
             </section>
-        
         `;
     }
 };

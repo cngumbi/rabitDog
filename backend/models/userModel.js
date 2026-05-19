@@ -17,7 +17,6 @@ const userSchema = new mongoose.Schema({
     forgotPasswordTokenValidation: { type: Number, select: false }
 
 }, { timestamps: true });
-
 //create the user model
 const User = mongoose.model('User', userSchema);
 //export the user model
