@@ -3,7 +3,7 @@ const config = require('../config/config');
 
 //create transporter
 const transporter = nodemailer.createTransport({
-    service : 'gmail',
+    service : config.NODE_SMTP_SERVICE,
     auth: {
         user: config.NODE_CODE_EMAIL_ADDRESS,
         pass: config.NODE_CODE_EMAIL_PASSWORD,

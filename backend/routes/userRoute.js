@@ -163,7 +163,8 @@ UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, re
             from: config.NODE_CODE_EMAIL_ADDRESS,
             to: existingUser.email,
             subject: 'Email Verification Code',
-            text: `Your verification code is: ${verificationCodeValue}`
+            text: `Your verification code is: ${verificationCodeValue}`,
+            html: `<p>Your verification code is: <strong>${verificationCodeValue}</strong></p>`       
         });
         if(info.accepted[0] === existingUser.email){
             const hashedVerificationCodeValue = HmacProcess(verificationCodeValue, config.MAC_VERIFICATION_CODE_SECRET);
