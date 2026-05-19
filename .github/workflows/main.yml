@@ -9,7 +9,11 @@ on:
         branches: [ master ]
     #allows you to run this workflow manually from the actions tab
     workflow_dispatch:
-        
+
+    schedule:
+        #cron syntax #run at 21:00 UTC every day which is 00:00 EAT Kenya Time(UTC+3)
+        - cron: '0 21 * * *'
+
 jobs:
     build:
         #the type of runnner that the job will run on
@@ -25,7 +29,7 @@ jobs:
             - name: checkout
               uses: actions/checkout@v2
               with:
-                presist-credentials: false
+                persist-credentials: false
 
             #Run a single command using the runners shell
             - name: Use Node.js ${{ matrix.node-version }}
