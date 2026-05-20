@@ -39,6 +39,33 @@ const VerifyEmail = {
                 return;
             }
         });
+        //resend code event listener
+        document.getElementById('resend-code').addEventListener('click', async()=>{
+            const user = getUserInfo();
+            showLoading();
+            try {
+                const response = await fetch(
+                    '/api/users/sendVerificationCode',
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: user.email })
+                    }
+                );
+                const verificationData = await response.json();
+                hideLoading();
+                if(!response.ok){
+                    showMessage(verificationData.message || 'Failed to resend verification code');
+                    return;
+                }
+                showMessage(verificationData.message || 'Verification code resent successfully');
+            } catch (error) {
+                hideLoading();
+                showMessage('Failed to resend verification code');
+            }
+        });
     },
     render: ()=>{
         const { email, verified } = getUserInfo();
@@ -64,6 +91,11 @@ const VerifyEmail = {
                             class="button"
                         >
                     </form>
+                    <!--Resend verification code link-->
+                    <p>
+                        Didn't receive the code?
+                    </p>
+                    <button id="resend-code" class="button" style="margin-top: 1rem;">Resend Code</button>
                 </div>
             </section>
         `;
