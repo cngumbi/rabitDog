@@ -5,8 +5,14 @@ const Registration = {
     vignette: ()=>{
         document.getElementById('register-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
+            //password match validation
             if(document.getElementById('password').value !== document.getElementById('confirmPassword').value){
                 showMessage('Passwords do not match');
+                return;
+            }
+            //password length validation
+            if(document.getElementById('password').value.length < 8){
+                showMessage('Password must be at least 8 characters');
                 return;
             }
             showLoading();
@@ -14,15 +20,37 @@ const Registration = {
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             });
-            hideLoading();
             if(data.error){
+                hideLoading();
                 showMessage(data.error);
-            }else{
-                setUserInfo(data);
-                document.location.hash = '/dashboard';
+                return;
             }
+            //store user info in local storage
+            setUserInfo(data);
+            //send verification email
+            const response = await fetch(
+                '/api/users/sendVerificationCode', 
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: data.email })
+                }
+            );
+            const verificationData = await response.json();
+            hideLoading();
+            //if the email sending fails, show an error message but still redirect to the verify email page so the user can try again
+            if(!response.ok){
+                showMessage(verificationData.message || 'Failed to send verification email');
+                return;
+            }
+            //show success message
+            showMessage(verificationData.message || 'Verification email sent successfully');
+            //redirect to verify email page
+            document.location.hash = '/verify-email';
+            
         });
-        const signupImage = document.getElementById('signupImage'); 
     },
     render: ()=>{
         return`

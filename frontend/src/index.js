@@ -9,6 +9,7 @@ import Header from './components/header';
 //pages
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
+import VerifyEmail from './components/authentication/verifyEmail';
 import Profile from './components/profile/profilePage';
 import Forget from './components/authentication/forget';
 import Dashboard from './components/profile/admin/dashboard/dashboard';
@@ -54,6 +55,7 @@ const routes = {
     '/': SignIn,
     '/user-current': SignIn,
     '/new-user-create': Registration,
+    '/verify-email': VerifyEmail,
     '/forget': Forget,
     '/profile': Profile,
     '/dashboard': Dashboard,
@@ -93,7 +95,7 @@ const router = async () => {
         '/',
         '/new-user-create',
         '/forget',
-        '/user-current'
+        '/user-current',
     ];
     const protectedPages = [
         '/profile',
@@ -102,8 +104,12 @@ const router = async () => {
     //get the current path
     const currentPath = request.resource ? `/${request.resource}` : '/';
     //redirect to dashboard if the user is trying to access an auth page while being logged in 
-    if(userInfo.email && authPages.includes(currentPath)){
+    if(userInfo.email && userInfo.verified && authPages.includes(currentPath)){
         document.location.hash = '/dashboard';
+        return;
+    }
+    if(userInfo.email && !userInfo.verified && authPages.includes(currentPath)){
+        document.location.hash = '/verify-email';
         return;
     }
     //redirect to home page if the user is trying to access a protected page while being logged out

@@ -27,6 +27,11 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
                 message: 'Invalid Email or Password',
             });
         }
+        if(!signinUser.verified){
+            return res.status(401).send({
+                message: 'Email not verified, please verify your email before signing in',
+            });
+        }
         //const profile = await Profile.findOne({ user: signinUser._id});
         //set token in httpOnly cookie
         res.cookie('Authorization', 'Bearer ' + generateToken(signinUser), {
@@ -40,6 +45,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
             _id: signinUser._id,
             email: signinUser.email,
             isAdmin: signinUser.isAdmin,
+            verified: signinUser.verified,
             token: generateToken(signinUser),
             //profileCompleted: profile.profileCompleted,
         });
@@ -86,6 +92,7 @@ UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
                 _id: createdUser._id,
                 email: createdUser.email,
                 isAdmin: createdUser.isAdmin,
+                verified: createdUser.verified,
                 token: generateToken(createdUser),  //generate token for the user
             });
         }
