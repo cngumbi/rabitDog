@@ -1,6 +1,6 @@
 import { signIn } from '../../connection/api';
-import { getUserInfo, setUserInfo } from '../../localStorage';
-import { hideLoading, showLoading, showMessage, veer } from '../../utils';
+import { setUserInfo } from '../../localStorage';
+import { hideLoading, showLoading, showMessage} from '../../utils';
 const SignIn = {
     vignette: ()=>{
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
@@ -11,13 +11,47 @@ const SignIn = {
                 password: document.getElementById('password').value
             });
             hideLoading();
+            //check if there is an error
             if(data.error){
                 showMessage(data.error);
-            }else{
-                setUserInfo(data);
-                document.location.hash = '/dashboard';
             }
-        })
+            setUserInfo(data);
+            if(!data.verified){
+                try{
+                    //send verification code to user's email
+                    const response = await fetch(
+                        '/api/users/sendVerificationCode',
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: data.email
+                        })
+                    });
+                    const verificationData = await response.json();
+                    hideLoading();
+                    if(!response.ok){
+                        showMessage(verificationData.message || 'Failed to send verification email.');
+                        return;
+                    }
+                    showMessage(
+                        verificationData.message ||
+                        'Verification code sent to your email. Please check your inbox.'
+                    );
+                    document.location.hash = '/verify-email';
+                    return;
+                } catch (error) {
+                    hideLoading();
+                    console.error(error);
+                    showMessage('Failed to send verification email.');
+                    return;
+                }
+            }
+            document.location.hash = '/dashboard';
+            
+        });
     },
     render: ()=>{
         return`
