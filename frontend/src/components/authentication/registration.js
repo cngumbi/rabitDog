@@ -5,6 +5,10 @@ const Registration = {
     vignette: ()=>{
         document.getElementById('register-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
+            if(document.getElementById('password').value !== document.getElementById('confirmPassword').value){
+                showMessage('Passwords do not match');
+                return;
+            }
             showLoading();
             const data = await register({
                 email: document.getElementById('email').value,
