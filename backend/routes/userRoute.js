@@ -3,7 +3,7 @@ const expressAsync = require('express-async-handler');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
-const { ValidateData, ValidateCode } = require('../middleware/validateData');
+const { ValidateData, ValidateCode, ValidateForgottenPassword } = require('../middleware/validateData');
 const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
 const config = require('../config/config');
@@ -224,4 +224,77 @@ UserRoute.patch('/verifyEmail', authLimiter, expressAsync(async(req, res)=>{
     }
 }));
 //TODO: add forgot password route
+UserRoute.patch('/sendForgetPasswordCode', authLimiter, expressAsync(async(req, res)=>{
+    try{
+        //check if email exist
+        const existingUser = await User.findOne({
+            email: req.body.email,
+        });
+        if(!existingUser){
+                return res.status(404).send({ message: 'User does not exist' });
+        }
+        //generate a random 6-digit code
+        const verificationCodeValue = Math.floor(100000 + Math.random() * 900000).toString();
+        //send the code to user's email (for demonstration, we will just return the code in response)
+        let info = await transporter.sendMail({
+            from: config.NODE_CODE_EMAIL_ADDRESS,
+            to: existingUser.email,
+            subject: 'Forget Password Verification Code',
+            text: `Your Reset code is: ${verificationCodeValue}`,
+            html: `<p>Your Reset code is: <strong>${verificationCodeValue}</strong></p>`       
+        });
+        if(info.accepted[0] === existingUser.email){
+            const hashedVerificationCodeValue = HmacProcess(verificationCodeValue, config.MAC_VERIFICATION_CODE_SECRET);
+            existingUser.forgotPasswordToken = hashedVerificationCodeValue;
+            existingUser.forgotPasswordTokenValidation = Date.now() + 10 * 60 * 1000; // token valid for 10 minutes
+            await existingUser.save();
+            return res.status(200).send({ message: 'Verification code sent to email' });
+        }
+        return res.status(400).send({ message: 'Failed to send verification code' });
+    }catch(error){
+        console.log(error);
+        return res.status(500).send({
+            message: 'Failed to send verification code'
+        });
+    }
+}));
+UserRoute.patch('/verifyForgottenPassword', authLimiter, expressAsync(async(req, res)=>{
+    try{
+        const { email, verificationCodeProvided, newPassword } = req.body;
+        // validate user input
+        const { error, value } = ValidateForgottenPassword().validate({ email, verificationCodeProvided, newPassword });
+        if (error) {
+            return res.status(400).send({ message: error.details[0].message });
+        }
+        //const codeValue = req.body.verificationCodeprovided;
+        const codeValue = verificationCodeProvided.toString();
+        //check if email exist
+        const existingUser = await User.findOne({
+            email: req.body.email,
+        }).select('+forgotPasswordToken +forgotPasswordTokenValidation');
+        if(!existingUser){
+            return res.status(404).send({ message: 'User does not exist' });
+        }
+        //check if verification token exist and valid
+        if(!existingUser.forgotPasswordToken || !existingUser.forgotPasswordTokenValidation){
+            return res.status(400).send({ message: 'No verification code found, please request a new one' });
+        }
+        if(Date.now() > existingUser.forgotPasswordTokenValidation){
+            return res.status(400).send({ message: 'Verification code expired, please request a new one' });
+        }
+
+        const hashedCodeValue = HmacProcess(codeValue, config.MAC_VERIFICATION_CODE_SECRET);
+        if(hashedCodeValue === existingUser.forgotPasswordToken){
+            existingUser.password = PassHash(newPassword, 8);
+            existingUser.forgotPasswordToken = undefined;
+            existingUser.forgotPasswordTokenValidation = undefined;
+            await existingUser.save();
+            return res.status(200).send({ message: 'Password reset successfully' });
+        }
+        return res.status(400).send({ message: 'Invalid verification code!!' });
+    }catch(error){
+        console.log(error);
+        return res.status(500).send({ message: 'Email verification failed' });
+    }
+}));
 module.exports = UserRoute;
