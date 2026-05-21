@@ -27,11 +27,11 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
                 message: 'Invalid Email or Password',
             });
         }
-        if(!signinUser.verified){
-            return res.status(401).send({
-                message: 'Email not verified, please verify your email before signing in',
-            });
-        }
+        //if(!signinUser.verified){
+        //    return res.status(401).send({
+        //        message: 'Email not verified, please verify your email before signing in',
+        //    });
+        //}
         //const profile = await Profile.findOne({ user: signinUser._id});
         //set token in httpOnly cookie
         res.cookie('Authorization', 'Bearer ' + generateToken(signinUser), {

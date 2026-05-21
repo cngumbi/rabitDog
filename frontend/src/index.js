@@ -17,6 +17,7 @@ import Dashboard from './components/profile/admin/dashboard/dashboard';
 import Chicken from './components/pages/poultry/Chicken/chicken';
 import MedicalLogs from './components/pages/utils/medicalLogs';
 import Breeds from './components/pages/utils/breeds';
+//utils
 import { getUserInfo } from './localStorage';
 //import { session } from 'passport';
 //import CartPage from './components/order/cartpage';
@@ -91,12 +92,19 @@ const router = async () => {
     //get user info from local storage
     const userInfo = getUserInfo();
     //check if the user is trying to access an auth page while being logged in or trying to access a protected page while being logged out
+    //Auth Pages
     const authPages = [
         '/',
         '/new-user-create',
         '/forget',
         '/user-current',
     ];
+    //Public Pages
+    //const publicPages = [
+    //    '/forget',
+    //    '/verify-email',
+    //];
+    //Protected Pages
     const protectedPages = [
         '/profile',
         '/dashboard',
@@ -108,15 +116,30 @@ const router = async () => {
         document.location.hash = '/dashboard';
         return;
     }
+    //redirect unverified users to verify page
     if(userInfo.email && !userInfo.verified && authPages.includes(currentPath)){
         document.location.hash = '/verify-email';
         return;
     }
-    //redirect to home page if the user is trying to access a protected page while being logged out
+    //prevent verified users from accessing verify page
+    if(userInfo.email && userInfo.verified && currentPath === '/verify-email'){
+        document.location.hash = '/dashboard';
+        return;
+    }
+    //block unverified users from accessing protected pages
+    if(userInfo.email && !userInfo.verified && protectedPages.includes(currentPath)){
+        document.location.hash = '/verify-email';
+        return;
+    }
+    //block unauthenticated users from accessing protected pages
     if(!userInfo.email && protectedPages.includes(currentPath)){
         document.location.hash = '/';
         return;
     }
+    //allow access to public pages without authentication
+    //if(publicPages.includes(currentPath)){
+    //    //do nothing and allow access
+    //}
     //Build base path -> '/chicken'
     /*'old style' -> const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
             const sessions = routes[parseUrl] ? routes[parseUrl] : Error404;
@@ -171,10 +194,3 @@ const router = async () => {
 };
 window.addEventListener('load', router);
 window.addEventListener('hashchange', router);
-
-
-
-
-
-
-

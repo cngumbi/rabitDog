@@ -5,19 +5,20 @@ const SignIn = {
     vignette: ()=>{
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
             e.preventDefault();
-            showLoading();
-            const data = await signIn({
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            });
-            hideLoading();
-            //check if there is an error
-            if(data.error){
-                showMessage(data.error);
-            }
-            setUserInfo(data);
-            if(!data.verified){
-                try{
+            try{
+                showLoading();
+                const data = await signIn({
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                });
+                //check if there is an error
+                if(data.error){
+                    hideLoading();
+                    showMessage(data.error);
+                    return;
+                }
+                setUserInfo(data);
+                if(!data.verified){
                     //send verification code to user's email
                     const response = await fetch(
                         '/api/users/sendVerificationCode',
@@ -25,11 +26,12 @@ const SignIn = {
                             method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            email: data.email
-                        })
-                    });
+                            },
+                            body: JSON.stringify({
+                                email: data.email
+                            })
+                        }
+                    );
                     const verificationData = await response.json();
                     hideLoading();
                     if(!response.ok){
@@ -42,14 +44,14 @@ const SignIn = {
                     );
                     document.location.hash = '/verify-email';
                     return;
-                } catch (error) {
-                    hideLoading();
-                    console.error(error);
-                    showMessage('Failed to send verification email.');
-                    return;
                 }
+                hideLoading();
+                document.location.hash = '/dashboard';
+            } catch(error){
+                hideLoading();
+                console.error(error);
+                showMessage('Failed to sign in. Please check your email and password.');
             }
-            document.location.hash = '/dashboard';
             
         });
     },
