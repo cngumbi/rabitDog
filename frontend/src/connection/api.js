@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiURL } from "../config/config";
 import { getUserInfo } from '../localStorage';
 
-export const register = async({ name, userName, phoneNumber, email, password })=>{
+export const register = async({ email, password })=>{
     try{
         const response = await axios({
             url: `${apiURL}/api/users/register`,
@@ -11,9 +11,6 @@ export const register = async({ name, userName, phoneNumber, email, password })=
                 'Content-Type': 'application/json',
             },
             data: {
-                //name,
-                //userName,
-                //phoneNumber,
                 email,
                 password
             }
@@ -46,7 +43,7 @@ export const signIn = async({email, password})=>{
     }
 
 };
-export const update = async({ name, userName, phoneNumber, email, password })=>{
+export const update = async({ email, password, currentPassword })=>{
     try{
         const { _id, token } = getUserInfo();
         const response = await axios({
@@ -57,11 +54,9 @@ export const update = async({ name, userName, phoneNumber, email, password })=>{
                 Authorization: `Bearer ${token}`,
             },
             data: {
-                //name,
-                //userName,
-                //phoneNumber,
                 email,
-                password
+                password,
+                currentPassword
             }
         });
         if(response.statusText !== 'OK'){

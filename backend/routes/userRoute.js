@@ -3,7 +3,7 @@ const expressAsync = require('express-async-handler');
 const User = require('../models/userModel');
 const { generateToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
-const { ValidateData, ValidateCode, ValidateForgottenPassword } = require('../middleware/validateData');
+const { ValidateData, ValidateCode, ValidateForgottenPassword, ValidateUpdateProfile } = require('../middleware/validateData');
 const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
 const config = require('../config/config');
@@ -100,7 +100,7 @@ UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
 UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
     try{
         //validate user input
-        const { error } = await ValidateData().validateAsync(req.body);
+        const { error } = await ValidateUpdateProfile().validateAsync(req.body);
         if (error) {
             return res.status(400).send({ message: error.details[0].message });
         }
@@ -114,7 +114,17 @@ UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
         } else {
             //update user info
             user.email = req.body.email || user.email;
-            user.password = req.body.password ? PassHash(req.body.password, 8) : user.password; //|| user.password;
+            //update password if provided
+            if(req.body.password){
+                const isMatch = await PassCompare(req.body.currentPassword, user.password);
+                if(!isMatch){
+                    return res.status(401).send({
+                        message: 'Current password is incorrect'
+                    });
+                }
+                user.password = PassHash(req.body.password, 8);
+            }
+            //user.password = req.body.password ? PassHash(req.body.password, 8) : user.password; //|| user.password;
             //save updated user to database
             const updateUser = await user.save();
             //check if user updated successfully
