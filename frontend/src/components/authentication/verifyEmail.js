@@ -73,29 +73,18 @@ const VerifyEmail = {
            <section class="login container">
                 <div class="login-container">
                     <h2>Email Verification</h2>
-                    <p>
-                        A verification code has been sent to:
-                    </p>
+                    <p> A verification code has been sent to: </p>
                     <h3>${email}</h3>
                     <form id="verify-form">
                         <span>Enter Verification Code</span>
-                        <input 
-                            type="text"
-                            id="verificationCode"
-                            placeholder="6-digit code"
-                            required
-                        >
-                        <input
-                            type="submit"
-                            value="Verify Email"
-                            class="button"
-                        >
+                        <input type="text" id="verificationCode" placeholder="6-digit code" required >
+                        <input type="submit" value="Verify Email" class="button" >
+                        <!--Resend verification code link-->
+                        <p> Didn't receive the code?</p>
+                        <button id="resend-code" class="button" style="margin-top: 1rem;">Resend Code</button>
+                        <a href="/#/forget">Forget Password?</a>
                     </form>
-                    <!--Resend verification code link-->
-                    <p>
-                        Didn't receive the code?
-                    </p>
-                    <button id="resend-code" class="button" style="margin-top: 1rem;">Resend Code</button>
+                    
                 </div>
             </section>
         `;
