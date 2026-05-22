@@ -9,44 +9,10 @@ const Profile = {
             await clearUser();
             document.location.hash = '/';
           });
-          const updateButton = document.getElementById('update-profile-button');
-          if (updateButton) {
-            updateButton.addEventListener('click', async (e) => {
-              e.preventDefault();
-              const currentPassword = document.getElementById('currentPassword').value;
-              const newPassword = document.getElementById('password').value;
-              const confirmPassword = document.getElementById('confirmPassword').value;
-              if (newPassword !== confirmPassword) {
-                showMessage('Password and confirm password are not match');
-                return;
-              }
-              try {
-                showLoading();
-                const data = await update({
-                  email: document.getElementById('email').value,
-                  currentPassword: currentPassword,
-                  password: newPassword,
-                });
-                hideLoading();
-                console.log(data);
-                if (data.error) {
-                  showMessage(data.error);
-                } else {
-                  setUserInfo(data);
-                  showMessage('Profile updated successfully');
-                  document.location.hash = '/';
-                }
-              } catch (error) {
-                hideLoading();
-                showMessage(error.message);
-              }
-            });
-          }
-          //document
-          //  .getElementById('profile-form')
-          //  .addEventListener('submit', async (e) => {
+          //const updateButton = document.getElementById('update-profile-button');
+          //if (updateButton) {
+          //  updateButton.addEventListener('click', async (e) => {
           //    e.preventDefault();
-          //    //e.stopPropagation();
           //    const currentPassword = document.getElementById('currentPassword').value;
           //    const newPassword = document.getElementById('password').value;
           //    const confirmPassword = document.getElementById('confirmPassword').value;
@@ -54,21 +20,55 @@ const Profile = {
           //      showMessage('Password and confirm password are not match');
           //      return;
           //    }
-          //    showLoading();
-          //    const data = await update({
-          //      email: document.getElementById('email').value,
-          //      currentPassword: currentPassword,
-          //      password: newPassword,
-          //      
-          //    });
-          //    hideLoading();
-          //    if (data.error) {
-          //      showMessage(data.error);
-          //    } else {
-          //      setUserInfo(data);
-          //      document.location.hash = '/';
+          //    try {
+          //      showLoading();
+          //      const data = await update({
+          //        email: document.getElementById('email').value,
+          //        currentPassword: currentPassword,
+          //        password: newPassword,
+          //      });
+          //      hideLoading();
+          //      console.log(data);
+          //      if (data.error) {
+          //        showMessage(data.error);
+          //      } else {
+          //        setUserInfo(data);
+          //        showMessage('Profile updated successfully');
+          //        document.location.hash = '/';
+          //      }
+          //    } catch (error) {
+          //      hideLoading();
+          //      showMessage(error.message);
           //    }
           //  });
+          //}
+          document
+            .getElementById('update-profile-button')
+            .addEventListener('click', async (e) => {
+              e.preventDefault();
+              //e.stopPropagation();
+              const currentPassword = document.getElementById('currentPassword').value;
+              const newPassword = document.getElementById('password').value;
+              const confirmPassword = document.getElementById('confirmPassword').value;
+              if (newPassword !== confirmPassword) {
+                showMessage('Password and confirm password are not match');
+                return;
+              }
+              showLoading();
+              const data = await update({
+                email: document.getElementById('email').value,
+                currentPassword,
+                password: newPassword,
+                
+              });
+              hideLoading();
+              if (data.error) {
+                showMessage(data.error);
+              } else {
+                setUserInfo(data);
+                document.location.hash = '/';
+              }
+            });
           },
     render: ()=>{
         const { email } = getUserInfo();
@@ -79,8 +79,8 @@ const Profile = {
             <div class="content profile">
               <div class="profile-info">
                 <div class="form-container">
-                    <form id="profile-form" action="javascript:void(0);" method="put">
-                      <ul class="form-items">
+                    <form id="profile-form">
+                      <ul class="form-items" onsubmit="return false;">
                         <li>
                           <h1>User Profile</h1>
                         </li>

@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+//const methodOverride = require("method-override");
 const path = require("path");
 const  db = require("./config/mongoosDB");
 const config = require("./config/config");
@@ -21,6 +22,8 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+//override with POST having ?_method=DELETE
+//app.use(methodOverride('_method'));
 //routes
 app.use('/api/users', UserRoute);
 app.use("/api/profile", ProfileRoute);
