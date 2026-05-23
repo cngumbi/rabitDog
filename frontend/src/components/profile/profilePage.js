@@ -5,14 +5,21 @@ import DashboardMenu from "./admin/dashboard/dashboardMenu";
 
 const Profile = {
     vignette: ()=>{
-        document.getElementById('signout-button').addEventListener('click', async () => {
-            await clearUser();
-            document.location.hash = '/';
-          });
-          //const updateButton = document.getElementById('update-profile-button');
-          //if (updateButton) {
-          //  updateButton.addEventListener('click', async (e) => {
+          // Sign out button event listener
+          const signoutButton = document.getElementById('signout-button');
+          if (signoutButton) {
+            signoutButton.onclick = async () => {
+              await clearUser();
+              document.location.hash = '/';
+            };
+          };
+          // Update profile button event listener
+
+          //document
+          //  .getElementById('update-profile-button')
+          //  .addEventListener('click', async (e) => {
           //    e.preventDefault();
+          //    //e.stopPropagation();
           //    const currentPassword = document.getElementById('currentPassword').value;
           //    const newPassword = document.getElementById('password').value;
           //    const confirmPassword = document.getElementById('confirmPassword').value;
@@ -20,55 +27,21 @@ const Profile = {
           //      showMessage('Password and confirm password are not match');
           //      return;
           //    }
-          //    try {
-          //      showLoading();
-          //      const data = await update({
-          //        email: document.getElementById('email').value,
-          //        currentPassword: currentPassword,
-          //        password: newPassword,
-          //      });
-          //      hideLoading();
-          //      console.log(data);
-          //      if (data.error) {
-          //        showMessage(data.error);
-          //      } else {
-          //        setUserInfo(data);
-          //        showMessage('Profile updated successfully');
-          //        document.location.hash = '/';
-          //      }
-          //    } catch (error) {
-          //      hideLoading();
-          //      showMessage(error.message);
+          //    showLoading();
+          //    const data = await update({
+          //      email: document.getElementById('email').value,
+          //      currentPassword,
+          //      password: newPassword,
+          //      
+          //    });
+          //    hideLoading();
+          //    if (data.error) {
+          //      showMessage(data.error);
+          //    } else {
+          //      setUserInfo(data);
+          //      document.location.hash = '/';
           //    }
           //  });
-          //}
-          document
-            .getElementById('update-profile-button')
-            .addEventListener('click', async (e) => {
-              e.preventDefault();
-              //e.stopPropagation();
-              const currentPassword = document.getElementById('currentPassword').value;
-              const newPassword = document.getElementById('password').value;
-              const confirmPassword = document.getElementById('confirmPassword').value;
-              if (newPassword !== confirmPassword) {
-                showMessage('Password and confirm password are not match');
-                return;
-              }
-              showLoading();
-              const data = await update({
-                email: document.getElementById('email').value,
-                currentPassword,
-                password: newPassword,
-                
-              });
-              hideLoading();
-              if (data.error) {
-                showMessage(data.error);
-              } else {
-                setUserInfo(data);
-                document.location.hash = '/';
-              }
-            });
           },
     render: ()=>{
         const { email } = getUserInfo();
