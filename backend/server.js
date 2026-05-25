@@ -37,15 +37,20 @@ app.get('/api/paypal/clientId', (req, res)=>{
 //app.use('/api/services', ServiceRoute);
 app.use('/uploads', express.static(path.join(__dirname, '/../uploads')));
 app.use(express.static(path.join(__dirname, "/../frontend/dist")));
-//app.get("*", (req, res) => {
-//  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
-//});
-app.use((req, res, next) => {
-  if (req.originalUrl.startsWith('/api')) {
-    return next();
-  }
+app.use('/api', (req, res) => {
+  res.status(404).send({ 
+    message: `API endpoint not found : ${req.method} ${req.originalUrl}`
+  });
+});
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
 });
+//app.use((req, res, next) => {
+//  if (req.originalUrl.startsWith('/api')) {
+//    return next();
+//  }
+//  res.sendFile(path.join(__dirname, "/../frontend/dist/index.html"));
+//});
 //middleware
 //error handling code to handle all errors in express instance
 app.use((err, req, res, next) => {

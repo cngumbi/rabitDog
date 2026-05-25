@@ -98,6 +98,7 @@ UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
     }
 }));
 UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
+    console.log('UPDATE ROUTE CALLED WITH BODY:');
     try{
         //validate user input
         const { error } = await ValidateUpdateProfile().validateAsync(req.body);
