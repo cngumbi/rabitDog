@@ -22,7 +22,6 @@ const Profile = {
       };
       setTimeout(()=>{
         document.getElementById('update-profile-button').addEventListener('click', async(e)=>{
-          console.log('BUTTON CLICKED');
           showLoading();
           try{
             const email = document.getElementById('email').value.trim();
@@ -45,9 +44,6 @@ const Profile = {
               showMessage('Passwords do not match');
               return false;
             }
-            // DEBUG
-            console.log('Sending PUT request...');
-            console.log(getUserInfo());
             const data = await update({
               email,
               currentPassword,
@@ -61,11 +57,10 @@ const Profile = {
             }else{
               setUserInfo(data);
               showMessage('Profile updated successfully');
-              document.location.hash = '/dashboard';
+              document.location.hash = '/';
             }
           }catch(error){
             hideLoading();
-            console.error('Error updatin Profile:', error);
             showMessage(error.message || 'An error occurred  while updating profile');
           }
         });
