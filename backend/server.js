@@ -17,6 +17,16 @@ const ProfileRoute = require("./routes/profileRoute");
 
 const app = express();
 //middleware
+//for production
+//app.use(
+//  cors({
+//    origin: [
+//      "http://localhost:5000",
+//      "https://domainName.com",
+//    ],
+//    credentials: true,
+//  })
+//);
 app.use(cors({
   origin: true,
   credentials: true
@@ -28,7 +38,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 //-0000000000000000000000000000000000000000000000000000000000
 //-0000000000000000000-SESSION-SETUP-000000000000000000000000
 //-0000000000000000000000000000000000000000000000000000000000
-//app.set('trust proxy', 1);
+//TRUST REVERSE PROXY (NGINX, RENDER, HEROKU, RAILWAY, VERCEL, ETC.)
+app.set('trust proxy', 1);
+const isProduction = process.env.NODE_ENV === "production";
 app.use(
   session({
     name: "sessionId",
@@ -38,11 +50,16 @@ app.use(
     store: MongoStore.create({
       mongoUrl: config.MONGODB_URL,
       collectionName: "sessions",
+      ttl: 24 * 60 * 60 // one day
     }),
     cookie: {
       httpOnly: true,
       secure: false,//config.NODE_ENV,
       sameSite: "lax",
+      //to use in production
+      //required in production HTTps
+      //-secure: isProduction,
+      //-sameSite: isProduction ? "none" : "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     }
   })
