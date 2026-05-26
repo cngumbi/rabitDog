@@ -11,15 +11,40 @@ const OrderRoute = require("./routes/ordrerRoute");
 const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 const ProfileRoute = require("./routes/profileRoute");
+const session = require("express-session");
 
 
 const app = express();
 //middleware
-app.use(cors()); 
+app.use(cors({
+  origin: true,
+  credentials: true
+})); 
 app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+//-0000000000000000000000000000000000000000000000000000000000
+//-0000000000000000000-SESSION-SETUP-000000000000000000000000
+//-0000000000000000000000000000000000000000000000000000000000
+app.use(
+  session({
+    name: "sessionId",
+    secret: config.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: config.MONGODB_URL,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: config.NODE_ENV_P,
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    }
+  })
+);
 //Static file serving
 app.use('/uploads', express.static(path.join(__dirname, '/../uploads')));
 app.use(express.static(path.join(__dirname, "/../frontend/dist")));
