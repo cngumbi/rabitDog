@@ -13,6 +13,7 @@ import VerifyEmail from './components/authentication/verifyEmail';
 import Profile from './components/profile/profilePage';
 import Forget from './components/authentication/forget';
 import Dashboard from './components/profile/admin/dashboard/dashboard';
+import RefreshFailed from './components/authentication/refreshFailed';
 //Chicken (Nested Layout)
 import Chicken from './components/pages/poultry/Chicken/chicken';
 import MedicalLogs from './components/pages/utils/medicalLogs';
@@ -58,6 +59,7 @@ const routes = {
     '/new-user-create': Registration,
     '/verify-email': VerifyEmail,
     '/forget': Forget,
+    '/refresh-failed': RefreshFailed,
     '/profile': Profile,
     '/dashboard': Dashboard,
     //'/checken': Chicken,

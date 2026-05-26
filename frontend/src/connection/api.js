@@ -1,6 +1,70 @@
 import axios from 'axios';
 import { apiURL } from "../config/config";
-import { getUserInfo } from '../localStorage';
+import { getUserInfo, setUserInfo, clearUser } from '../localStorage';
+
+const apiClient = axios.create({
+    baseURL: apiURL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+const refreshToken = async () => {
+    try{
+        const response = await axios({
+            url: `${apiURL}/api/users/refresh-token`,
+            method: 'POST',
+            withCredentials: true,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if(response.statusText !== 'OK'){
+            throw new Error(response.data.message || 'Token refresh failed');
+        }
+        setUserInfo(response.data);
+        return response.data;
+    } catch(err){
+        // On refresh failure, ensure client signs out and return null
+        try { await clearUser(); } catch(e) { /* best-effort */ }
+        // Redirect to a refresh-failure page so UX can explain next steps
+        document.location.hash = '/refresh-failed';
+        return null;
+    }
+};
+
+apiClient.interceptors.request.use((config)=>{
+    const { token } = getUserInfo();
+    if(token){
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+apiClient.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+        if(
+            error.response &&
+            error.response.status === 401 &&
+            originalRequest &&
+            !originalRequest._retry &&
+            !originalRequest.url.endsWith('/refresh-token')
+        ){
+            originalRequest._retry = true;
+            const data = await refreshToken();
+            if(data && data.token){
+                originalRequest.headers.Authorization = `Bearer ${data.token}`;
+                return apiClient(originalRequest);
+            }
+            // If refresh failed, ensure we surface the failure to caller
+            return Promise.reject(new Error('Session expired - refresh failed'));
+        }
+        return Promise.reject(error);
+    }
+);
 
 export const register = async({ email, password })=>{
     try{
@@ -46,15 +110,10 @@ export const signIn = async({email, password})=>{
 };
 export const update = async({ email, password, currentPassword })=>{
     try{
-        const { _id, token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/users/${_id}`,
+        const { _id } = getUserInfo();
+        const response = await apiClient({
+            url: `/api/users/${_id}`,
             method: 'PUT',
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: {
                 email,
                 password,

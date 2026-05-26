@@ -1,7 +1,8 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
+const jsonWT = require('jsonwebtoken');
 const User = require('../models/userModel');
-const { generateToken, isAuth } = require('../util');
+const { generateToken, generateRefreshToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
 const { ValidateData, ValidateCode, ValidateForgottenPassword, ValidateUpdateProfile } = require('../middleware/validateData');
 const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
@@ -28,13 +29,28 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
                 message: 'Invalid Email or Password',
             });
         }
+        if(!signinUser.verified){
+            return res.status(403).send({
+                message: 'Please verify your email before signing in.',
+            });
+        }
+        const token = generateToken(signinUser);
+        const refreshToken = generateRefreshToken(signinUser);
+        signinUser.refreshToken = HmacProcess(refreshToken, config.MAC_VERIFICATION_CODE_SECRET);
+        await signinUser.save();
         //const profile = await Profile.findOne({ user: signinUser._id});
-        //set token in httpOnly cookie
-        res.cookie('Authorization', 'Bearer ' + generateToken(signinUser), {
+        //set tokens in httpOnly cookies
+        res.cookie('Authorization', 'Bearer ' + token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 2 * 60 * 60 * 1000, // 2 hours  
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
         req.session.user = {
             _id: signinUser._id,
@@ -47,7 +63,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
             email: signinUser.email,
             isAdmin: signinUser.isAdmin,
             verified: signinUser.verified,
-            token: generateToken(signinUser),
+            token,
             //profileCompleted: profile.profileCompleted,
         });
     }catch{
@@ -155,6 +171,13 @@ UserRoute.put('/:id', isAuth, SessionAuth, expressAsync(async(req, res) => {
     }
 }));
 UserRoute.post('/signout', expressAsync(async(req, res)=>{
+    if (req.session && req.session.user) {
+        const user = await User.findById(req.session.user._id).select('+refreshToken');
+        if (user) {
+            user.refreshToken = undefined;
+            await user.save();
+        }
+    }
     req.session.destroy((error)=>{
         if(error){
             return res.status(500).send({
@@ -171,11 +194,66 @@ UserRoute.post('/signout', expressAsync(async(req, res)=>{
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
         });
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
         res.send({ 
             success: true, message: 'Sign out successful' 
         });
     }); 
 }));
+
+UserRoute.post('/refresh-token', authLimiter, expressAsync(async(req, res)=>{
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken){
+        return res.status(401).send({ message: 'Refresh token not available' });
+    }
+
+    let payload;
+    try{
+        payload = jsonWT.verify(refreshToken, config.REFRESH_TOKEN_SECRET);
+    }catch(error){
+        return res.status(401).send({ message: 'Invalid refresh token' });
+    }
+
+    const user = await User.findById(payload._id).select('+refreshToken');
+    if(!user || !user.refreshToken){
+        return res.status(401).send({ message: 'Invalid refresh token' });
+    }
+
+    if(user.refreshToken !== HmacProcess(refreshToken, config.MAC_VERIFICATION_CODE_SECRET)){
+        return res.status(401).send({ message: 'Invalid refresh token' });
+    }
+
+    const token = generateToken(user);
+    const newRefreshToken = generateRefreshToken(user);
+    user.refreshToken = HmacProcess(newRefreshToken, config.MAC_VERIFICATION_CODE_SECRET);
+    await user.save();
+
+    res.cookie('Authorization', 'Bearer ' + token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+    res.cookie('refreshToken', newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 4 * 60 * 60 * 1000, // 4 hours
+    });
+
+    res.send({
+        _id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        verified: user.verified,
+        token,
+    });
+}));
+
 UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, res)=>{
     try{
         //check if email exist

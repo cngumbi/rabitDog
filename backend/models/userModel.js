@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
     verificationToken: { type: String, select: false },
     verificationTokenValidation: { type: Number, select: false },
     forgotPasswordToken: { type: String, select: false },
-    forgotPasswordTokenValidation: { type: Number, select: false }
+    forgotPasswordTokenValidation: { type: Number, select: false },
+    refreshToken: { type: String, select: false }
 
 }, { timestamps: true });
 //create the user model

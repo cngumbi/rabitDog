@@ -5,22 +5,35 @@ const generateToken =(user)=> {
     return jsonWT.sign(
         {
             _id: user.id,
-            //name: user.name,
             email: user.email,
             isAdmin: user.isAdmin,
         },
         config.JWT_SECRET,
         {
-            expiresIn: '2h',
+            expiresIn: '15m',
         }
     );
-
-
 };
+
+const generateRefreshToken = (user)=> {
+    return jsonWT.sign(
+        {
+            _id: user.id,
+            email: user.email,
+            isAdmin: user.isAdmin,
+        },
+        config.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: '4h',
+        }
+    );
+};
+
 const isAuth = (req, res, next) => {
     const bearerToken = req.cookies.Authorization || req.headers.authorization;
     if (!bearerToken) {
         res.status(401).send({ message: 'Token not available: Access Denied' });
+        return;
     }
 
     const token = bearerToken.startsWith('Bearer ') ? bearerToken.slice(7) : bearerToken;
@@ -30,7 +43,6 @@ const isAuth = (req, res, next) => {
         }
         req.user = data;
         next();
-        
     })
 };
 const isAdmin = (req, res, next) => {
@@ -42,6 +54,7 @@ const isAdmin = (req, res, next) => {
  };
 module.exports = {
     generateToken,
+    generateRefreshToken,
     isAuth,
     isAdmin
 }
