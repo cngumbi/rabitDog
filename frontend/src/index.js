@@ -121,6 +121,11 @@ const router = async () => {
         document.location.hash = '/verify-email';
         return;
     }
+    //block unauthenticated users from accessing Verify page
+    if(!userInfo.email && currentPath === '/verify-email'){
+        document.location.hash = '/';
+        return;
+    }
     //prevent verified users from accessing verify page
     if(userInfo.email && userInfo.verified && currentPath === '/verify-email'){
         document.location.hash = '/dashboard';
