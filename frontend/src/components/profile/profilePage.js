@@ -10,6 +10,12 @@ const Profile = {
       if (profileForm) {
         profileForm.addEventListener('submit', async (e) => {
           e.preventDefault();
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          if(typeof e.cancelBubble !== "undefined"){
+            e.cancelBubble = true;
+          }
         });
       }
       // Sign out button event listener
@@ -77,7 +83,7 @@ const Profile = {
               <div class="form-container">
                 <!--IMORTANT-->
                 <!--NO FORM TAG-->
-                  <div id="profile-form" class="profile-form">
+                  <div id="profile-form" role="form">
                     <ul class="form-items">
                       <li>
                         <h1>User Profile</h1>
@@ -85,22 +91,22 @@ const Profile = {
                       <!--Email -->
                       <li>
                         <label for="email">Email</label>
-                        <input type="email" name="email" id="email" value="${email || ''}" />
+                        <input type="email" id="email" value="${email || ''}" />
                       </li>
                       <!--Current Password-->
                       <li>
                         <label for="currentPassword">Current Password</label>
-                        <input type="password" name="currentPassword" id="currentPassword" placeholder="Current Password" />
+                        <input type="password" id="currentPassword" placeholder="Current Password" />
                       </li>
                       <!--New Password-->
                       <li>
                         <label for="password">Password</label>
-                        <input type="password" name="password" id="password" placeholder="New Password" />
+                        <input type="password" id="password" placeholder="New Password" />
                       </li>
                       <!-- Confirm password -->
                       <li>
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm New Password" />
+                        <input type="password" id="confirmPassword" placeholder="Confirm New Password" />
                       </li>
                      </ul>
                     <!-- BUTTONS OUTSIDE UL -->

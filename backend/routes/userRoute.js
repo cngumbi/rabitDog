@@ -9,6 +9,7 @@ const UserRoute = express.Router();
 const config = require('../config/config');
 const transporter = require('../middleware/sendmail');
 const { authLimiter } = require('../middleware/rateLimiter');
+const SessionAuth = require('../middleware/sessionsAuth');
 // User registration route
 UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
     try{
@@ -35,6 +36,11 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
             sameSite: 'strict',
             maxAge: 2 * 60 * 60 * 1000, // 2 hours  
         });
+        req.session.user = {
+            _id: signinUser._id,
+            email: signinUser.email,
+            isAdmin: signinUser.isAdmin,
+        }
         //send user info and token to client
         res.send({
             _id: signinUser._id,
@@ -49,6 +55,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
             message: 'Authentication Failed'
         });
     }
+    console.log('SESSION AFTER LOGIN:', req.session);
 }));
 UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
     try{
@@ -97,7 +104,7 @@ UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
         });
     }
 }));
-UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
+UserRoute.put('/:id', isAuth, SessionAuth, expressAsync(async(req, res) => {
     try{
         //validate user input
         const { error } = await ValidateUpdateProfile().validateAsync(req.body);
@@ -148,12 +155,26 @@ UserRoute.put('/:id', isAuth, expressAsync(async(req, res) => {
     }
 }));
 UserRoute.post('/signout', expressAsync(async(req, res)=>{
-    res.clearCookie('Authorization', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-    });
-    res.send({ success: true, message: 'Sign out successful' });
+    req.session.destroy((error)=>{
+        if(error){
+            return res.status(500).send({
+                message: 'Failed to sign out'
+            });
+        }
+        res.clearCookie('sessionId', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        });
+        res.clearCookie('Authorization', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+        res.send({ 
+            success: true, message: 'Sign out successful' 
+        });
+    }); 
 }));
 UserRoute.patch('/sendVerificationCode', authLimiter, expressAsync(async(req, res)=>{
     try{
@@ -306,6 +327,19 @@ UserRoute.patch('/verifyForgottenPassword', authLimiter, expressAsync(async(req,
     }catch(error){
         console.log(error);
         return res.status(500).send({ message: 'Email verification failed' });
+    }
+}));
+UserRoute.get('/session', expressAsync(async(req, res)=>{
+    if(!req.session || !req.session.user){
+        res.status(401).send({ 
+            authenticated: false,
+            message: 'Please Sign In' 
+        });
+    } else {
+        res.send({ 
+            authenticated: true,
+            user: req.session.user 
+        });
     }
 }));
 module.exports = UserRoute;

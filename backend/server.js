@@ -6,12 +6,13 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const  db = require("./config/mongoosDB");
 const config = require("./config/config");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const UserRoute = require("./routes/userRoute");
 const OrderRoute = require("./routes/ordrerRoute");
 const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 const ProfileRoute = require("./routes/profileRoute");
-const session = require("express-session");
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 //-0000000000000000000000000000000000000000000000000000000000
 //-0000000000000000000-SESSION-SETUP-000000000000000000000000
 //-0000000000000000000000000000000000000000000000000000000000
+//app.set('trust proxy', 1);
 app.use(
   session({
     name: "sessionId",
@@ -39,7 +41,7 @@ app.use(
     }),
     cookie: {
       httpOnly: true,
-      secure: config.NODE_ENV_P,
+      secure: false,//config.NODE_ENV,
       sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     }
