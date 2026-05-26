@@ -5,6 +5,9 @@ const User = require('../models/userModel');
 const { generateToken, generateRefreshToken, isAuth } = require('../util');
 const Profile = require('../models/profileModel');
 const { ValidateData, ValidateCode, ValidateForgottenPassword, ValidateUpdateProfile } = require('../middleware/validateData');
+
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_TIME = 60 * 60 * 1000; // 1 hour
 const { PassHash, PassCompare, HmacProcess } = require('../util/passHash');
 const UserRoute = express.Router();
 const config = require('../config/config');
@@ -23,17 +26,52 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
         const signinUser = await User.findOne({
             email: req.body.email,
         });
+        if (signinUser) {
+            // clear expired lock if needed
+            if (signinUser.lockUntil && signinUser.lockUntil <= Date.now()) {
+                signinUser.loginAttempts = 0;
+                signinUser.lockUntil = undefined;
+            }
+
+            // locked account handling
+            if (signinUser.lockUntil && signinUser.lockUntil > Date.now()) {
+                const waitMinutes = Math.ceil((signinUser.lockUntil - Date.now()) / 60000);
+                return res.status(423).send({
+                    message: `Account locked due to too many failed login attempts. Try again in ${waitMinutes} minute${waitMinutes === 1 ? '' : 's'}.`,
+                });
+            }
+        }
+
         //check if user exist and password match
         if(!signinUser || !PassCompare(req.body.password, signinUser.password)){
-            return res.status(401).send({
-                message: 'Invalid Email or Password',
-            });
+            if(signinUser){
+                signinUser.loginAttempts = (signinUser.loginAttempts || 0) + 1;
+                if(signinUser.loginAttempts >= MAX_LOGIN_ATTEMPTS){
+                    signinUser.lockUntil = Date.now() + LOCK_TIME;
+                }
+                await signinUser.save();
+            }
+            const errorResponse = signinUser && signinUser.lockUntil && signinUser.lockUntil > Date.now()
+                ? {
+                    status: 423,
+                    message: `Account locked due to too many failed login attempts. Try again in ${Math.ceil((signinUser.lockUntil - Date.now()) / 60000)} minute${Math.ceil((signinUser.lockUntil - Date.now()) / 60000) === 1 ? '' : 's'}.`,
+                    lockedUntil: signinUser.lockUntil,
+                }
+                : { status: 401, message: 'Invalid Email or Password' };
+            return res.status(errorResponse.status).send({ message: errorResponse.message, lockedUntil: errorResponse.lockedUntil });
         }
+
         if(!signinUser.verified){
             return res.status(403).send({
                 message: 'Please verify your email before signing in.',
             });
         }
+
+        if(signinUser.loginAttempts || signinUser.lockUntil){
+            signinUser.loginAttempts = 0;
+            signinUser.lockUntil = undefined;
+        }
+
         const token = generateToken(signinUser);
         const refreshToken = generateRefreshToken(signinUser);
         signinUser.refreshToken = HmacProcess(refreshToken, config.MAC_VERIFICATION_CODE_SECRET);

@@ -104,7 +104,11 @@ export const signIn = async({email, password})=>{
         if(response.statusText !== 'OK') throw new Error(response.data.message);
         return response.data;
     }catch(err){
-        return { error: err.response ? err.response.data.message : err.message };
+        return {
+            error: err.response ? err.response.data.message : err.message,
+            status: err.response ? err.response.status : null,
+            lockedUntil: err.response && err.response.data ? err.response.data.lockedUntil : null,
+        };
     }
 
 };

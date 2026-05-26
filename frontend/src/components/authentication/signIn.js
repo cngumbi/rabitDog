@@ -1,6 +1,33 @@
 import { signIn } from '../../connection/api';
 import { setUserInfo } from '../../localStorage';
 import { hideLoading, showLoading, showMessage} from '../../utils';
+
+let lockoutTimerId = null;
+
+const renderLockoutCountdown = (lockedUntil) => {
+    const element = document.getElementById('lockout-info');
+    if (!element || !lockedUntil) return;
+
+    const update = () => {
+        const remaining = lockedUntil - Date.now();
+        if (remaining <= 0) {
+            element.textContent = 'Your account lockout has ended. You may try signing in again.';
+            clearInterval(lockoutTimerId);
+            lockoutTimerId = null;
+            return;
+        }
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        element.textContent = `Account locked. Try again in ${minutes} minute${minutes === 1 ? '' : 's'} ${seconds} second${seconds === 1 ? '' : 's'}.`;
+    };
+
+    if (lockoutTimerId) {
+        clearInterval(lockoutTimerId);
+    }
+    update();
+    lockoutTimerId = setInterval(update, 1000);
+};
+
 const SignIn = {
     vignette: ()=>{
         document.getElementById('signin-form').addEventListener('submit', async(e)=>{
@@ -15,6 +42,9 @@ const SignIn = {
                 if(data.error){
                     hideLoading();
                     showMessage(data.error);
+                    if(data.status === 423 && data.lockedUntil){
+                        renderLockoutCountdown(data.lockedUntil);
+                    }
                     return;
                 }
                 setUserInfo(data);
@@ -71,6 +101,7 @@ const SignIn = {
                         <a href="/#/forget">Forget Password?</a>
                         <a href="/#/new-user-create">Register for an Account.</a>
                     </form>
+                    <div id="lockout-info" class="lockout-info"></div>
                 </div>
             </section>
         `;
