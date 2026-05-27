@@ -7,6 +7,12 @@ const Product = require('../models/productModel');
 
 const OrderRoute = express.Router();
 
+const validateOrderOwnership = (order, user) => {
+    if (!order || !user) return false;
+    const ownerId = order.user && order.user._id ? order.user._id.toString() : order.user?.toString();
+    return ownerId === user._id || user.isAdmin;
+};
+
 OrderRoute.get('/summary', isAuth, isAdmin, expressAsync(async(req, res) =>{
     const orders = await Order.aggregate([
         {
@@ -54,12 +60,15 @@ OrderRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
     res.send(orders);
 }));
 OrderRoute.get('/mine', isAuth, expressAsync(async(req, res) => {
-    const orders = await Order.find({ user: req.user_id });
+    const orders = await Order.find({ user: req.user._id });
     res.send(orders);
 }));
 OrderRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate('user', '_id email');
     if(order){
+        if (!validateOrderOwnership(order, req.user)) {
+            return res.status(403).send({ message: 'Access denied: order access restricted' });
+        }
         res.send(order);
     }else{
         res.status(404).send({ message: 'Order Not Found' });
@@ -99,8 +108,11 @@ OrderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     }
 }));
 OrderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id).populate('user', '_id');
     if (order){
+        if (!validateOrderOwnership(order, req.user)) {
+            return res.status(403).send({ message: 'Access denied: cannot pay for this order' });
+        }
         order.isPaid = true;
         order.paidAt = Date.now();
         order.payment.paymentResult = {
@@ -114,7 +126,7 @@ OrderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
         res.status(404).send({ message:' Order Not Found' });
     }
 }));
-OrderRoute.put('/:id/deliver', isAuth, expressAsync(async(req, res)=>{
+OrderRoute.put('/:id/deliver', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const order = await Order.findById(req.params.id);
     if(order){
         order.isDelivered = true;

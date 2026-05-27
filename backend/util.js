@@ -32,29 +32,38 @@ const generateRefreshToken = (user)=> {
 const isAuth = (req, res, next) => {
     const bearerToken = req.cookies.Authorization || req.headers.authorization;
     if (!bearerToken) {
-        res.status(401).send({ message: 'Token not available: Access Denied' });
-        return;
+        return res.status(401).send({ message: 'Token not available: Access Denied' });
     }
 
     const token = bearerToken.startsWith('Bearer ') ? bearerToken.slice(7) : bearerToken;
     jsonWT.verify(token, config.JWT_SECRET, (err, data) => {
         if (err) {
-           return res.status(401).send({ message: 'Invalid Token' });
+            return res.status(401).send({ message: 'Invalid Token' });
         }
         req.user = data;
         next();
-    })
+    });
 };
-const isAdmin = (req, res, next) => {
-    if(req.user && req.user.isAdmin){
-        next();
-    }else{
-        res.status(401).send({ message: 'Token not valid for admin user' });
+
+const hasRole = (...allowedRoles) => (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).send({ message: 'Authentication required' });
     }
- };
+
+    const userRole = req.user.isAdmin ? 'admin' : 'user';
+    if (!allowedRoles.includes(userRole)) {
+        return res.status(403).send({ message: 'Access denied: insufficient permissions' });
+    }
+
+    next();
+};
+
+const isAdmin = hasRole('admin');
+
 module.exports = {
     generateToken,
     generateRefreshToken,
     isAuth,
-    isAdmin
-}
+    hasRole,
+    isAdmin,
+};
