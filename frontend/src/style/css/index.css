@@ -3648,6 +3648,9 @@ img {
   display: -ms-flexbox;
   display: flex;
 }
+#message-overlay .message-box {
+  background-color: white;
+}
 #message-overlay > div {
   width: 100%;
   max-width: 420px;

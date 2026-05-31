@@ -23,7 +23,7 @@ const Forget = {
                 }
                 showMessage(data.message || 'Reset code sent to your email. Please check your inbox.');
                 //hide the send verification code form
-                document.getElementById('send-reset-code-section').classList.add('hidden');
+                document.getElementById('send-reset-code-button').classList.add('hidden');
                 // Show the reset password form
                 document.getElementById('reset-password-section').classList.remove('hidden'); 
             } catch (error) {
@@ -87,7 +87,7 @@ const Forget = {
                         <form id="send-reset-code-form">
                             <span>Email Address</span>
                             <input type="email" id="email" placeholder="yourmail@gmail.com" required>
-                            <input type="submit" value="Send Verification Code" class="button">
+                            <input type="submit" value="Send Verification Code" id="send-reset-code-button" class="button">
                             <a href="/#/user-current">Back to Login.</a>
                         </form>
                     </div>

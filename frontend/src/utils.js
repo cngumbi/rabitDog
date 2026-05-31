@@ -21,7 +21,7 @@ export const showMessage = (message, callback)=>{
     const messageOverlay = document.getElementById('message-overlay');
     //create the message content
     const messageContent = `
-        <div>
+        <div class="message-box">
             <div id="message-content">${message}</div>
             <button id="close-button">OK</button>
         </div>
