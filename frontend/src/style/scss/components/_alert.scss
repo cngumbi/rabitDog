@@ -1,0 +1,20 @@
+@use '../abstracts/variables' as *;
+@use 'sass:color' as *;
+
+.alert {
+    display: block;
+    padding: $base_padding $base_padding * 2;
+    border-radius: $base_border_radius;
+    border: $base_border_thickness solid transparent;
+    margin: $base_margin 0;
+    box-shadow: $base_box_shadow;
+    font-weight: 500;
+}
+
+@each $key, $val in $colors {
+    .alert-#{$key} {
+        background-color: mix(white, $val, 85%);
+        border-color: mix(white, $val, 60%);
+        color: mix(black, $val, 35%);
+    }
+}

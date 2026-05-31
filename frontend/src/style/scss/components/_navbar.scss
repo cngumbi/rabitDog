@@ -1,3 +1,4 @@
+@use '../abstracts/variables';
 @use '../abstracts/breakpoints';
 @use '../abstracts/functions';
 
@@ -38,7 +39,7 @@
     align-items: center;
     gap: functions.rem(10px);
     text-decoration: none;
-    color: #232946;
+    color: variables.$secondary;
     font-weight: 700;
     span {
         display: inline;
@@ -54,6 +55,7 @@
     font-size: functions.rem(18px);
     font-weight: 600;
     color: #232946;
+    margin-left: functions.rem(130px);
 }
 /* ==========================================
    ACTIONS
