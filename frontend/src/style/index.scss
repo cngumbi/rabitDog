@@ -1,3 +1,13 @@
 //the Library is developed by Cngumbi
 //base and layout
 @use 'scss/base/base';
+@use 'scss/base/grid';
+//@use 'scss/layout/header';
+//colors
+@use 'scss/base/colors';
+//components
+@use '../style/scss/components/navbar';
+//utilities(margin, padding, opacity)
+@use 'scss/base/utilities';
+//pages
+@use 'scss/layout/registration';

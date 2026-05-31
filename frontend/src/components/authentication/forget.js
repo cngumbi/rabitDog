@@ -22,6 +22,8 @@ const Forget = {
                     return;
                 }
                 showMessage(data.message || 'Reset code sent to your email. Please check your inbox.');
+                //hide the send verification code form
+                document.getElementById('send-reset-code-section').classList.add('hidden');
                 // Show the reset password form
                 document.getElementById('reset-password-section').classList.remove('hidden'); 
             } catch (error) {
@@ -81,11 +83,14 @@ const Forget = {
                     <h2>Forgot Password</h2>
                     <p> Enter your email address to receive a password reset code. </p>
                     <!-- SEND RESET CODE FORM -->
-                    <form id="send-reset-code-form">
-                        <span>Email Address</span>
-                        <input type="email" id="email" placeholder="yourmail@gmail.com" required>
-                        <input type="submit" value="Send Verification Code" class="button">
-                    </form>
+                    <div class="send-reset-code-section">
+                        <form id="send-reset-code-form">
+                            <span>Email Address</span>
+                            <input type="email" id="email" placeholder="yourmail@gmail.com" required>
+                            <input type="submit" value="Send Verification Code" class="button">
+                            <a href="/#/user-current">Back to Login.</a>
+                        </form>
+                    </div>
                     <!-- RESET PASSWORD FORM -->
                     <div id="reset-password-section" class="hidden">
                         <form id="reset-password-form">
@@ -98,7 +103,6 @@ const Forget = {
                             <input type="submit" value="Reset Password" class="button">
                         </form>
                     </div>
-                    <a href="/#/user-current"> Back to Login</a>
                 </div>
 
             </section>

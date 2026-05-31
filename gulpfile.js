@@ -84,7 +84,7 @@ function buildProd(){
  * Watch task
  */
 function liveTask() {
-    watch(paths.styles.watch, series(buildDev));
+    watch(paths.styles.watch, series(buildProd));
 }
 /**
  * Public Task
@@ -92,5 +92,5 @@ function liveTask() {
 exports.clean = clean;
 exports.dev = series(clean, buildDev);
 exports.build = series(clean, buildProd);
-exports.watch = series(clean, buildDev, liveTask);
+exports.watch = series(clean, buildProd, liveTask);
 exports.default = exports.watch;

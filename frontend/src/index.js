@@ -1,7 +1,7 @@
 //the main js file index.js
 //import router engine
 //==========import styles===============
-import './style/css/kwito.min.css';
+import './style/css/index.min.css';
 import favicon from './assets/favicon.ico';
 import ParseRequestUrl from "./config/parseUrl";
 import Error404 from "./components/errors/error404";
