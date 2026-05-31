@@ -1,17 +1,48 @@
-@import url('https://fonts.googleapis.com/css2?family=Clicker+Script&family=Poppins:wght@200;300;400;500;600;700;900&display=swap');
+//variables
+// Theme color
+$primary: #326dee !default;
+$secondary: #1ac886 !default;
+$error: #d32752 !default;
+$info: #f6c31c !default;
 
-:root{
-    --main-font: 'poppins' sans-serif;
-    --box-shadow: 2px 2px 18px rgb(14 52 54 / 15%);
-    --main-color: #2aaf83;
-    --second-color: #196a38;
-    --text-color: #343435;
-    --bg-color: #ffffff;
-    --hover-color: #23c08c;
-    --skin-color: #85c026;
-    --hover-text: #dad3d3;
-    --box-color: #c0c0c0;
-    --bg-color-2: #161313;
-}
-$font-weights: ( "regular": 400, "medium": 700, "bold": 900);
+//color palette
+$colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "error": $error,
+    "info": $info,
+    "blue": #1919e6,
+    "red": #e61919,
+    "yellow": #e6e619,
+    "green": #19e635,
+    "orange": #ffa600,
+    "purple": #9900ff,
+    "gray": #808080,
+    "pink": #ffc0cb,
+    "black": black,
+    "white": white,  
+);
 
+$font-weights: ( 
+    "regular": 400,
+    "medium": 700,
+    "bold": 900
+);
+
+//spacing
+$base_padding: 0.75rem !default;
+$base_margin: 0.75rem !default;
+
+//borders
+$base_border_thickness: 1px !default;
+$base_border_radius: 20px !default;
+
+//box-shadow
+$base_box_shadow: 1px 3px 5px rgba(0, 0, 0, 0.1) !default;
+
+//font size
+$base_font_size: 1rem !default;
+$font_size_sm: $base_font_size * 0.75 !default;
+$font_size_lg: $base_font_size * 1.5 !default;
+$font_size_xl: $base_font_size * 2 !default;
+$font_size_xxl: $base_font_size * 3 !default;

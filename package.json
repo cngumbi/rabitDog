@@ -9,6 +9,10 @@
     "start": "nodemon --watch backend --exec babel-node backend/server.js",
     "serve": "node dist/server.js",
     "qstart": "npm install && cd frontend && npm install",
+    "dev": "gulp dev",
+    "watch": " gulp watch",
+    "build_gulp": "gulp build",
+    "clean": "gulp clean",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -46,8 +50,21 @@
     "@babel/core": "^7.22.5",
     "@babel/node": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
+    "autoprefixer": "^10.5.0",
     "baseline-browser-mapping": "^2.10.12",
-    "nodemon": "^3.0.1"
+    "cssnano": "^7.1.9",
+    "del": "^8.0.1",
+    "gulp": "^5.0.1",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-notify": "^5.0.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^10.0.0",
+    "gulp-purgecss": "^8.0.0",
+    "gulp-rename": "^2.1.0",
+    "gulp-sass": "^6.0.1",
+    "gulp-sourcemaps": "^2.6.5",
+    "nodemon": "^3.0.1",
+    "sass": "^1.100.0"
   },
   "engines": {
     "node": "20.19.5",
