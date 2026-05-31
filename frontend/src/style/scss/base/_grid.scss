@@ -1,0 +1,63 @@
+@use 'sass:math';
+@use '../abstracts/breakpoints';
+@use '../abstracts/functions';
+
+
+$grid_columns: 12;
+$grid-gaps: (
+    "0": 0,
+    "1": functions.em(10px),
+    "2": functions.em(20px),
+    "3": functions.em(30px),
+);
+$breakpoints: (
+    xs: 0,
+    sm: functions.em(480px),
+    md: functions.em(720px),
+    lg: functions.em(960px),
+    xl: functions.em(1200px)
+);
+
+$layout-values: flex-start, flex-end, center, space-between, space-around;
+
+//base layout classes
+
+.container {
+    width: 100%;
+    max-width: functions.rem(1200px);
+    margin: 0 auto;
+    padding: 0 functions.rem(20px);
+    box-sizing: border-box;
+}
+.row {
+    display: flex;
+    flex-flow: row wrap;
+}
+//grid gaps
+@each $key, $val in $grid-gaps{
+    .gap-#{$key} > * {
+        padding: $val;
+    }
+    .gap-#{$key}{
+        margin-left: -$val;
+        margin-right: -$val;
+    }
+}
+//justify content classes
+@each $val in $layout-values{
+    .justify-#{$val}{
+        justify-content: $val;
+    }
+}
+//generate all breakpoints
+@each $bp, $size in breakpoints.$breakpoints{
+    @include breakpoints.breakpoint($bp){
+        @for $i from 1 through $grid_columns{
+            .col-#{$bp}-#{$i}{
+                box-sizing: border-box;
+                flex-grow: 0;
+                width: math.div($i * 100%, $grid_columns);
+            }
+        }
+    }
+}

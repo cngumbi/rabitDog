@@ -1,0 +1,174 @@
+@use '../abstracts/breakpoints';
+@use '../abstracts/functions';
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.navbar-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: functions.rem(64px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: functions.rem(12px) functions.rem(16px);
+    background: #fff;
+    border-bottom: 1px solid #e5e7ef;
+    box-sizing: border-box;
+    z-index: 101;
+}
+/* ==========================================
+   LOGO
+   Hidden by default (mobile-first)
+========================================== */
+.navbar-logo {
+    position: absolute;
+    left: functions.rem(30px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: functions.rem(10px);
+    text-decoration: none;
+    color: #232946;
+    font-weight: 700;
+    span {
+        display: inline;
+        font-size: functions.rem(18px);
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+}
+/* ==========================================
+   TITLE
+========================================== */
+.navbar-title {
+    font-size: functions.rem(18px);
+    font-weight: 600;
+    color: #232946;
+}
+/* ==========================================
+   ACTIONS
+========================================== */
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: functions.rem(12px);
+}
+/* ==========================================
+   USER DROPDOWN
+========================================== */
+.dropdown {
+    position: relative;
+}
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: functions.rem(8px);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: functions.rem(6px);
+    border-radius: functions.rem(6px);
+    font-size: functions.rem(14px);
+    color: #232946;
+    transition: background-color 0.2s ease;
+    &:hover {
+        background: #f5f7fa;
+    }
+    img {
+        width: functions.rem(36px);
+        height: functions.rem(36px);
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    span {
+        display: none;
+    }
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: functions.rem(180px);
+    background: #fff;
+    border: 1px solid #e5e7ef;
+    border-radius: functions.rem(8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+.dropdown.open .dropdown-menu {
+    display: block;
+}
+.dropdown-menu a {
+    display: block;
+    padding: functions.rem(12px) functions.rem(16px);
+    text-decoration: none;
+    color: #232946;
+    transition: background-color 0.2s ease;
+    &:hover {
+        background-color: #f5f7fa;
+    }
+}
+/* ==========================================
+   SMALL DEVICES >= 480px
+========================================== */
+@include breakpoints.breakpoint(sm) {
+    .navbar-top {
+        padding-inline: functions.rem(20px);
+    }
+}
+/* ==========================================
+   TABLETS >= 720px
+========================================== */
+@include breakpoints.breakpoint(md) {
+    .logo{
+        span {
+            display: inline;
+        }
+    }
+    .dropdown-toggle span {
+        display: inline;
+    }
+    .navbar-title {
+        font-size: functions.rem(20px);
+    }
+}
+/* ==========================================
+   DESKTOP >= 960px
+========================================== */
+@include breakpoints.breakpoint(lg) {
+    .navbar-top {
+        padding-left: functions.rem(260px);
+        padding-right: functions.rem(24px);
+    }
+    .navbar-logo {
+        display: flex;
+        align-items: center;
+    }
+}
+/* ==========================================
+   LARGE DESKTOP >= 1200px
+========================================== */
+@include breakpoints.breakpoint(xl) {
+    .navbar-top {
+        padding-left: functions.rem(280px);
+        padding-right: functions.rem(32px);
+    }
+    .logo img {
+        width: functions.rem(44px);
+        height: functions.rem(44px);
+    }
+    .logo span {
+        font-size: functions.rem(20px);
+    }
+}

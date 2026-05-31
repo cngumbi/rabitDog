@@ -1,0 +1,28 @@
+@use 'sass:map';
+@use 'functions';
+//media query manager
+//0-480px:      phone
+//480-720px:    tablets portrait
+//720-960px:   tablets landscape
+//960-1200px:  nomal style of the web pages(defalut style)
+//1200px and above big desktops
+//$breakpoints:
+// phone, tablet-portrait, tablet-landscape, big-desktop
+//use em for media queries
+//1em = 16px
+$breakpoints:(
+    "xs": 0,
+    "sm": functions.em(480px),
+    "md": functions.em(720px),
+    "lg": functions.em(960px),
+    "xl": functions.em(1200px),
+);
+@mixin breakpoint($name){
+    @if map.has-key($breakpoints, $name){
+        @media(min-width: #{map.get($breakpoints, $name)}){
+            @content;
+        }
+    }@else{
+        @error "Unknown breakpoint: #{$name}. Available: #{map.keys($breakpoints)}";
+    }
+}
