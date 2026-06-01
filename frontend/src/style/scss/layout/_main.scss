@@ -1,6 +1,36 @@
-.wrap{
-    display: flex;
-    width: 100%;
-    position: fixed;
-    top: 48px;
+$navbar-height: 64px;
+$sidebar-width: 240px;
+//.wrap{
+//    display: flex;
+//    width: 100%;
+//    position: fixed;
+//    top: 64px;
+//}
+.wrap {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - #{$navbar-height});
+  margin-top: $navbar-height;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  padding: 1.5rem;
+
+  transition:
+    margin-left 0.3s ease-in-out,
+    width 0.3s ease-in-out;
+}
+
+/* Desktop */
+
+@media (min-width: 768px) {
+  .main {
+    margin-left: $sidebar-width;
+  }
+
+  body.sidebar-collapsed .main {
+    margin-left: 0;
+  }
 }

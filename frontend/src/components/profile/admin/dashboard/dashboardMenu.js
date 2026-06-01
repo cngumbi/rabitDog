@@ -1,17 +1,19 @@
 const DashboardMenu = {
     render: (cons)=>{
         return `
-        <!--Sidebar--
-        <div class="sidebar">
-            <!--Main Navigation--
-            <nav>
-                <div class="nav-item ${cons.selected === 'dashboard' ? 'selected':''}"><a href="/#/dashboard">DASHBOARD</a></div>
-                <h3>POULTRY</h3>
-                <div class="nav-item ${cons.selected === 'chicken' ? 'selected':''}"><a href="/#/chicken">Chicken</a></div>
-                <div class="setting ${cons.selected === 'profile' ? 'selected': ''}"><a href="/#/profile">Setting</a></div>
-                <h6> copy rigtht &#169; Softcraze Corporation</6>   
+        <!--side bar-->
+        <aside class="sidebar">
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="/#/dashboard" class="${cons.selected === 'dashboard' ? 'selected':''}">DASHBOARD</a></li>
+                    <li><a href="/#/chicken" class="${cons.selected === 'chicken' ? 'selected':''}">CHICKEN</a></li>
+                    <li><a href="/#/profile" class="${cons.selected === 'profile' ? 'selected': ''}">SETTING</a></li>
+                </ul>
             </nav>
-        </div>-->
+            <div class="sidebar-footer">
+                <p> &#169;<b>Softcraze</b> Corporation</p>
+            </div>      
+        </aside>
         `;
     }
 };

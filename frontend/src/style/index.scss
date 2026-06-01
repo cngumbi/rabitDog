@@ -2,6 +2,7 @@
 //base and layout
 @use 'scss/base/base';
 @use 'scss/base/grid';
+@use 'scss/layout/main';
 //@use 'scss/layout/header';
 //colors
 @use 'scss/base/colors';
@@ -10,6 +11,7 @@
 @use '../style/scss/components/overlay';
 @use '../style/scss/components/alert';
 @use '../style/scss/components/button';
+@use '../style/scss/components/sidebar';
 //utilities(margin, padding, opacity)
 @use 'scss/base/utilities';
 //pages

@@ -247,3 +247,38 @@
         max-width: 480px;
     }
 }
+
+$navbar-height: 64px;
+
+.sidebar-overlay {
+  position: fixed;
+
+  top: $navbar-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+
+  z-index: 99;
+}
+
+/* Mobile only */
+
+body.sidebar-open .sidebar-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (min-width: 768px) {
+  .sidebar-overlay {
+    display: none;
+  }
+}

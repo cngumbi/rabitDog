@@ -4,8 +4,10 @@ const Dashboard = {
     vignette: ()=>{},
     render: ()=>{
         return `
-        <div class="wrap">
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        <div class="wrap"> 
             ${DashboardMenu.render({selected: 'dashboard'})}
+            
             <div class="main" id="dashboard">
                 <h1> dashboard</h1>
                 
