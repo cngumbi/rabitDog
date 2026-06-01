@@ -24,16 +24,30 @@ const Header = {
         //overlay?.addEventListener('click', ()=>{
         //    document.body.classList.remove('sidebar-open');
         //});
-        (function(){
-          const btn = document.getElementById('sidebarToggle');
-          if(btn){
-            btn.addEventListener('click', function(){
-              document.body.classList.toggle('sidebar-collapsed');
-              localStorage.setItem('panzefarm-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed'));
-            });
-          }
-          if(localStorage.getItem('panzefarm-sidebar-collapsed') === 'true') document.body.classList.add('sidebar-collapsed');
-        })();
+                (function(){
+                    const btn = document.getElementById('sidebarToggle');
+                    const overlay = document.getElementById('sidebarOverlay');
+                    const MOBILE_BREAKPOINT = 780;
+
+                    if(btn){
+                        btn.addEventListener('click', function(){
+                            if(window.innerWidth < MOBILE_BREAKPOINT){
+                                document.body.classList.toggle('sidebar-open');
+                            } else {
+                                document.body.classList.toggle('sidebar-collapsed');
+                                localStorage.setItem('panzefarm-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed'));
+                            }
+                        });
+                    }
+
+                    overlay?.addEventListener('click', ()=>{
+                        document.body.classList.remove('sidebar-open');
+                    });
+
+                    if(window.innerWidth >= MOBILE_BREAKPOINT && localStorage.getItem('panzefarm-sidebar-collapsed') === 'true') {
+                        document.body.classList.add('sidebar-collapsed');
+                    }
+                })();
         // Sign out button event listener
         const signoutButton = document.getElementById('signout-button');
         if (signoutButton) {
@@ -80,7 +94,7 @@ const Header = {
                             </button>
                             <div class="dropdown-menu">
                                 <a href="profile.html">Profile</a>
-                                <a href="settings.html">Settings</a>
+                                <a href="/#/profile">Settings</a>
                                 <a href="#" id="signout-button">Sign Out</a>
                             </div>
                         </div>
