@@ -120,6 +120,7 @@
     &:hover {
         background-color: #f5f7fa;
     }
+    
 }
 /* ==========================================
    SMALL DEVICES >= 480px
@@ -156,6 +157,9 @@
     .navbar-logo {
         display: flex;
         align-items: center;
+    }
+    .navbar-title{
+        margin-left: functions.rem(20px);
     }
 }
 /* ==========================================

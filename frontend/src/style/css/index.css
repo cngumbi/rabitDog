@@ -3555,6 +3555,9 @@ img {
         -ms-flex-align: center;
             align-items: center;
   }
+  .navbar-title {
+    margin-left: 1.25rem;
+  }
 }
 /* ==========================================
    LARGE DESKTOP >= 1200px
