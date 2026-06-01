@@ -4622,7 +4622,7 @@ body.sidebar-open .sidebar {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  padding: 0 0.5rem;
+  padding: 0 0.2rem;
 }
 
 .sidebar-menu ul {
@@ -4632,7 +4632,7 @@ body.sidebar-open .sidebar {
 }
 
 .sidebar-menu li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .sidebar-menu a {
