@@ -54,7 +54,7 @@ const Registration = {
     },
     render: ()=>{
         return`
-            <section class="login container">
+            <section class="login">
                 <div class="login-container">
                     <h2> Welcome, let's get started</h2>
                     <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>

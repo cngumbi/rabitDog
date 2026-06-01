@@ -4,7 +4,7 @@ const RefreshFailed = {
     },
     render: ()=>{
         return `
-            <section class="login container">
+            <section class="login">
                 <div class="login-container">
                     <h2>Session Expired</h2>
                     <p>Your session could not be refreshed. Please sign in again to continue.</p>

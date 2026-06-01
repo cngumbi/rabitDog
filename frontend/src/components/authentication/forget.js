@@ -78,7 +78,7 @@ const Forget = {
     },
     render: ()=>{
         return`
-         <section class="login container">
+         <section class="login">
                 <div class="login-container">
                     <h2>Forgot Password</h2>
                     <p> Enter your email address to receive a password reset code. </p>

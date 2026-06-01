@@ -87,7 +87,7 @@ const SignIn = {
     },
     render: ()=>{
         return`
-            <section class="login container ">
+            <section class="login">
                 <div class="login-container">
                     <h2> Login to continue</h2>
                     <p> use the data Created During registration</p>

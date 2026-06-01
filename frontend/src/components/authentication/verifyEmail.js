@@ -70,7 +70,7 @@ const VerifyEmail = {
     render: ()=>{
         const { email, verified } = getUserInfo();
         return`
-           <section class="login container">
+           <section class="login">
                 <div class="login-container">
                     <h2>Email Verification</h2>
                     <p> A verification code has been sent to: </p>

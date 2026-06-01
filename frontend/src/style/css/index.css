@@ -4867,17 +4867,18 @@ img {
    AUTH PAGE WRAPPER
 ========================================== */
 .login {
-  min-height: 100vh;
+  min-height: auto;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  padding: 1rem;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  padding-top: 1.25rem;
+  padding-inline: 1.25rem;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
 }
@@ -4896,7 +4897,7 @@ img {
       -ms-flex-direction: column;
           flex-direction: column;
   gap: 0.75rem;
-  padding: 1.5rem;
+  padding: 1.25rem;
   background: #fff;
   border: 1px solid #e6e4e4;
   border-radius: 0.75rem;
