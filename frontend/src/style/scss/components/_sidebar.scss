@@ -1,0 +1,65 @@
+@use '../abstracts/variables' as *;
+
+$navbar-height: 64px;
+$sidebar-width: 240px;
+
+.sidebar {
+    position: fixed;
+    width: $sidebar-width;
+    height: calc(100vh - #{$navbar-height});
+    background: #232946;
+    color: #fff;
+    position: fixed;
+    left: 0;
+    top: $navbar-height;
+    padding-top: 10px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+body.sidebar-open .sidebar {
+  transform: translateX(0);
+}
+.sidebar-menu {
+  flex: 1;
+  padding: 0 0.5rem;
+}
+.sidebar-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.sidebar-menu li {
+  margin-bottom: 0.5rem;
+}
+.sidebar-menu a {
+  display: block;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+.sidebar-menu a.active, .sidebar-menu a:hover {
+  background: #3e4a6d;
+  color: #fff;
+}
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  font-size: 0.9rem;
+  color: #bfc9e0;
+  border-top: 1px solid #2d3652;
+}
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+  }
+}
