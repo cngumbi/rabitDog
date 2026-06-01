@@ -3379,7 +3379,8 @@ img {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding-left: 1.875rem;
+  padding-right: 1rem;
   background: #fff;
   border-bottom: 1px solid #e5e7ef;
   -webkit-box-sizing: border-box;
@@ -3387,23 +3388,27 @@ img {
   z-index: 101;
 }
 
-/* ==========================================
-   LOGO
-   Hidden by default (mobile-first)
-========================================== */
-.navbar-logo {
-  position: absolute;
-  left: 1.875rem;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-          transform: translateY(-50%);
+.navbar-left {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  margin: 0;
+  margin-left: 0.875rem;
+}
+
+/* ==========================================
+   LOGO
+   Hidden by default (mobile-first)
+========================================== */
+.navbar-logo {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 
 .logo {
@@ -3425,14 +3430,43 @@ img {
   letter-spacing: 0.03em;
 }
 
+/*
+*toggle button for sidebar, visible on mobile and tablets, hidden on desktop
+*/
+.sidebar-toggle {
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 1.25rem;
+  cursor: pointer;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  margin-left: 1.25rem;
+}
+
+body.sidebar-collapsed .sidebar {
+  -webkit-transform: translateX(-260px);
+          transform: translateX(-260px);
+  visibility: hidden;
+}
+
+body.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+
+.sidebar-toggle:focus {
+  outline: 2px solid rgba(99, 102, 241, 0.12);
+  outline-offset: 2px;
+}
+
 /* ==========================================
    TITLE
 ========================================== */
 .navbar-title {
+  margin-left: 1.25rem;
   font-size: 1.125rem;
   font-weight: 600;
   color: #232946;
-  margin-left: 8.125rem;
 }
 
 /* ==========================================
@@ -3520,11 +3554,6 @@ img {
 /* ==========================================
    SMALL DEVICES >= 480px
 ========================================== */
-@media (min-width: 30em) {
-  .navbar-top {
-    padding-inline: 1.25rem;
-  }
-}
 /* ==========================================
    TABLETS >= 720px
 ========================================== */
@@ -3543,10 +3572,6 @@ img {
    DESKTOP >= 960px
 ========================================== */
 @media (min-width: 60em) {
-  .navbar-top {
-    padding-left: 16.25rem;
-    padding-right: 1.5rem;
-  }
   .navbar-logo {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -3563,14 +3588,6 @@ img {
    LARGE DESKTOP >= 1200px
 ========================================== */
 @media (min-width: 75em) {
-  .navbar-top {
-    padding-left: 17.5rem;
-    padding-right: 2rem;
-  }
-  .logo img {
-    width: 2.75rem;
-    height: 2.75rem;
-  }
   .logo span {
     font-size: 1.25rem;
   }

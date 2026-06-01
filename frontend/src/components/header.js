@@ -27,16 +27,22 @@ const Header = {
         const { email, isAdmin } = getUserInfo();
         return `
             <!--logo-->
-            <div class="navbar-logo">
-                <a href="/" class="logo">
-                    <span>Mwandya</span>
-                </a>
+            <div class="navbar-left">
+                <div class="navbar-logo">
+                    <a href="/" class="logo">
+                        <span>Mwandya</span>
+                    </a>
+                </div>
+                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle menu">☰</button>
+                ${
+                    email ?`
+                    <div class="navbar-title">
+                       Dashboard
+                    </div>`:''
+                }
             </div>
             ${
                 email ? `
-                    <div class="navbar-title">
-                       Dashboard
-                    </div>
                     <div class="navbar-action">
                         <div class="dropdown" id="userDropdown">
                             <button class="dropdown-toggle">

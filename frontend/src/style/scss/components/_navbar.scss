@@ -15,24 +15,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: functions.rem(12px) functions.rem(16px);
+    padding-left: functions.rem(30px);
+    padding-right: functions.rem(16px);
     background: #fff;
     border-bottom: 1px solid #e5e7ef;
     box-sizing: border-box;
     z-index: 101;
+}
+.navbar-left {
+    display: flex;
+    align-items: center;
+    margin-left: functions.rem(14px);
 }
 /* ==========================================
    LOGO
    Hidden by default (mobile-first)
 ========================================== */
 .navbar-logo {
-    position: absolute;
-    left: functions.rem(30px);
-    top: 50%;
-    transform: translateY(-50%);
     display: flex;
     align-items: center;
-    margin: 0;
 }
 .logo {
     display: flex;
@@ -48,14 +49,37 @@
         letter-spacing: 0.03em;
     }
 }
+/*
+*toggle button for sidebar, visible on mobile and tablets, hidden on desktop
+*/
+.sidebar-toggle {
+    background: none;
+    border: 0;
+    color: inherit;
+    font-size: functions.rem(20px);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-left: functions.rem(20px);
+}
+body.sidebar-collapsed .sidebar {
+  transform: translateX(-260px);
+  visibility: hidden;
+}
+body.sidebar-collapsed .main-content {
+  margin-left: 0;
+}
+.sidebar-toggle:focus {
+  outline: 2px solid rgba(99,102,241,0.12);
+  outline-offset: 2px;
+}
 /* ==========================================
    TITLE
 ========================================== */
 .navbar-title {
+    margin-left: functions.rem(20px);
     font-size: functions.rem(18px);
     font-weight: 600;
     color: #232946;
-    margin-left: functions.rem(130px);
 }
 /* ==========================================
    ACTIONS
@@ -125,11 +149,11 @@
 /* ==========================================
    SMALL DEVICES >= 480px
 ========================================== */
-@include breakpoints.breakpoint(sm) {
-    .navbar-top {
-        padding-inline: functions.rem(20px);
-    }
-}
+//@include breakpoints.breakpoint(sm) {
+//    .navbar-top {
+//        background: red;
+//    }
+//}
 /* ==========================================
    TABLETS >= 720px
 ========================================== */
@@ -150,10 +174,6 @@
    DESKTOP >= 960px
 ========================================== */
 @include breakpoints.breakpoint(lg) {
-    .navbar-top {
-        padding-left: functions.rem(260px);
-        padding-right: functions.rem(24px);
-    }
     .navbar-logo {
         display: flex;
         align-items: center;
@@ -166,14 +186,6 @@
    LARGE DESKTOP >= 1200px
 ========================================== */
 @include breakpoints.breakpoint(xl) {
-    .navbar-top {
-        padding-left: functions.rem(280px);
-        padding-right: functions.rem(32px);
-    }
-    .logo img {
-        width: functions.rem(44px);
-        height: functions.rem(44px);
-    }
     .logo span {
         font-size: functions.rem(20px);
     }
