@@ -12,8 +12,6 @@ const Header = {
             document.location.hash = '/';
           };
         };
-
-
         const btn = document.querySelector('.dropdown-toggle');
 
         btn?.addEventListener('click', (e)=>{
