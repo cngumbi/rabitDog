@@ -1,9 +1,19 @@
 import profileImg from '../assets/account.png';
 import logoImg from '../assets/SOFTCRAZE_LOGO.PNG';
-import { getUserInfo } from "../localStorage";
+import { clearUser, getUserInfo } from "../localStorage";
 
 const Header = {
     vignette: ()=>{
+        // Sign out button event listener
+        const signoutButton = document.getElementById('signout-button');
+        if (signoutButton) {
+          signoutButton.onclick = async () => {
+            await clearUser();
+            document.location.hash = '/';
+          };
+        };
+
+
         const btn = document.querySelector('.dropdown-toggle');
 
         btn?.addEventListener('click', (e)=>{
@@ -37,7 +47,7 @@ const Header = {
                             <div class="dropdown-menu">
                                 <a href="profile.html">Profile</a>
                                 <a href="settings.html">Settings</a>
-                                <a href="#">Sign Out</a>
+                                <a href="#" id="signout-button">Sign Out</a>
                             </div>
                         </div>
                     </div>

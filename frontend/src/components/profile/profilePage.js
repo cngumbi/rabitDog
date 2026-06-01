@@ -18,14 +18,6 @@ const Profile = {
           }
         });
       }
-      // Sign out button event listener
-      const signoutButton = document.getElementById('signout-button');
-      if (signoutButton) {
-        signoutButton.onclick = async () => {
-          await clearUser();
-          document.location.hash = '/';
-        };
-      };
       setTimeout(()=>{
         document.getElementById('update-profile-button').addEventListener('click', async(e)=>{
           showLoading();
@@ -111,7 +103,6 @@ const Profile = {
                      </ul>
                     <!-- BUTTONS OUTSIDE UL -->
                     <button type="button" formnovalidate id="update-profile-button" class="primary">Update Profile</button>
-                    <button type="button" id="signout-button" class="secondary">Sign Out</button>
                   </div>
                 </div>
               </div>
