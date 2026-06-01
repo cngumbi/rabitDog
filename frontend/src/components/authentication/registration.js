@@ -57,7 +57,6 @@ const Registration = {
             <section class="login">
                 <div class="login-container">
                     <h2> Welcome, let's get started</h2>
-                    <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>
                     <!--login form-->
                     <form action="" id="register-form">
                         <span>Enter your email address</span>
@@ -67,6 +66,7 @@ const Registration = {
                         <span>Confirm Password</span>
                         <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm Password" required>
                         <input type="submit" value="SignIn" class="button">
+                        <p>Already have an Account? <a href="/#/user-current">Sign In</a></p>
                     </form>
                 </div>
             </section>

@@ -77,9 +77,9 @@ const Header = {
                         <span>Mwandya</span>
                     </a>
                 </div>
-                <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle menu">☰</button>
                 ${
                     email ?`
+                    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle menu">☰</button>
                     <div class="navbar-title">
                        Dashboard
                     </div>`:''
