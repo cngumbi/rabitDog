@@ -12,7 +12,7 @@ const ProfileRoute = express.Router();
 ProfileRoute.get("/", isAuth, expressAsync(async(req, res)=>{
     let profile = await Profile.findOne({ user: req.user._id });
     if (!profile) {
-        profile = await Profile.crreate({ user: req.user._id});
+        profile = await Profile.create({ user: req.user._id });
     }
     const user = await User.findById(req.user._id);
     res.send({
@@ -51,7 +51,7 @@ ProfileRoute.put("/", isAuth, expressAsync(async(req, res)=>{
         }
     );
 
-    const user = await User.findByIdAndUpdate(req.user._id);
+    const user = await User.findById(req.user._id);
 
     user.activityLog.unshift({
         action: 'PROFILE_COMPLETED',
@@ -61,7 +61,6 @@ ProfileRoute.put("/", isAuth, expressAsync(async(req, res)=>{
     await user.save();
     res.send(profile);
 
-    
 }));
 
 

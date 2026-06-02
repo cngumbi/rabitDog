@@ -6,7 +6,7 @@
 }
 
 html {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 body {
@@ -17,12 +17,12 @@ body {
 
 @media (max-width: 900px) {
   html {
-    font-size: 12px;
+    font-size: 11px;
   }
 }
 @media (max-width: 640px) {
   html {
-    font-size: 11px;
+    font-size: 10px;
   }
 }
 ul {
@@ -4650,12 +4650,12 @@ body.sidebar-open .sidebar-overlay {
 .sidebar {
   position: fixed;
   width: 240px;
-  height: calc(100vh - 50px);
+  height: calc(100vh - 47px);
   background: #232946;
   color: #fff;
   position: fixed;
   left: 0;
-  top: 50px;
+  top: 47px;
   padding-top: 10px;
   z-index: 100;
   display: -webkit-box;
@@ -5598,6 +5598,8 @@ body.sidebar-open .sidebar {
 .profile-table td {
   padding: 14px 16px;
   border-top: 1px solid #e5e7ef;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .profile-table td:first-child {
   width: 38%;
@@ -5607,12 +5609,16 @@ body.sidebar-open .sidebar {
 
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: start;
   margin-bottom: 24px;
+}
+
+.activity-item {
+  word-break: break-word;
 }
 
 .panel {

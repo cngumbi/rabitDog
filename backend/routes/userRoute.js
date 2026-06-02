@@ -484,11 +484,12 @@ UserRoute.get('/session', expressAsync(async(req, res)=>{
 }));
 //profile summary route
 UserRoute.get('/profile-summary', isAuth, expressAsync(async(req, res)=>{
-    const user = await User.findById(req.user_id);
+    const user = await User.findById(req.user._id);
     if(!user){
         return res.status(404).send({ message: 'User not found' });
     }
-    const profile = await Profile.findOne({ user: req.user_id });
+    const profile = await Profile.findOne({ user: req.user._id });
+    const activityLog = Array.isArray(user.activityLog) ? user.activityLog : [];
     res.send({
         _id: user._id,
         email: user.email,
@@ -496,7 +497,7 @@ UserRoute.get('/profile-summary', isAuth, expressAsync(async(req, res)=>{
         verified: user.verified,
         memberSince: user.createdAt,
         lastLogin: user.lastLogin,
-        activityLog: user.activetyLog.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10), // return latest 10 activities
+        activityLog: activityLog.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10),
         profile: profile || null,
         profileCompleted: profile ? profile.profileCompleted : false,
     });

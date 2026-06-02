@@ -1,33 +1,23 @@
-import { getProfileSummary, update } from "../../connection/api";
-import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
+import { getProfileSummary, update, updateProfile } from "../../connection/api";
+import { getUserInfo, setUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../dashboard/dashboardMenu";
 
 const Profile = {
     vignette: async ()=>{
-      // Prevent form submission and handle profile update
-      const profileForm = document.getElementById('profile-form');
-      if (profileForm) {
-        profileForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          e.preventDefault();
-          e.stopPropagation();
-          e.stopImmediatePropagation();
-          if(typeof e.cancelBubble !== "undefined"){
-            e.cancelBubble = true;
-          }
-        });
-      }
-      setTimeout(()=>{
-        document.getElementById('save-profile-button').addEventListener('click', async(e)=>{
+      const saveButton = document.getElementById('save-profile-button');
+      const updateButton = document.getElementById('update-profile-button');
+
+      if (saveButton) {
+        saveButton.addEventListener('click', async ()=>{
           try{
             showLoading();
             const profileData = {
               name: document.getElementById('profileName').value,
-              userName: document.getElementById('userName').value,
+              userName: document.getElementById('profileUserName').value,
               phoneNumber: document.getElementById('profilePhone').value,
               nationalID: document.getElementById('profileNationalID').value,
-              bio: document.getElementById('Bio').value,
+              bio: document.getElementById('bio').value,
             };
             const response = await updateProfile(profileData);
             hideLoading();
@@ -41,7 +31,10 @@ const Profile = {
             showMessage(error.message || 'An error occurred while updating profile');
           }
         });
-        document.getElementById('update-profile-button').addEventListener('click', async(e)=>{
+      }
+
+      if (updateButton) {
+        updateButton.addEventListener('click', async()=>{
           showLoading();
           try{
             const email = document.getElementById('email').value.trim();
@@ -49,20 +42,24 @@ const Profile = {
             const newPassword = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             if (!email) {
+              hideLoading();
               showMessage('Email is required');
               return;
             }
             if (!currentPassword) {
+              hideLoading();
               showMessage('Current password is required to update profile');
-              return false;
+              return;
             }
             if(!newPassword){
+              hideLoading();
               showMessage('New password is required to update profile');
-              return false;
+              return;
             }
             if (newPassword !== confirmPassword) {
+              hideLoading();
               showMessage('Passwords do not match');
-              return false;
+              return;
             }
             const data = await update({
               email,
@@ -70,29 +67,41 @@ const Profile = {
               password: newPassword
             });
             hideLoading();
-            console.log('API RESPONSE:', data);
             if (data.error) {
               showMessage(data.error);
-              return false;
-            }else{
-              setUserInfo(data);
-              showMessage('Profile updated successfully');
-              document.location.hash = '/';
+              return;
             }
+            setUserInfo(data);
+            showMessage('Profile updated successfully');
+            document.location.hash = '/';
           }catch(error){
             hideLoading();
-            showMessage(error.message || 'An error occurred  while updating profile');
+            showMessage(error.message || 'An error occurred while updating profile');
           }
         });
-      }, 0);
+      }
     },
     render: async ()=>{
-      const { email, lastLogin, memberSince } = getUserInfo();
+      const { email: currentEmail } = getUserInfo();
       const profilesummary = await getProfileSummary();
-      const { profile, account } = profilesummary;
-      const lastLoginFormatted = account.lastLogin ? new Date(account.lastLogin).toLocaleDateString() : "Never";
-      const memberSinceFormatted = account.memberSince ? new Date(account.memberSince).toLocaleDateString() : "-";
-      const activityLog = account.activityLog || [];
+      if (profilesummary.error) {
+        return `
+        <div class="wrap">
+          ${DashboardMenu.render({selected: ''})}
+          <div class="main" id="dashboard">
+            <div class="page-header">
+              <div><h1 class="font-xl">Profile</h1><p class="text-muted">Unable to load profile information: ${profilesummary.error}</p></div>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      const profile = profilesummary.profile || {};
+      const email = profilesummary.email || currentEmail || '';
+      const lastLoginFormatted = profilesummary.lastLogin ? new Date(profilesummary.lastLogin).toLocaleDateString() : "Never";
+      const memberSinceFormatted = profilesummary.memberSince ? new Date(profilesummary.memberSince).toLocaleDateString() : "-";
+      const activityLog = Array.isArray(profilesummary.activityLog) ? profilesummary.activityLog : [];
+      const isAdmin = profilesummary.isAdmin || false;
       return `
       <div class="wrap">
         ${DashboardMenu.render({selected: ''})}
@@ -109,13 +118,13 @@ const Profile = {
           <!--profile top content and cards-->
           <div class="profile-top">
             <div class="profile-user">
-              <div class=" bg-primary text-white avatar">AW</div>
+              <div class=" bg-primary text-white avatar">${(profile.name || 'U').slice(0, 2).toUpperCase()}</div>
               <div class="profile-user-info">
-                <h2>${profile?.name || 'No Name'}</h2>
-                <p>${profilesummary.isAdmin ? 'Administrator' : 'User'}</p>
+                <h2>${profile.name || 'No Name'}</h2>
+                <p>${isAdmin ? 'Administrator' : 'User'}</p>
                 <div class="profile-badges">
-                  <span class="badge-pill">Administrator</span>
-                  <span class="badge-pill">2FA enabled</span>
+                  <span class="badge-pill">${isAdmin ? 'Administrator' : 'Standard user'}</span>
+                  <span class="badge-pill">Profile saved</span>
                 </div>
               </div>
             </div>
@@ -135,10 +144,10 @@ const Profile = {
                 <div class="table-responsive">
                   <table class="profile-table">
                     <tbody>
-                      <tr><td>Full name</td><td>${profile?.name || 'No Name Set'}</td></tr>
-                      <tr><td>Email</td><td>${email || ''}</td></tr>
-                      <tr><td>Phone number</td><td>${profile?.phoneNumber || 'No Set' }</td></tr>
-                      <tr><td>Role</td><td>${profilesummary.isAdmin ? 'Administrator' : 'User'}</td></tr>
+                      <tr><td>Full name</td><td>${profile.name || 'No Name Set'}</td></tr>
+                      <tr><td>Email</td><td>${email}</td></tr>
+                      <tr><td>Phone number</td><td>${profile.phoneNumber || 'Not available' }</td></tr>
+                      <tr><td>Role</td><td>${isAdmin ? 'Administrator' : 'User'}</td></tr>
                       <tr><td>Last login</td><td>${lastLoginFormatted}</td></tr>
                       <tr><td>Member since</td><td>${memberSinceFormatted}</td></tr>
                     </tbody>
@@ -150,27 +159,27 @@ const Profile = {
             <!--profile edit form-->
             <div class="panel">
               <div class="card-title">Profile information</div>
-              <p class="text-muted">Update your name, email, and phone number for your account.</p>
+              <p class="text-muted">Update your name, username, phone number, and profile bio.</p>
               <div class="field-grid">
                 <div class="form-block">
                   <label class="form-label" for="profileName">Full name</label>
-                  <input class="form-control" id="profileName" type="text" value="" placeholder="e.g. Amina Wanjohi">
+                  <input class="form-control" id="profileName" type="text" value="${profile.name || ''}" placeholder="e.g. Amina Wanjohi">
                 </div>
                 <div class="form-block">
-                  <label class="form-label" for="profileUserName">Email address</label>
-                  <input class="form-control" id="profileUserName" type="text" value="" placeholder="user name">
+                  <label class="form-label" for="profileUserName">User name</label>
+                  <input class="form-control" id="profileUserName" type="text" value="${profile.userName || ''}" placeholder="e.g. aminawanjohi">
                 </div>
                 <div class="form-block">
                   <label class="form-label" for="profilePhone">Phone number</label>
-                  <input class="form-control" id="profilePhone" type="text" value="" placeholder="e.g. 0712 345 678">
+                  <input class="form-control" id="profilePhone" type="text" value="${profile.phoneNumber || ''}" placeholder="e.g. 0712 345 678">
                 </div>
                 <div class="form-block">
                   <label class="form-label" for="profileNationalID">National ID</label>
-                  <input class="form-control" id="profileNationalID" type="number" value="" placeholder="e.g. 12345678">
+                  <input class="form-control" id="profileNationalID" type="number" value="${profile.nationalID || ''}" placeholder="e.g. 12345678">
                 </div>
                 <div class="form-block">
                   <label class="form-label" for="bio">Bio</label>
-                  <textarea class="form-control" id="bio" placeholder="Tell us about yourself..."></textarea>
+                  <textarea class="form-control" id="bio" placeholder="Tell us about yourself...">${profile.bio || ''}</textarea>
                 </div>
               </div>
               <div class="profile-actions">
@@ -187,7 +196,7 @@ const Profile = {
                 <!--Email-->
                 <div class="form-block">
                   <label class="form-label" for="email">Email</label>
-                  <input class="form-control" type="email" id="email" value="${email || ''}" />
+                  <input class="form-control" type="email" id="email" value="${email}" />
                 </div>
                 <!--Current Password-->
                 <div class="form-block">
@@ -205,7 +214,6 @@ const Profile = {
                   <input class="form-control" type="password" id="confirmPassword" placeholder="Confirm new password" />
                 </div>
               </div>
-              <!-- BUTTONS OUTSIDE UL -->
               <div class="profile-actions">
                   <button type="button" formnovalidate id="update-profile-button" class="btn btn-primary">Update Profile</button>
               </div>
@@ -237,11 +245,7 @@ const Profile = {
                   </li>
                   `
                 }
-                <li class="activity-item">
-                  <strong>Profile updated</strong>
-                  <span>Changed email address and contact number.</span>
-                </li>
-                
+              </ul>
             </div>
             <!--end of profile activity feed-->
           </div>

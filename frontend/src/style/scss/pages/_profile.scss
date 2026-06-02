@@ -93,11 +93,13 @@
 }
 .profile-table { 
     width:100%; 
-    border-collapse: 
-    collapse; margin-top:14px; 
+    border-collapse: collapse; 
+    margin-top:14px; 
     td { 
         padding:14px 16px; 
         border-top:1px solid #e5e7ef; 
+        word-break: break-word;
+        overflow-wrap: anywhere;
         &:first-child { 
             width:38%; 
             color:#6b7280; 
@@ -107,10 +109,13 @@
 }
 .profile-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
     align-items: start;
     margin-bottom: 24px;
+}
+.activity-item {
+    word-break: break-word;
 }
 .panel {
     background: #ffffff;
