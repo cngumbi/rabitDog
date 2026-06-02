@@ -93,8 +93,8 @@ const Header = {
                                 <span style="margin-right:0.5em;">👤</span> Admin ▼
                             </button>
                             <div class="dropdown-menu">
-                                <a href="profile.html">Profile</a>
-                                <a href="/#/profile">Settings</a>
+                                <a href="/#/profile">Profile</a>
+                                <a href="/#/settings">Settings</a>
                                 <a href="#" id="signout-button">Sign Out</a>
                             </div>
                         </div>

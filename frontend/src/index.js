@@ -10,9 +10,10 @@ import Header from './components/header';
 import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
 import VerifyEmail from './components/authentication/verifyEmail';
-import Profile from './components/profile/profilePage';
 import Forget from './components/authentication/forget';
 import Dashboard from './components/profile/admin/dashboard/dashboard';
+import Settings from './components/authentication/settings';
+import Profile from './components/profile/admin/profile';
 import RefreshFailed from './components/authentication/refreshFailed';
 //Chicken (Nested Layout)
 import Chicken from './components/pages/poultry/Chicken/chicken';
@@ -60,8 +61,9 @@ const routes = {
     '/verify-email': VerifyEmail,
     '/forget': Forget,
     '/refresh-failed': RefreshFailed,
-    '/profile': Profile,
+    '/settings': Settings,
     '/dashboard': Dashboard,
+    '/profile': Profile,
     //'/checken': Chicken,
     //'/chicken': { 
     //    component: Chicken,
@@ -108,8 +110,9 @@ const router = async () => {
     //];
     //Protected Pages
     const protectedPages = [
-        '/profile',
+        '/settings',
         '/dashboard',
+        '/profile'
     ];
     //get the current path
     const currentPath = request.resource ? `/${request.resource}` : '/';

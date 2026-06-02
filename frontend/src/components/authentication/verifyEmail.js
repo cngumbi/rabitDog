@@ -80,8 +80,7 @@ const VerifyEmail = {
                         <input type="text" id="verificationCode" placeholder="6-digit code" required >
                         <input type="submit" value="Verify Email" class="button" >
                         <!--Resend verification code link-->
-                        <p> Didn't receive the code?</p>
-                        <button id="resend-code" class="button" style="margin-top: 1rem;">Resend Code</button>
+                        <p> Didn't receive the code? <a  href="#" id="resend-code">Resend Code</a> </p>
                         <a href="/#/forget">Forget Password?</a>
                     </form>
                     
