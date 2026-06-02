@@ -3,6 +3,7 @@
 @use 'scss/base/base';
 @use 'scss/base/grid';
 @use 'scss/layout/main';
+@use 'scss/layout/settings';
 //@use 'scss/layout/header';
 //colors
 @use 'scss/base/colors';
@@ -12,7 +13,10 @@
 @use '../style/scss/components/alert';
 @use '../style/scss/components/button';
 @use '../style/scss/components/sidebar';
+@use './scss/components/form';
+@use './scss/components/table';
 //utilities(margin, padding, opacity)
 @use 'scss/base/utilities';
 //pages
 @use 'scss/layout/registration';
+@use 'scss/pages/profile';
