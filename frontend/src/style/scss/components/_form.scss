@@ -1,0 +1,49 @@
+@use '../abstracts/variables' as *;
+@use 'sass:color' as *;
+@use 'sass:math';
+
+%form-base {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: $base_padding;
+    border-radius: math.div($base_border_radius, 2);
+    border: $base_border_thickness solid mix(black, white, 70%);
+    font-size: $base_font_size;
+    margin: $base_margin 0;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: math.div($base_padding, 2);
+    font-weight: 600;
+}
+
+.form-control, .form-select, textarea {
+    @extend %form-base;
+}
+
+.form-control:focus, .form-select:focus, textarea:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+}
+
+.form-text {
+    display: block;
+    margin-top: calc($base_padding / -2);
+    margin-bottom: $base_margin;
+    color: mix(black, white, 55%);
+    font-size: $font_size_sm;
+}
+
+@each $key, $val in $colors {
+    .form-control-#{$key}, .form-select-#{$key} {
+        border-color: $val;
+    }
+
+    .form-control-#{$key}:focus, .form-select-#{$key}:focus {
+        border-color: $val;
+        box-shadow: 0 0 0 3px rgba($val, 0.15);
+    }
+}
