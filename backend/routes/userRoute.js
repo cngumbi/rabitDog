@@ -497,7 +497,7 @@ UserRoute.get('/profile-summary', isAuth, expressAsync(async(req, res)=>{
         verified: user.verified,
         memberSince: user.createdAt,
         lastLogin: user.lastLogin,
-        activityLog: activityLog.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10),
+        activityLog: activityLog.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10), // return latest 10 activities
         profile: profile || null,
         profileCompleted: profile ? profile.profileCompleted : false,
     });

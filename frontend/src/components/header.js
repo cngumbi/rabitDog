@@ -3,51 +3,27 @@ import { clearUser, getUserInfo } from "../localStorage";
 
 const Header = {
     vignette: ()=>{
-        // Sidebar toggle persistence
-        //const sidebarToggle = document.getElementById('sidebarToggle');
-        //const overlay = document.getAnimationById('sidebarOverlay');
-        ////restore desktop state
-        //if(window.innerWidth >= 768 && localStorage.getItem('panzefarm-sidebar-collapsed') === 'true') {
-        //  document.body.classList.add('sidebar-collapsed');
-        //}
-        //sidebarToggle?.addEventListener('click', ()=>{
-        //    document.body.classList.toggle('sidebar-collapsed');
-        //});
-        //sidebarToggle?.addEventListener('click', ()=>{
-        //    if(window.innerWidth < 768){
-        //        document.body.classList.toggle('sidebar-open');
-        //    }else{
-        //        document.body.classList.toggle('sidebar-collapsed');
-        //        localStorage.setItem('panzefarm-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed'));
-        //    }
-        //});
-        //overlay?.addEventListener('click', ()=>{
-        //    document.body.classList.remove('sidebar-open');
-        //});
-                (function(){
-                    const btn = document.getElementById('sidebarToggle');
-                    const overlay = document.getElementById('sidebarOverlay');
-                    const MOBILE_BREAKPOINT = 780;
-
-                    if(btn){
-                        btn.addEventListener('click', function(){
-                            if(window.innerWidth < MOBILE_BREAKPOINT){
-                                document.body.classList.toggle('sidebar-open');
-                            } else {
-                                document.body.classList.toggle('sidebar-collapsed');
-                                localStorage.setItem('panzefarm-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed'));
-                            }
-                        });
+        (function(){
+            const btn = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            const MOBILE_BREAKPOINT = 780;
+            if(btn){
+                btn.addEventListener('click', function(){
+                    if(window.innerWidth < MOBILE_BREAKPOINT){
+                        document.body.classList.toggle('sidebar-open');
+                    } else {
+                        document.body.classList.toggle('sidebar-collapsed');
+                        localStorage.setItem('panzefarm-sidebar-collapsed', document.body.classList.contains('sidebar-collapsed'));
                     }
-
-                    overlay?.addEventListener('click', ()=>{
-                        document.body.classList.remove('sidebar-open');
-                    });
-
-                    if(window.innerWidth >= MOBILE_BREAKPOINT && localStorage.getItem('panzefarm-sidebar-collapsed') === 'true') {
-                        document.body.classList.add('sidebar-collapsed');
-                    }
-                })();
+                });
+            }
+            overlay?.addEventListener('click', ()=>{
+                document.body.classList.remove('sidebar-open');
+            });
+            if(window.innerWidth >= MOBILE_BREAKPOINT && localStorage.getItem('panzefarm-sidebar-collapsed') === 'true') {
+                document.body.classList.add('sidebar-collapsed');
+            }
+        })();
         // Sign out button event listener
         const signoutButton = document.getElementById('signout-button');
         if (signoutButton) {

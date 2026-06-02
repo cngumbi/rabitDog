@@ -8,7 +8,6 @@ package-lock.json
 #.env
 #.prettierrc
 .vscode
-text
 #--------------------------
 dist/
 #webpack configuration files
