@@ -1,4 +1,4 @@
-import DashboardMenu from "../../../profile/admin/dashboard/dashboardMenu";
+import DashboardMenu from "../../../dashboard/dashboardMenu";
 import Aside from "../aside";
 
 /*

@@ -11,9 +11,9 @@ import SignIn from './components/authentication/signIn';
 import Registration from './components/authentication/registration';
 import VerifyEmail from './components/authentication/verifyEmail';
 import Forget from './components/authentication/forget';
-import Dashboard from './components/profile/admin/dashboard/dashboard';
+import Dashboard from './components/dashboard/dashboard';
 import Settings from './components/authentication/settings';
-import Profile from './components/profile/admin/profile';
+import Profile from './components/authentication/profile';
 import RefreshFailed from './components/authentication/refreshFailed';
 //Chicken (Nested Layout)
 import Chicken from './components/pages/poultry/Chicken/chicken';

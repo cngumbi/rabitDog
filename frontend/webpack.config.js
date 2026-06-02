@@ -1,4 +1,6 @@
-const { mode } = require('webpack-nano/argv');
+// Derive mode from webpack argv or environment if available. Fallback to 'development'.
+// Older helper packages may not provide a `mode` value when invoked by `webpack serve`.
+let detectedMode;
 const path = require('path');
 const { merge } = require('webpack-merge');
 const commonParts = require('./config/webpack.common');
@@ -40,4 +42,7 @@ const getConfig = (mode)=>{
     }
 };
 
-module.exports = getConfig(mode);
+module.exports = (env, argv) => {
+    detectedMode = argv && argv.mode ? argv.mode : process.env.NODE_ENV || 'development';
+    return getConfig(detectedMode);
+};
