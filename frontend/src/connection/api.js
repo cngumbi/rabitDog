@@ -132,6 +132,38 @@ export const update = async({ email, password, currentPassword })=>{
         return { error: err.response ? err.response.data.message : err.message };
      }
 };
+export const getProfileSummary =  async ()=>{
+    try{
+        const response = await apiClient({
+            url: '/api/users/profile-summary',
+            method: 'GET',
+        });
+        return response.data;
+    }catch(error){
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+export const updateProfile = async(profileData)=>{
+    try{
+
+        const response = await apiClient({
+            url: "/api/profile",
+            method: "PUT",
+            data: profileData
+        });
+
+        return response.data;
+
+    }catch(err){
+
+        return {
+            error: err.response
+                ? err.response.data.message
+                : err.message
+        };
+
+    }
+};
 //products
 //export const getProducts = async ({ searchKeyword = "" }) => {
 //    try{

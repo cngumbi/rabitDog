@@ -4650,12 +4650,12 @@ body.sidebar-open .sidebar-overlay {
 .sidebar {
   position: fixed;
   width: 240px;
-  height: calc(100vh - 44px);
+  height: calc(100vh - 50px);
   background: #232946;
   color: #fff;
   position: fixed;
   left: 0;
-  top: 44px;
+  top: 50px;
   padding-top: 10px;
   z-index: 100;
   display: -webkit-box;

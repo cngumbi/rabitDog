@@ -1,10 +1,10 @@
-import { update } from "../../connection/api";
+import { getProfileSummary, update } from "../../connection/api";
 import { clearUser, getUserInfo, setUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../dashboard/dashboardMenu";
 
 const Profile = {
-    vignette: ()=>{
+    vignette: async ()=>{
       // Prevent form submission and handle profile update
       const profileForm = document.getElementById('profile-form');
       if (profileForm) {
@@ -19,6 +19,28 @@ const Profile = {
         });
       }
       setTimeout(()=>{
+        document.getElementById('save-profile-button').addEventListener('click', async(e)=>{
+          try{
+            showLoading();
+            const profileData = {
+              name: document.getElementById('profileName').value,
+              userName: document.getElementById('userName').value,
+              phoneNumber: document.getElementById('profilePhone').value,
+              nationalID: document.getElementById('profileNationalID').value,
+              bio: document.getElementById('Bio').value,
+            };
+            const response = await updateProfile(profileData);
+            hideLoading();
+            if(response.error){
+              return showMessage(response.error);
+            }
+            showMessage('Profile updated successfully');
+            document.location.reload();
+          }catch(error){
+            hideLoading();
+            showMessage(error.message || 'An error occurred while updating profile');
+          }
+        });
         document.getElementById('update-profile-button').addEventListener('click', async(e)=>{
           showLoading();
           try{
@@ -64,8 +86,13 @@ const Profile = {
         });
       }, 0);
     },
-    render: ()=>{
-      const { email } = getUserInfo();
+    render: async ()=>{
+      const { email, lastLogin, memberSince } = getUserInfo();
+      const profilesummary = await getProfileSummary();
+      const { profile, account } = profilesummary;
+      const lastLoginFormatted = account.lastLogin ? new Date(account.lastLogin).toLocaleDateString() : "Never";
+      const memberSinceFormatted = account.memberSince ? new Date(account.memberSince).toLocaleDateString() : "-";
+      const activityLog = account.activityLog || [];
       return `
       <div class="wrap">
         ${DashboardMenu.render({selected: ''})}
@@ -84,8 +111,8 @@ const Profile = {
             <div class="profile-user">
               <div class=" bg-primary text-white avatar">AW</div>
               <div class="profile-user-info">
-                <h2>Amina Wanjohi</h2>
-                <p>Operations Admin • PoultryHub</p>
+                <h2>${profile?.name || 'No Name'}</h2>
+                <p>${profilesummary.isAdmin ? 'Administrator' : 'User'}</p>
                 <div class="profile-badges">
                   <span class="badge-pill">Administrator</span>
                   <span class="badge-pill">2FA enabled</span>
@@ -108,12 +135,12 @@ const Profile = {
                 <div class="table-responsive">
                   <table class="profile-table">
                     <tbody>
-                      <tr><td>Full name</td><td>Amina Wanjohi</td></tr>
+                      <tr><td>Full name</td><td>${profile?.name || 'No Name Set'}</td></tr>
                       <tr><td>Email</td><td>${email || ''}</td></tr>
-                      <tr><td>Phone number</td><td>0712 223 334</td></tr>
-                      <tr><td>Role</td><td>Administrator</td></tr>
-                      <tr><td>Last login</td><td>June 2, 2026 at 09:24</td></tr>
-                      <tr><td>Member since</td><td>March 2024</td></tr>
+                      <tr><td>Phone number</td><td>${profile?.phoneNumber || 'No Set' }</td></tr>
+                      <tr><td>Role</td><td>${profilesummary.isAdmin ? 'Administrator' : 'User'}</td></tr>
+                      <tr><td>Last login</td><td>${lastLoginFormatted}</td></tr>
+                      <tr><td>Member since</td><td>${memberSinceFormatted}</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -130,16 +157,24 @@ const Profile = {
                   <input class="form-control" id="profileName" type="text" value="" placeholder="e.g. Amina Wanjohi">
                 </div>
                 <div class="form-block">
-                  <label class="form-label" for="profileEmail">Email address</label>
-                  <input class="form-control" id="profileEmail" type="email" value="" placeholder="e.g. your.email@example.com">
+                  <label class="form-label" for="profileUserName">Email address</label>
+                  <input class="form-control" id="profileUserName" type="text" value="" placeholder="user name">
                 </div>
                 <div class="form-block">
                   <label class="form-label" for="profilePhone">Phone number</label>
-                  <input class="form-control" id="profilePhone" type="tel" value="" placeholder="e.g. 0712 345 678">
+                  <input class="form-control" id="profilePhone" type="text" value="" placeholder="e.g. 0712 345 678">
+                </div>
+                <div class="form-block">
+                  <label class="form-label" for="profileNationalID">National ID</label>
+                  <input class="form-control" id="profileNationalID" type="number" value="" placeholder="e.g. 12345678">
+                </div>
+                <div class="form-block">
+                  <label class="form-label" for="bio">Bio</label>
+                  <textarea class="form-control" id="bio" placeholder="Tell us about yourself..."></textarea>
                 </div>
               </div>
               <div class="profile-actions">
-                <button class="btn btn-primary" type="button">Save profile</button>
+                <button id="save-profile-button" class="btn btn-primary" type="button">Save profile</button>
                 <button class="btn btn-outline" type="button">Reset form</button>
               </div>
             </div>  
@@ -180,10 +215,33 @@ const Profile = {
             <div class="panel">
               <div class="card-title">Recent activity</div>
               <ul class="activity-list">
-                <li class="activity-item"><strong>Profile updated</strong><span>Changed email address and contact number.</span></li>
-                <li class="activity-item"><strong>Password reset</strong><span>Security update completed 2 days ago.</span></li>
-                <li class="activity-item"><strong>Team settings modified</strong><span>Updated access levels for support staff.</span></li>
-              </ul>
+                ${
+                  activityLog.length ? activityLog
+                  .map(
+                    (activity) => `
+                    <li class="activity-item">
+                      <strong>${activity.action}</strong>
+                      <span>
+                        ${activity.description}
+                        <br>
+                        <small>
+                          ${new Date(activity.createdAt).toLocaleString()}
+                        </small>
+                      </span>
+                    </li>
+                    `
+                  )
+                  .join('') : `
+                  <li class="activity-item">
+                    <span>No recent activity</span>
+                  </li>
+                  `
+                }
+                <li class="activity-item">
+                  <strong>Profile updated</strong>
+                  <span>Changed email address and contact number.</span>
+                </li>
+                
             </div>
             <!--end of profile activity feed-->
           </div>

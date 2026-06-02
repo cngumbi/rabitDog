@@ -17,7 +17,18 @@ const userSchema = new mongoose.Schema({
     forgotPasswordTokenValidation: { type: Number, select: false },
     loginAttempts: { type: Number, default: 0, select: false },
     lockUntil: { type: Number, select: false },
-    refreshToken: { type: String, select: false }
+    refreshToken: { type: String, select: false },
+    lastLogin: { type: Date, default: null },
+    activityLog: [
+        {
+            action: String,
+            description: String,
+            createdAt : {
+                type: Date,
+                default: Date.now
+            }
+        }
+    ]
 
 }, { timestamps: true });
 //create the user model

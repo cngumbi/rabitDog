@@ -48,7 +48,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
                 signinUser.loginAttempts = (signinUser.loginAttempts || 0) + 1;
                 if(signinUser.loginAttempts >= MAX_LOGIN_ATTEMPTS){
                     signinUser.lockUntil = Date.now() + LOCK_TIME;
-                }
+                }             
                 await signinUser.save();
             }
             const errorResponse = signinUser && signinUser.lockUntil && signinUser.lockUntil > Date.now()
@@ -74,6 +74,17 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
 
         const token = generateToken(signinUser);
         const refreshToken = generateRefreshToken(signinUser);
+        //update last login
+        signinUser.lastLogin = Date.now();
+        //Add Login activity
+        signinUser.activityLog.unshift({
+            action: 'LOGIN',
+            description: `User signed in from ${req.ip}`,
+            createdAt: new Date()
+        });
+        //keep only latest 50 activities
+        signinUser.activityLog = signinUser.activityLog.slice(0, 50);
+
         signinUser.refreshToken = HmacProcess(refreshToken, config.MAC_VERIFICATION_CODE_SECRET);
         await signinUser.save();
         //const profile = await Profile.findOne({ user: signinUser._id});
@@ -134,9 +145,9 @@ UserRoute.post('/register', authLimiter, expressAsync(async(req, res) => {
         //save user to database
         const createdUser = await user.save();
         //create empty profile here
-        //await Profile.create({
-        //    user: user._id
-        //});
+        await Profile.create({
+            user: user._id
+        });
         //check if user created successfully
         if (!createdUser) {
             return res.status(401).send({
@@ -184,7 +195,20 @@ UserRoute.put('/:id', isAuth, SessionAuth, expressAsync(async(req, res) => {
                     });
                 }
                 user.password = PassHash(req.body.password, 8);
+                user.activityLog.unshift({
+                    action: 'PASSWORD_CHANGE',
+                    description: 'Password updated successfully',
+                    createdAt: new Date()
+                });
             }
+            //Add profile update activity
+            user.activityLog.unshift({
+                action: 'PROFILE_UPDATE',
+                description: 'Updated profile information',
+                createdAt: new Date()
+            });
+            //keep only latest 50 activities
+            user.activityLog = user.activityLog.slice(0, 50);
             //user.password = req.body.password ? PassHash(req.body.password, 8) : user.password; //|| user.password;
             //save updated user to database
             const updateUser = await user.save();
@@ -458,4 +482,24 @@ UserRoute.get('/session', expressAsync(async(req, res)=>{
         });
     }
 }));
+//profile summary route
+UserRoute.get('/profile-summary', isAuth, expressAsync(async(req, res)=>{
+    const user = await User.findById(req.user_id);
+    if(!user){
+        return res.status(404).send({ message: 'User not found' });
+    }
+    const profile = await Profile.findOne({ user: req.user_id });
+    res.send({
+        _id: user._id,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        verified: user.verified,
+        memberSince: user.createdAt,
+        lastLogin: user.lastLogin,
+        activityLog: user.activetyLog.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 10), // return latest 10 activities
+        profile: profile || null,
+        profileCompleted: profile ? profile.profileCompleted : false,
+    });
+}));
+
 module.exports = UserRoute;

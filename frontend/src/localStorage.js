@@ -3,7 +3,9 @@ export const setUserInfo = ({
     email = '',
     token = '',
     isAdmin = false,
-    verified = false
+    verified = false,
+    lastLogin = null,
+    memberSince = null,
 })=>{
     localStorage.setItem(
         'userInfo',
@@ -12,7 +14,9 @@ export const setUserInfo = ({
             email,
             token,
             isAdmin,
-            verified
+            verified,
+            lastLogin,
+            memberSince
         })
     );
 };
