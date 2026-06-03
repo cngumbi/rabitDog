@@ -5674,17 +5674,23 @@ body.sidebar-open .sidebar {
 }
 
 .activity-grid {
+  padding: 0;
+  margin: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  gap: 12px;
 }
 
 .activity-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  background: #fff;
-  min-height: 129px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  min-height: 50px;
+}
+.activity-card strong {
+  display: block;
+  margin-bottom: 4px;
 }
 
 .pagination-container {
