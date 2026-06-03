@@ -3,65 +3,100 @@ import DashboardMenu from "../dashboard/dashboardMenu";
 
 const Settings = {
     vignette: ()=>{
-        // Tab navigation
-        document.querySelectorAll('.settings-nav button').forEach(function(button){
-          button.addEventListener('click', function(){
-            document.querySelectorAll('.settings-nav button').forEach(i=>i.classList.remove('active'));
-            button.classList.add('active');
-            const tab = button.getAttribute('data-tab');
-            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-            const panel = document.getElementById('tab-' + tab);
-            if(panel) panel.classList.add('active');
+        const settingsKey = 'poultryhub.settings';
+        const getById = (id) => document.getElementById(id);
+
+        const setSwitchState = (switchEl, enabled) => {
+          if (!switchEl) return;
+          if (enabled) {
+            switchEl.classList.add('on');
+          } else {
+            switchEl.classList.remove('on');
+          }
+          switchEl.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+        };
+
+        const toggleSwitch = (el) => {
+          if (!el) return;
+          setSwitchState(el, !el.classList.contains('on'));
+        };
+
+        const loadSettings = () => {
+          try {
+            const s = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+            if (s.currency) getById('currency').value = s.currency;
+            if (s.dateformat) getById('dateformat').value = s.dateformat;
+            if (s.workspaceName) getById('workspaceName').value = s.workspaceName;
+            if (s.businessEmail) getById('businessEmail').value = s.businessEmail;
+            if (s.digestTime) getById('digestTime').value = s.digestTime;
+            if (s.sessionTimeout) getById('sessionTimeout').value = s.sessionTimeout;
+            setSwitchState(getById('emailSwitch'), !!s.emailAlerts);
+            setSwitchState(getById('lowstockSwitch'), !!s.lowStockAlerts);
+            setSwitchState(getById('admin2fa'), !!s.admin2fa);
+          } catch (e) {
+            console.warn('Unable to load settings', e);
+          }
+        };
+
+        const saveSettings = () => {
+          const cfg = {
+            currency: getById('currency')?.value || 'Ksh',
+            dateformat: getById('dateformat')?.value || 'DD/MM/YYYY',
+            workspaceName: getById('workspaceName')?.value || '',
+            businessEmail: getById('businessEmail')?.value || '',
+            emailAlerts: getById('emailSwitch')?.classList.contains('on'),
+            lowStockAlerts: getById('lowstockSwitch')?.classList.contains('on'),
+            digestTime: getById('digestTime')?.value || '06:00',
+            sessionTimeout: getById('sessionTimeout')?.value || '120',
+            admin2fa: getById('admin2fa')?.classList.contains('on')
+          };
+          localStorage.setItem(settingsKey, JSON.stringify(cfg));
+        };
+
+        const navButtons = Array.from(document.querySelectorAll('.settings-nav .tab-button'));
+        const activateTab = (button) => {
+          navButtons.forEach(i => i.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+          button.classList.add('active');
+          const tab = button.getAttribute('data-tab');
+          const panel = document.getElementById('tab-' + tab);
+          if (panel) panel.classList.add('active');
+        };
+
+        navButtons.forEach(function(button){
+          button.addEventListener('click', function(){ activateTab(button); });
+        });
+        document.querySelectorAll('.settings-nav li').forEach(function(item){
+          item.addEventListener('click', function(event){
+            if (event.target.closest('.tab-button')) return;
+            const button = item.querySelector('.tab-button');
+            if (button) activateTab(button);
           });
         });
-    
-        // Simple switch toggles
-        function toggleSwitch(el){
-          el.classList.toggle('on');
-          const pressed = el.classList.contains('on');
-          el.setAttribute('aria-pressed', pressed ? 'true' : 'false');
-        }
+
         document.querySelectorAll('.switch').forEach(function(s){
           s.addEventListener('click', function(){ toggleSwitch(s); });
         });
-    
-        // Save & reset (local demo only)
-        document.getElementById('saveBtn').addEventListener('click', function(){
-          const cfg = {
-            currency: document.getElementById('currency').value,
-            dateformat: document.getElementById('dateformat').value,
-            workspaceName: document.getElementById('workspaceName').value,
-            businessEmail: document.getElementById('businessEmail').value,
-            emailAlerts: document.getElementById('emailSwitch').classList.contains('on'),
-            lowStockAlerts: document.getElementById('lowstockSwitch').classList.contains('on'),
-            digestTime: document.getElementById('digestTime').value,
-            sessionTimeout: document.getElementById('sessionTimeout').value
-          };
-          localStorage.setItem('poultryhub.settings', JSON.stringify(cfg));
-          alert('Settings saved');
-        });
-    
-        document.getElementById('resetBtn').addEventListener('click', function(){
-          if(confirm('Reset settings to defaults?')){
-            localStorage.removeItem('poultryhub.settings');
-            location.reload();
-          }
-        });
-    
-        // Load persisted settings on page load
-        window.addEventListener('DOMContentLoaded', function(){
-          try{
-            const s = JSON.parse(localStorage.getItem('poultryhub.settings') || '{}');
-            if(s.currency) document.getElementById('currency').value = s.currency;
-            if(s.dateformat) document.getElementById('dateformat').value = s.dateformat;
-            if(s.workspaceName) document.getElementById('workspaceName').value = s.workspaceName;
-            if(s.businessEmail) document.getElementById('businessEmail').value = s.businessEmail;
-            if(s.digestTime) document.getElementById('digestTime').value = s.digestTime;
-            if(s.sessionTimeout) document.getElementById('sessionTimeout').value = s.sessionTimeout;
-            if(s.emailAlerts) document.getElementById('emailSwitch').classList.add('on');
-            if(s.lowStockAlerts) document.getElementById('lowstockSwitch').classList.add('on');
-          }catch(e){/* ignore */}
-        });
+
+        const saveBtn = getById('saveBtn');
+        if (saveBtn) {
+          saveBtn.addEventListener('click', function(){
+            saveSettings();
+            alert('Settings saved');
+          });
+        }
+
+        const resetBtn = getById('resetBtn');
+        if (resetBtn) {
+          resetBtn.addEventListener('click', function(){
+            if(confirm('Reset settings to defaults?')){
+              localStorage.removeItem(settingsKey);
+              loadSettings();
+            }
+          });
+        }
+
+        loadSettings();
     },
     render: ()=>{
         return `

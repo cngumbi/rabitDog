@@ -740,7 +740,14 @@ img {
   -webkit-transition: all 0.18s ease;
   transition: all 0.18s ease;
 }
-.settings-nav:hover {
+.settings-nav button.active {
+  background: #eef4ff;
+  color: #2146d6;
+  font-weight: 700;
+  -webkit-box-shadow: inset 0 0 0 1px rgba(33, 70, 214, 0.12);
+          box-shadow: inset 0 0 0 1px rgba(33, 70, 214, 0.12);
+}
+.settings-nav button:hover {
   background: #f5f7fb;
 }
 .settings-nav.active {
