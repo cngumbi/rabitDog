@@ -50,29 +50,39 @@ const SignIn = {
                 setUserInfo(data);
                 if(!data.verified){
                     //send verification code to user's email
-                    const response = await fetch(
-                        '/api/users/sendVerificationCode',
-                        {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                email: data.email
-                            })
+                    try {
+                        const response = await fetch(
+                            '/api/users/sendVerificationCode',
+                            {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    email: data.email
+                                })
+                            }
+                        );
+                        const verificationData = await response.json();
+                        hideLoading();
+                        if(!response.ok){
+                            showMessage(verificationData.message || 'Failed to send verification email. Please check your email or request a new code.');
+                        } else {
+                            showMessage(
+                                verificationData.message ||
+                                'Verification code sent to your email. Please check your inbox.'
+                            );
                         }
-                    );
-                    const verificationData = await response.json();
-                    hideLoading();
-                    if(!response.ok){
-                        showMessage(verificationData.message || 'Failed to send verification email.');
-                        return;
+                    } catch (error) {
+                        hideLoading();
+                        showMessage('Network error. Please check your connection and try again.');
+                        console.error('Error sending verification email:', error);
                     }
-                    showMessage(
-                        verificationData.message ||
-                        'Verification code sent to your email. Please check your inbox.'
-                    );
-                    document.location.hash = '/verify-email';
+                    //redirect to verify email page regardless of email sending success/failure
+                    //user can resend the code from the verify-email page
+                    setTimeout(() => {
+                        document.location.hash = '/verify-email';
+                    }, 1500);
                     return;
                 }
                 hideLoading();
