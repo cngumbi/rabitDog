@@ -17,7 +17,7 @@
 @use './scss/components/form';
 @use './scss/components/table';
 //utilities(margin, padding, opacity)
-@use 'scss/base/utilities';
+@use './scss/base/utilities';
 //pages
-@use 'scss/layout/registration';
-@use 'scss/pages/profile';
+@use './scss/layout/registration';
+@use './scss/pages/profile';
