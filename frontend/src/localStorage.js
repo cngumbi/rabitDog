@@ -37,7 +37,7 @@ export const clearUser = async ()=>{
     }
     localStorage.removeItem('userInfo');
 };
-/*export const getCartItems = ()=>{
+export const getCartItems = ()=>{
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
     return cartItems;
 };
@@ -61,8 +61,6 @@ export const setPayment = ({ paymentMethod = 'paypal' })=>{
 export const cleanCart = ()=>{
     localStorage.removeItem('cartItems');
 };
-*/
-
 //########################################################################################################################################################################
 //########################################################################################################################################################################
 //########################################################################################################################################################################

@@ -1,6 +1,6 @@
 import { deleteProduct, getProducts } from "../../connection/api";
 import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
-import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
+import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
 const ProductList = {
   vignette: () => {

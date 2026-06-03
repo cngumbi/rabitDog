@@ -15,23 +15,25 @@ import Dashboard from './components/dashboard/dashboard';
 import Settings from './components/authentication/settings';
 import Profile from './components/authentication/profile';
 import RefreshFailed from './components/authentication/refreshFailed';
+//pages
+import ProductPage from './components/product/productPage';
+import ListingProduct from './components/product/listingProduct';
+import AddProduct from './components/product/addProdut';
+import EditProduct from './components/product/editProduct';
+//orders
+import OrderPage from './components/order/order';
+import OrderList from './components/order/listingOrder';
+import PlaceOrder from './components/order/PlaceOrder';
+
 //Chicken (Nested Layout)
-import Chicken from './components/pages/poultry/Chicken/chicken';
-import MedicalLogs from './components/pages/utils/medicalLogs';
-import Breeds from './components/pages/utils/breeds';
+//import Chicken from './components/pages/poultry/Chicken/chicken';
+//import MedicalLogs from './components/pages/utils/medicalLogs';
+//import Breeds from './components/pages/utils/breeds';
 //utils
 import { getUserInfo } from './localStorage';
-//import { session } from 'passport';
 //import CartPage from './components/order/cartpage';
-//import ProductPage from './components/product/productPage';
-//import ListingProduct from './components/product/listingProduct';
-//import EditProduct from './components/product/editProduct';
-//import AddProduct from './components/product/addProdut';
 //import ShippingPage from './shipping/Shipping';
 //import PaymentMethods from './components/payment/payment';
-//import PlaceOrder from './components/order/PlaceOrder';
-//import OrderPage from './components/order/order';
-//import OrderList from './components/order/listingOrder';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
 //import NewSubscriber from './components/profile/pages/newSubscriber';
 //setting the favicon of the site
@@ -64,6 +66,15 @@ const routes = {
     '/settings': Settings,
     '/dashboard': Dashboard,
     '/profile': Profile,
+    //products
+    '/listproduct': ListingProduct,
+    '/product/:id':ProductPage,
+    '/createproduct': AddProduct,
+    '/product/:id/edit': EditProduct,
+    //orders
+    '/orderlist': OrderList,
+    '/placeorder': PlaceOrder,
+    '/order/:id':OrderPage,
     //'/checken': Chicken,
     //'/chicken': { 
     //    component: Chicken,
@@ -73,17 +84,10 @@ const routes = {
     //    }
     //},
    /* '/newsubscriber': NewSubscriber,
-    '/properties/:id':ProductPage,
-    '/product/:id/edit': EditProduct,
-    '/listproduct': ListingProduct,
-    '/createproduct': AddProduct,
     '/cart': CartPage,
     '/cart/:id': CartPage,
-    '/order/:id':OrderPage,
     '/shipping': ShippingPage,
     '/payment': PaymentMethods,
-    '/placeorder': PlaceOrder,
-    '/orderlist': OrderList,
     '/chicken/medicallogs': MedicalLogs,
     '/chicken/breeds': Breeds, */
 };
@@ -112,7 +116,13 @@ const router = async () => {
     const protectedPages = [
         '/settings',
         '/dashboard',
-        '/profile'
+        '/profile',
+        '/listproduct',
+        '/product/:id',
+        '/createproduct',
+        '/product/:id/edit'
+
+
     ];
     //get the current path
     const currentPath = request.resource ? `/${request.resource}` : '/';

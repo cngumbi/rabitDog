@@ -4,7 +4,7 @@
 
 import { deleteOrder, getOrders } from "../../connection/api";
 import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
-import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
+import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
 const OrderList = {
   vignette: () => {

@@ -1,6 +1,6 @@
 import { createProduct } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
-import DashboardMenu from "../profile/admin/dashboard/dashboardMenu";
+import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
  
   const AddProduct = {
