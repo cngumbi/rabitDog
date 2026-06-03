@@ -1,4 +1,4 @@
-import { getProfileSummary, update, updateProfile } from "../../connection/api";
+import { getProfileSummary, getActivityLog, update, updateProfile } from "../../connection/api";
 import { getUserInfo, setUserInfo } from "../../localStorage";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../dashboard/dashboardMenu";
@@ -57,6 +57,25 @@ const Profile = {
             hideLoading();
             showMessage(error.message || 'Unable to reset profile form');
           }
+        });
+      }
+
+      const previousPage = document.getElementById('previous-page');
+      const nextPage = document.getElementById('next-page');
+      if (previousPage) {
+        previousPage.addEventListener('click', () => {
+          const currentPage = Number(previousPage.dataset.page) || 1;
+          if (currentPage > 1) {
+            const baseHash = window.location.hash.split('?')[0];
+            document.location.hash = `${baseHash}?page=${currentPage - 1}`;
+          }
+        });
+      }
+      if (nextPage) {
+        nextPage.addEventListener('click', () => {
+          const currentPage = Number(nextPage.dataset.page) || 1;
+          const baseHash = window.location.hash.split('?')[0];
+          document.location.hash = `${baseHash}?page=${currentPage + 1}`;
         });
       }
 
@@ -130,7 +149,11 @@ const Profile = {
       const isAdmin = profilesummary.isAdmin || false;
       const verified = profilesummary.verified ? 'Verified' : 'Unverified';
       const profileCompleted = profilesummary.profileCompleted ? 'Complete' : 'Incomplete';
-      const activityLog = Array.isArray(profilesummary.activityLog) ? profilesummary.activityLog : [];
+      const currentHashQuery = window.location.hash.split('?')[1] || '';
+      const currentPage = Number(new URLSearchParams(currentHashQuery).get('page')) || 1;
+      const activityResponse = await getActivityLog(currentPage, 9);
+      const activityLog = Array.isArray(activityResponse.activities) ? activityResponse.activities : [];
+      const totalPages = activityResponse.totalPages || 1;
 
       return `
       <div class="wrap">
@@ -278,6 +301,11 @@ const Profile = {
                   </div>
                   `
                 }
+              </div>
+              <div class="pagination-container">
+                <button id="previous-page" class="btn-outline-primary" data-page="${currentPage}" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+                <span class="pagination-info">Page ${currentPage} of ${totalPages}</span>
+                <button id="next-page" class="btn-outline-secondary" data-page="${currentPage}" ${currentPage >= totalPages ? 'disabled' : ''}>Next</button>
               </div>
             <!--end of profile activity feed-->
         </div>

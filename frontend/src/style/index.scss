@@ -8,6 +8,7 @@
 //colors
 @use 'scss/base/colors';
 //components
+@use '../style/scss/components/badge';
 @use '../style/scss/components/navbar';
 @use '../style/scss/components/overlay';
 @use '../style/scss/components/alert';

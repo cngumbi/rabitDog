@@ -79,7 +79,7 @@ ProfileRoute.get('/activity-log', isAuth, expressAsync( async (req, res)=>{
     // Sort newest first
     // ----------------------------------------
     const activityLog = Array.isArray(user.activityLog) ? user.activityLog : [];
-    const sortedActivities = activityLog.sort((a, b)=>{new Date(b.createdAt) - new Date(a.createdAt)});
+    const sortedActivities = activityLog.sort((a, b)=> new Date(b.createdAt) - new Date(a.createdAt));
     // ----------------------------------------
     // Pagination calculations
     // ----------------------------------------
