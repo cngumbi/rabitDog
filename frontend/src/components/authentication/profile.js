@@ -6,7 +6,16 @@ import DashboardMenu from "../dashboard/dashboardMenu";
 const Profile = {
     vignette: async ()=>{
       const saveButton = document.getElementById('save-profile-button');
+      const resetButton = document.getElementById('reset-profile-button');
       const updateButton = document.getElementById('update-profile-button');
+
+      const fillProfileForm = (profile = {}) => {
+        document.getElementById('profileName').value = profile.name || '';
+        document.getElementById('profileUserName').value = profile.userName || '';
+        document.getElementById('profilePhone').value = profile.phoneNumber || '';
+        document.getElementById('profileNationalID').value = profile.nationalID || '';
+        document.getElementById('bio').value = profile.bio || '';
+      };
 
       if (saveButton) {
         saveButton.addEventListener('click', async ()=>{
@@ -29,6 +38,24 @@ const Profile = {
           }catch(error){
             hideLoading();
             showMessage(error.message || 'An error occurred while updating profile');
+          }
+        });
+      }
+
+      if (resetButton) {
+        resetButton.addEventListener('click', async ()=>{
+          try{
+            showLoading();
+            const response = await getProfileSummary();
+            hideLoading();
+            if (response.error) {
+              return showMessage(response.error);
+            }
+            fillProfileForm(response.profile || {});
+            showMessage('Profile form restored to saved values.');
+          }catch(error){
+            hideLoading();
+            showMessage(error.message || 'Unable to reset profile form');
           }
         });
       }
@@ -100,8 +127,11 @@ const Profile = {
       const email = profilesummary.email || currentEmail || '';
       const lastLoginFormatted = profilesummary.lastLogin ? new Date(profilesummary.lastLogin).toLocaleDateString() : "Never";
       const memberSinceFormatted = profilesummary.memberSince ? new Date(profilesummary.memberSince).toLocaleDateString() : "-";
-      const activityLog = Array.isArray(profilesummary.activityLog) ? profilesummary.activityLog : [];
       const isAdmin = profilesummary.isAdmin || false;
+      const verified = profilesummary.verified ? 'Verified' : 'Unverified';
+      const profileCompleted = profilesummary.profileCompleted ? 'Complete' : 'Incomplete';
+      const activityLog = Array.isArray(profilesummary.activityLog) ? profilesummary.activityLog : [];
+
       return `
       <div class="wrap">
         ${DashboardMenu.render({selected: ''})}
@@ -124,7 +154,8 @@ const Profile = {
                 <p>${isAdmin ? 'Administrator' : 'User'}</p>
                 <div class="profile-badges">
                   <span class="badge-pill">${isAdmin ? 'Administrator' : 'Standard user'}</span>
-                  <span class="badge-pill">Profile saved</span>
+                  <span class="badge-pill">${verified}</span>
+                  <span class="badge-pill">${profileCompleted}</span>
                 </div>
               </div>
             </div>
@@ -184,7 +215,7 @@ const Profile = {
               </div>
               <div class="profile-actions">
                 <button id="save-profile-button" class="btn btn-primary" type="button">Save profile</button>
-                <button class="btn btn-outline" type="button">Reset form</button>
+                <button id="reset-profile-button" class="btn btn-outline" type="button">Reset form</button>
               </div>
             </div>  
             <!--end of profile edit form-->
@@ -219,15 +250,17 @@ const Profile = {
               </div>
             </div>
             <!--end of profile password change form-->
-            <!--profile activity feed-->
+          </div>
+          <!--end of profile grid-->
+           <!--profile activity feed-->
             <div class="panel">
               <div class="card-title">Recent activity</div>
-              <ul class="activity-list">
+              <div class="activity-grid">
                 ${
                   activityLog.length ? activityLog
                   .map(
                     (activity) => `
-                    <li class="activity-item">
+                    <div class="activity-card">
                       <strong>${activity.action}</strong>
                       <span>
                         ${activity.description}
@@ -236,20 +269,17 @@ const Profile = {
                           ${new Date(activity.createdAt).toLocaleString()}
                         </small>
                       </span>
-                    </li>
+                    </div>
                     `
                   )
                   .join('') : `
-                  <li class="activity-item">
+                  <div class="activity-empty">
                     <span>No recent activity</span>
-                  </li>
+                  </div>
                   `
                 }
-              </ul>
-            </div>
+              </div>
             <!--end of profile activity feed-->
-          </div>
-          <!--end of profile grid-->
         </div>
       </div>  
         `;

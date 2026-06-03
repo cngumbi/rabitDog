@@ -164,6 +164,26 @@ export const updateProfile = async(profileData)=>{
 
     }
 };
+//get paginated activity logs
+export const getActivityLog = async(page = 1, limit = 15) => {
+    try{
+        const response = await fetch(
+            `/api/profile/activity-log?page=${page}&limit=${limit}`,
+            {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+        return await response.json();
+    }catch(error){
+        return { error: error.message || "Failed to Load Activity Log"}
+    }
+}
+
+
 //products
 //export const getProducts = async ({ searchKeyword = "" }) => {
 //    try{

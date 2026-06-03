@@ -62,6 +62,45 @@ ProfileRoute.put("/", isAuth, expressAsync(async(req, res)=>{
     res.send(profile);
 
 }));
+ProfileRoute.get('/activity-log', isAuth, expressAsync( async (req, res)=>{
+    // ----------------------------------------
+    // Read page and limit from query string
+    // Example:
+    // /api/profile/activity-log?page=1&limit=15
+    // ----------------------------------------
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 15;
+
+    const user = await User.findById(req.user._id);
+    if(!user){
+        return res.status(404).send({ message: "User not found "});
+    }
+    // ----------------------------------------
+    // Sort newest first
+    // ----------------------------------------
+    const activityLog = Array.isArray(user.activityLog) ? user.activityLog : [];
+    const sortedActivities = activityLog.sort((a, b)=>{new Date(b.createdAt) - new Date(a.createdAt)});
+    // ----------------------------------------
+    // Pagination calculations
+    // ----------------------------------------
+    const totalItems = sortedActivities.length;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const paginatedActivities = sortedActivities.slice(startIndex, endIndex);
+    // ----------------------------------------
+    // Send paginated result
+    // ----------------------------------------
+    res.send({
+        currentPage: page, 
+        limit, 
+        totalItems, 
+        totalPages, 
+        activities: paginatedActivities
+    });
+}));
 
 
 module.exports = ProfileRoute;

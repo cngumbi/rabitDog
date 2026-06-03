@@ -5568,6 +5568,11 @@ body.sidebar-open .sidebar {
   gap: 18px;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -5666,6 +5671,43 @@ body.sidebar-open .sidebar {
       flex-wrap: wrap;
   gap: 12px;
   margin-top: 18px;
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.activity-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  background: #fff;
+  min-height: 129px;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 15px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.pagination-info {
+  font-weight: 600;
 }
 
 @media (max-width: 1200px) {

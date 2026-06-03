@@ -77,6 +77,10 @@
     grid-template-columns: 
     1fr; gap:18px; 
 }
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
 .field-grid { 
     display:grid; 
     grid-template-columns: 1fr; 
@@ -154,6 +158,34 @@
     flex-wrap:wrap; 
     gap:12px; 
     margin-top:18px; 
+}
+//activity grid
+.activity-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+//activity card
+.activity-card{
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background: #fff;
+    min-height: 129px;
+}
+.pagination-container{
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+.pagination-btn{
+    padding: 8px 16px;
+    cursor: pointer;
+}
+.pagination-info{
+    font-weight: 600;
 }
 @media (max-width: 1200px) {
     .profile-grid {
