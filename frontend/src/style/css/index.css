@@ -6294,7 +6294,7 @@ body.sidebar-open .sidebar {
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
-  padding-top: 1.25rem;
+  padding-top: 0.3125rem;
   padding-inline: 1.25rem;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;

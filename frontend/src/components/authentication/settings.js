@@ -118,7 +118,7 @@ const Settings = {
                 <div class="settings-panel">
                 <!--start of setting nav section-->
                 <nav class="settings-nav" aria-label="Settings sections">
-                  <h2>Sections</h2>
+                  <h2>Settings</h2>
                   <ul>
                     <li><button type="button" class="tab-button active" data-tab="system">General</button></li>
                     <li><button type="button" class="tab-button" data-tab="notifications">Notifications</button></li>

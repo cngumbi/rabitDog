@@ -5,12 +5,12 @@
    AUTH PAGE WRAPPER
 ========================================== */
 .login {
-    min-height: auto; //calc(100vh - #{functions.rem(64px)});
+    min-height: auto;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: functions.rem(20px);
-    padding-inline: functions.rem(20px);
+    padding-top: functions.rem(5px);
+   padding-inline: functions.rem(20px);
     box-sizing: border-box;
 }
 /* ==========================================
