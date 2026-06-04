@@ -62,6 +62,48 @@ ProfileRoute.put("/", isAuth, expressAsync(async(req, res)=>{
     res.send(profile);
 
 }));
+
+ProfileRoute.get('/settings', isAuth, expressAsync(async (req, res)=>{
+    let profile = await Profile.findOne({ user: req.user._id });
+    if (!profile) {
+        profile = await Profile.create({ user: req.user._id });
+    }
+    res.send({ settings: profile.settings || {} });
+}));
+
+ProfileRoute.put('/settings', isAuth, expressAsync(async (req, res)=>{
+    const settingsData = {
+        currency: req.body.currency || 'Ksh',
+        dateformat: req.body.dateformat || 'DD/MM/YYYY',
+        workspaceName: req.body.workspaceName || '',
+        businessEmail: req.body.businessEmail || '',
+        emailAlerts: typeof req.body.emailAlerts === 'boolean' ? req.body.emailAlerts : true,
+        lowStockAlerts: typeof req.body.lowStockAlerts === 'boolean' ? req.body.lowStockAlerts : true,
+        digestTime: req.body.digestTime || '06:00',
+        sessionTimeout: Number(req.body.sessionTimeout) || 120,
+        admin2fa: typeof req.body.admin2fa === 'boolean' ? req.body.admin2fa : false,
+    };
+
+    const profile = await Profile.findOneAndUpdate(
+        { user: req.user._id },
+        { settings: settingsData, profileCompleted: true },
+        { new: true, upsert: true }
+    );
+
+    const user = await User.findById(req.user._id);
+    if (user) {
+        user.activityLog.unshift({
+            action: 'SETTINGS_UPDATE',
+            description: 'Updated workspace settings',
+            createdAt: new Date(),
+        });
+        user.activityLog = user.activityLog.slice(0, 50);
+        await user.save();
+    }
+
+    res.send({ settings: profile.settings });
+}));
+
 ProfileRoute.get('/activity-log', isAuth, expressAsync( async (req, res)=>{
     // ----------------------------------------
     // Read page and limit from query string

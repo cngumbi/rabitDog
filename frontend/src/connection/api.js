@@ -164,6 +164,32 @@ export const updateProfile = async(profileData)=>{
 
     }
 };
+
+export const getSettings = async()=>{
+    try{
+        const response = await apiClient({
+            url: '/api/profile/settings',
+            method: 'GET',
+        });
+        return response.data;
+    }catch(error){
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
+export const updateSettings = async(settingsData)=>{
+    try{
+        const response = await apiClient({
+            url: '/api/profile/settings',
+            method: 'PUT',
+            data: settingsData,
+        });
+        return response.data;
+    }catch(error){
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
 //get paginated activity logs
 export const getActivityLog = async(page = 1, limit = 15) => {
     try{

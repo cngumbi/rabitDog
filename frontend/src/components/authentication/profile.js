@@ -280,20 +280,21 @@ const Profile = {
               <div class="card-title">Recent activity</div>
               <div class="activity-grid">
                 ${
-                  activityLog.length ? activityLog
+                  activityLog && activityLog.length ? activityLog
                   .map(
-                    (activity) => `
+                    (activity) => {
+                      const createdAtDate = activity.createdAt ? new Date(activity.createdAt).toLocaleString() : 'Date unavailable';
+                      return `
                     <div class="activity-card">
-                      <strong>${activity.action}</strong>
+                      <strong>${activity.action || 'Activity'}</strong>
                       <span>
-                        ${activity.description}
+                        ${activity.description || 'No description'}
                         <br>
-                        <small>
-                          ${new Date(activity.createdAt).toLocaleString()}
-                        </small>
+                        <small>${createdAtDate}</small>
                       </span>
                     </div>
-                    `
+                    `;
+                    }
                   )
                   .join('') : `
                   <div class="activity-empty">

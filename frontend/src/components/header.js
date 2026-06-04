@@ -1,5 +1,5 @@
 import profileImg from '../assets/account.png';
-import { clearUser, getUserInfo } from "../localStorage";
+import { clearUser, getSettings, getUserInfo } from "../localStorage";
 
 const Header = {
     vignette: ()=>{
@@ -45,6 +45,7 @@ const Header = {
     },
     render: ()=>{
         const { email, isAdmin } = getUserInfo();
+        const settings = getSettings();
         return `
             <!--logo-->
             <div class="navbar-left">
@@ -57,7 +58,7 @@ const Header = {
                     email ?`
                     <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle menu">☰</button>
                     <div class="navbar-title">
-                       Dashboard
+                       ${settings.workspaceName || 'Dashboard'}
                     </div>`:''
                 }
             </div>

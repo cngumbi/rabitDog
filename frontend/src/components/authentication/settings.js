@@ -1,8 +1,10 @@
 import DashboardMenu from "../dashboard/dashboardMenu";
-
+import { getSettings as getServerSettings, updateSettings } from "../../connection/api";
+import { getSettings as getLocalSettings, setSettings as setLocalSettings } from "../../localStorage";
+import { hideLoading, showLoading, showMessage } from "../../utils";
 
 const Settings = {
-    vignette: ()=>{
+    vignette: async ()=>{
         const settingsKey = 'poultryhub.settings';
         const getById = (id) => document.getElementById(id);
 
@@ -21,9 +23,11 @@ const Settings = {
           setSwitchState(el, !el.classList.contains('on'));
         };
 
-        const loadSettings = () => {
+        const loadSettings = async () => {
           try {
-            const s = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+            const localSettings = getLocalSettings();
+            const response = await getServerSettings();
+            const s = response.error ? localSettings : { ...localSettings, ...response.settings };
             if (s.currency) getById('currency').value = s.currency;
             if (s.dateformat) getById('dateformat').value = s.dateformat;
             if (s.workspaceName) getById('workspaceName').value = s.workspaceName;
@@ -33,12 +37,15 @@ const Settings = {
             setSwitchState(getById('emailSwitch'), !!s.emailAlerts);
             setSwitchState(getById('lowstockSwitch'), !!s.lowStockAlerts);
             setSwitchState(getById('admin2fa'), !!s.admin2fa);
+            if (!response.error) {
+              localStorage.setItem(settingsKey, JSON.stringify(response.settings));
+            }
           } catch (e) {
             console.warn('Unable to load settings', e);
           }
         };
 
-        const saveSettings = () => {
+        const saveSettings = async () => {
           const cfg = {
             currency: getById('currency')?.value || 'Ksh',
             dateformat: getById('dateformat')?.value || 'DD/MM/YYYY',
@@ -47,10 +54,25 @@ const Settings = {
             emailAlerts: getById('emailSwitch')?.classList.contains('on'),
             lowStockAlerts: getById('lowstockSwitch')?.classList.contains('on'),
             digestTime: getById('digestTime')?.value || '06:00',
-            sessionTimeout: getById('sessionTimeout')?.value || '120',
+            sessionTimeout: Number(getById('sessionTimeout')?.value) || 120,
             admin2fa: getById('admin2fa')?.classList.contains('on')
           };
           localStorage.setItem(settingsKey, JSON.stringify(cfg));
+          setLocalSettings(cfg);
+          try {
+            showLoading();
+            const response = await updateSettings(cfg);
+            hideLoading();
+            if (response.error) {
+              showMessage(response.error);
+              return;
+            }
+            setLocalSettings(response.settings || cfg);
+            showMessage('Settings saved successfully');
+          } catch (error) {
+            hideLoading();
+            showMessage(error.message || 'Unable to save settings');
+          }
         };
 
         const navButtons = Array.from(document.querySelectorAll('.settings-nav .tab-button'));
@@ -80,23 +102,32 @@ const Settings = {
 
         const saveBtn = getById('saveBtn');
         if (saveBtn) {
-          saveBtn.addEventListener('click', function(){
-            saveSettings();
-            alert('Settings saved');
+          saveBtn.addEventListener('click', async function(){
+            await saveSettings();
           });
         }
 
         const resetBtn = getById('resetBtn');
         if (resetBtn) {
-          resetBtn.addEventListener('click', function(){
+          resetBtn.addEventListener('click', async function(){
             if(confirm('Reset settings to defaults?')){
               localStorage.removeItem(settingsKey);
-              loadSettings();
+              try {
+                showLoading();
+                const response = await getServerSettings();
+                hideLoading();
+                if (!response.error && response.settings) {
+                  setLocalSettings(response.settings);
+                }
+              } catch (error) {
+                hideLoading();
+              }
+              await loadSettings();
             }
           });
         }
 
-        loadSettings();
+        await loadSettings();
     },
     render: ()=>{
         return `

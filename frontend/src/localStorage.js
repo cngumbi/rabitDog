@@ -37,6 +37,40 @@ export const clearUser = async ()=>{
     }
     localStorage.removeItem('userInfo');
 };
+export const getSettings = ()=>{
+    const settings = localStorage.getItem('poultryhub.settings');
+    if(settings){
+        try {
+            return JSON.parse(settings);
+        } catch {
+            return {
+                currency: 'Ksh',
+                dateformat: 'DD/MM/YYYY',
+                workspaceName: '',
+                businessEmail: '',
+                emailAlerts: true,
+                lowStockAlerts: true,
+                digestTime: '06:00',
+                sessionTimeout: 120,
+                admin2fa: false,
+            };
+        }
+    }
+    return {
+        currency: 'Ksh',
+        dateformat: 'DD/MM/YYYY',
+        workspaceName: '',
+        businessEmail: '',
+        emailAlerts: true,
+        lowStockAlerts: true,
+        digestTime: '06:00',
+        sessionTimeout: 120,
+        admin2fa: false,
+    };
+};
+export const setSettings = (settings)=>{
+    localStorage.setItem('poultryhub.settings', JSON.stringify(settings));
+};
 export const getCartItems = ()=>{
     const cartItems = localStorage.getItem('cartItems') ? JSON.parse(localStorage.getItem('cartItems')) : [];
     return cartItems;

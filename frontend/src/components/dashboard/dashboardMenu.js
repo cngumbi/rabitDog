@@ -7,8 +7,8 @@ const DashboardMenu = {
                 <ul>
                     <li><a href="/#/dashboard" class="${cons.selected === 'dashboard' ? 'selected':''}">DASHBOARD</a></li>
                     <li><a href="#" class="${cons.selected === 'chicken' ? 'selected':''}">Parties</a></li>
-                    <li><a href="/#/listproduct" class="${cons.selected === 'profile' ? 'selected': ''}">Product Manager</a></li>
-                    <li><a href="/#/orderlist" class="${cons.selected === 'profile' ? 'selected': ''}">Sales</a></li>
+                    <li><a href="/#/listproduct" class="${cons.selected === 'products' ? 'selected': ''}">Product Manager</a></li>
+                    <li><a href="/#/orderlist" class="${cons.selected === 'orderList' ? 'selected': ''}">Sales</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Purchases</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Stock Transfers</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">POS</a></li>
