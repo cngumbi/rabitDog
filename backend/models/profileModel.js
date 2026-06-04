@@ -13,7 +13,6 @@ const profileSchema = new mongoose.Schema({
     phoneNumber: { type: String, default: '' },
     nationalID: {
         type: String,
-        required: true,
         sparse: true
     },
     bio: { type: String, default: '' },
