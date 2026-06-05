@@ -1,0 +1,48 @@
+@use '../abstracts/variables' as *;
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-toggle {
+  background: none;
+  border: none;
+  color: #232946;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.dropdown-toggle:hover, .dropdown-toggle:focus {
+  background: #f3f4fa;
+}
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 110%;
+  min-width: 180px;
+  background: #fff;
+  border: 1px solid #e5e7ef;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  z-index: 200;
+  padding: 0.5rem 0;
+}
+.dropdown.open .dropdown-menu {
+  display: block;
+}
+.dropdown-menu a {
+  display: block;
+  padding: 0.75rem 1.25rem;
+  color: #232946;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.dropdown-menu a:hover {
+  background: #f3f4fa;
+}
