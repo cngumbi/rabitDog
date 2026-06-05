@@ -15,4 +15,5 @@ records.json
 #webpack.config.js
 #uploads files
 uploads/*.jpg
+uploads/*.jpeg
 uploads/*.png
