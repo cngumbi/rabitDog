@@ -1,28 +1,59 @@
-import { createProduct } from "../../connection/api";
+import { createProduct, uploadProductImage } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
  
   const AddProduct = {
     vignette: () => {
+      // image preview handler
+      const imageInput = document.getElementById('image');
+      if (imageInput) {
+        imageInput.addEventListener('change', (ev) => {
+          const file = ev.target.files && ev.target.files[0];
+          const preview = document.getElementById('image-preview');
+          if (file && preview) {
+            const url = URL.createObjectURL(file);
+            preview.src = url;
+            preview.style.display = 'block';
+          }
+        });
+      }
+
       document
         .getElementById('add-product-form')
         .addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoading();
+
+          // Upload image first (if provided)
+          let imagePath = '';
+          const fileInput = document.getElementById('image');
+          if (fileInput && fileInput.files && fileInput.files[0]) {
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            const uploadResult = await uploadProductImage(formData);
+            if (uploadResult.error) {
+              hideLoading();
+              showMessage(uploadResult.error);
+              return;
+            }
+            imagePath = uploadResult.image || uploadResult.path || '';
+          }
+
           const data = await createProduct({
             name: document.getElementById('productName').value,
             price: document.getElementById('price').value,
-            brand: document.getElementById('brand').value,
+            brand: document.getElementById('brand') ? document.getElementById('brand').value : '',
             category: document.getElementById('category').value,
             countInStock: document.getElementById('countInStock').value,
             description: document.getElementById('description').value,
+            image: imagePath,
           });
+
           hideLoading();
           if (data.error) {
             showMessage(data.error);
           } else {
-            //setProductInfo(data)
             document.location.hash = '/listproduct';
           }
         });
@@ -88,6 +119,10 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
                   <input class="form-control" type="text" name="sku" id="sku" placeholder="SKU code">
                 </div>
                 <div>
+                  <label class="form-label">Product image</label>
+                  <input class="form-control" type="file" id="image" accept="image/*">
+                </div>
+                <div>
                   <label class="form-label">Status</label>
                   <select class="form-select">
                     <option>In stock</option>
@@ -149,6 +184,9 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
             <aside class="panel add-product-side-panel">
               <div class="card-title">Product summary</div>
+              <div style="margin:0.75rem 0">
+                <img id="image-preview" src="" alt="Preview" style="display:none;max-width:100%;border-radius:6px;" />
+              </div>
               <div class="add-product-summary-list">
                 <div class="add-product-summary-item">
                   <div class="add-product-summary-label">Product name</div>
