@@ -126,8 +126,27 @@ const router = async () => {
         '/order/:id'
 
     ];
-    //get the current path
+    //get the current hash path and route pattern for nested routes
+    const hashPath = window.location.hash.slice(1).toLowerCase() || '/';
     const currentPath = request.resource ? `/${request.resource}` : '/';
+    const lookupPath = request.resource
+        ? `/${request.resource}${request.id ? '/:id' : ''}${request.verb ? `/${request.verb}` : ''}`
+        : '/';
+
+    const findRouteKey = (path) => {
+        if (routes[path]) return path;
+        const pathSegments = path.split('/').filter(Boolean);
+        return Object.keys(routes).find((routeKey) => {
+            const routeSegments = routeKey.split('/').filter(Boolean);
+            if (routeSegments.length !== pathSegments.length) return false;
+            return routeSegments.every((segment, index) =>
+                segment.startsWith(':') || segment === pathSegments[index]
+            );
+        });
+    };
+
+    const matchedRoute = findRouteKey(hashPath) || findRouteKey(lookupPath) || findRouteKey(currentPath) || currentPath;
+
     //redirect to dashboard if the user is trying to access an auth page while being logged in 
     if(userInfo.email && userInfo.verified && authPages.includes(currentPath)){
         document.location.hash = '/dashboard';
@@ -149,12 +168,12 @@ const router = async () => {
         return;
     }
     //block unverified users from accessing protected pages
-    if(userInfo.email && !userInfo.verified && protectedPages.includes(currentPath)){
+    if(userInfo.email && !userInfo.verified && protectedPages.includes(matchedRoute)){
         document.location.hash = '/verify-email';
         return;
     }
     //block unauthenticated users from accessing protected pages
-    if(!userInfo.email && protectedPages.includes(currentPath)){
+    if(!userInfo.email && protectedPages.includes(matchedRoute)){
         document.location.hash = '/';
         return;
     }
@@ -162,13 +181,8 @@ const router = async () => {
     //if(publicPages.includes(currentPath)){
     //    //do nothing and allow access
     //}
-    //Build base path -> '/chicken'
-    /*'old style' -> const parseUrl = (request.resource ? `/${request.resource}`: '/') + (request.id ? '/:id' : '') + (request.verb ? `/${request.verb}` : '');
-            const sessions = routes[parseUrl] ? routes[parseUrl] : Error404;
-    */
-    //new style -> for nested routes
-    const basePath = request.resource ? `/${request.resource}` : '/';
-    const sessions = routes[basePath];
+    // Build lookup path for nested routes, e.g. /product/:id/edit
+    const sessions = routes[matchedRoute] || routes[currentPath];
 
     
 

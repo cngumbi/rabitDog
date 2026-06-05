@@ -32,12 +32,17 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
             const formData = new FormData();
             formData.append('image', fileInput.files[0]);
             const uploadResult = await uploadProductImage(formData);
-            if (uploadResult.error) {
+            if (!uploadResult || uploadResult.error) {
               hideLoading();
-              showMessage(uploadResult.error);
+              showMessage(uploadResult?.error || 'Image upload failed.');
               return;
             }
-            imagePath = uploadResult.image || uploadResult.path || '';
+            imagePath = uploadResult.image || uploadResult.path || uploadResult.data?.image || '';
+            if (!imagePath) {
+              hideLoading();
+              showMessage('Image uploaded but no file path was returned.');
+              return;
+            }
           }
 
           const data = await createProduct({
@@ -107,6 +112,10 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
                   <input class="form-control" type="text" name="productName" id="productName" placeholder=" Enter Product Name" />
                 </div>
                 <div>
+                  <label class="form-label">Brand</label>
+                  <input class="form-control" type="text" name="brand" id="brand" placeholder="Brand name" />
+                </div>
+                <div>
                   <label class="form-label">Category</label>
                   <select class="form-select" id="category">
                     <option value="Feed">Feed</option>
@@ -121,14 +130,6 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
                 <div>
                   <label class="form-label">Product image</label>
                   <input class="form-control" type="file" id="image" accept="image/*">
-                </div>
-                <div>
-                  <label class="form-label">Status</label>
-                  <select class="form-select">
-                    <option>In stock</option>
-                    <option>Low stock</option>
-                    <option>Out of stock</option>
-                  </select>
                 </div>
               </div>
 
@@ -180,7 +181,6 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
               </div>
             </article>
             </form>
-            </article>
 
             <aside class="panel add-product-side-panel">
               <div class="card-title">Product summary</div>

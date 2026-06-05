@@ -22,7 +22,9 @@ const addToCart = ( item, forceUpdate = false ) =>{
 
 const removeFromCart = (id) => {
     setCartItems(getCartItems().filter((x)=> x.product !== id));
-    if(id === ParseRequestUrl().id){
+    const request = ParseRequestUrl();
+    const productId = request.id || request.verb;
+    if(id === productId){
         document.location.hash = '/cart';
     }else{
         vitalize(CartPage);
@@ -44,8 +46,9 @@ const CartPage = {
     },
     render: async()=>{
         const request = ParseRequestUrl()
-        if(request.id){
-            const product = await getProduct(request.id);
+        const productId = request.id || request.verb;
+        if(productId){
+            const product = await getProduct(productId);
             addToCart(
                 {
                     product: product._id,

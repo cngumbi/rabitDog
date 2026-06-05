@@ -8,8 +8,9 @@ import Rating from "../rating";
   const ProductPage = {
     vignette: () => {
       const request = ParseRequestUrl();
+      const productId = request.id || request.verb;
       document.getElementById('add-button').addEventListener('click', () => {
-        document.location.hash = `/cart/${request.id}`;
+        document.location.hash = `/cart/${productId}`;
       });
   
       if (document.getElementById('review-form')) {
@@ -18,7 +19,7 @@ import Rating from "../rating";
           .addEventListener('submit', async (e) => {
             e.preventDefault();
             showLoading();
-            const data = await createReview(request.id, {
+            const data = await createReview(productId, {
               comment: document.getElementById('comment').value,
               rating: document.getElementById('rating').value,
             });
@@ -35,8 +36,9 @@ import Rating from "../rating";
     },
     render: async () => {
       const request = ParseRequestUrl();
+      const productId = request.id || request.verb;
       showLoading();
-      const product = await getProduct(request.id);
+      const product = await getProduct(productId);
       if (product.error) {
         return `<div>${product.error}</div>`;
       }

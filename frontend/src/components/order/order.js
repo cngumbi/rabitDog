@@ -48,7 +48,9 @@ const addPaypalSdk = async (totalPrice) => {
         onAuthorize(data, actions) {
           return actions.payment.execute().then(async () => {
             showLoading();
-            await payOrder(ParseRequestUrl().id, {
+            const request = ParseRequestUrl();
+            const orderId = request.id || request.verb;
+            await payOrder(orderId, {
               orderID: data.orderID,
               payerID: data.payerID,
               paymentID: data.paymentID,
@@ -68,10 +70,11 @@ const addPaypalSdk = async (totalPrice) => {
   const OrderPage = {
     vignette: async () => {
       const request = ParseRequestUrl();
+      const orderId = request.id || request.verb;
       if (document.getElementById('deliver-order-button')) {
         document.addEventListener('click', async () => {
           showLoading();
-          await deliverOrder(request.id);
+          await deliverOrder(orderId);
           hideLoading();
           showMessage('Order Delivered.');
           vitalize(OrderScreen);
@@ -81,6 +84,7 @@ const addPaypalSdk = async (totalPrice) => {
     render: async () => {
       const { isAdmin } = getUserInfo();
       const request = ParseRequestUrl();
+      const orderId = request.id || request.verb;
       const shipping = getShipping();
       const payment = getPayment();
       const {
@@ -96,7 +100,7 @@ const addPaypalSdk = async (totalPrice) => {
         deliveredAt,
         isPaid,
         paidAt,
-      } = await getOrder(request.id);
+      } = await getOrder(orderId);
       if (!isPaid) {
         addPaypalSdk(totalPrice);
       }

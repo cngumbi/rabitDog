@@ -1,4 +1,5 @@
 import ParseRequestUrl from "../../config/parseUrl";
+import DashboardMenu from "../../components/dashboard/dashboardMenu";
 import { getProduct, updateProduct, uploadProductImage } from "../../connection/api";
 import { hideLoading, showLoading, showMessage } from "../../utils";
 
@@ -6,13 +7,14 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
   const EditProduct = {
     vignette: () => {
       const request = ParseRequestUrl();
+      const productId = request.id || request.verb;
       document
         .getElementById('edit-product-form')
         .addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoading();
           const data = await updateProduct({
-            _id: request.id,
+            _id: productId,
             name: document.getElementById('name').value,
             price: document.getElementById('price').value,
             image: document.getElementById('image').value,
@@ -47,7 +49,11 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
     },
     render: async () => {
       const request = ParseRequestUrl();
-      const product = await getProduct(request.id);
+      const productId = request.id || request.verb;
+      const product = await getProduct(productId);
+      if (product.error) {
+        return `<div class="wrap"><div class="main"><div class="message-error">${product.error}</div></div></div>`;
+      }
       return `
       <div class="wrap">
         ${DashboardMenu.render({ selected: "products" })}

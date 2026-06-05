@@ -1,14 +1,17 @@
 import { deleteProduct, getProducts } from "../../connection/api";
+import { apiURL } from "../../config/config";
 import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
 import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
 const ProductList = {
   vignette: () => {
-    document
-      .getElementById("create-product-button")
-      .addEventListener("click", async () => {
+    const createBtn = document.getElementById("create-product-button");
+    if (createBtn) {
+      createBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
         document.location.hash = `/createproduct`;
       });
+    }
     const editButtons = document.getElementsByClassName("edit-button");
     Array.from(editButtons).forEach((editButton) => {
       editButton.addEventListener("click", () => {
@@ -35,6 +38,26 @@ const ProductList = {
     const productsResult = await getProducts({});
     const products = Array.isArray(productsResult) ? productsResult : [];
     const productsError = productsResult.error;
+    const rows = products.map((product) => {
+      const rawImage = product.image || '';
+      const imageSrc = rawImage && (rawImage.startsWith('http') || rawImage.startsWith('/'))
+        ? rawImage
+        : (rawImage ? `${apiURL}/${rawImage}` : '');
+      return `
+                <tr>
+                  <td>${product._id}</td>
+                  <td><img src="${imageSrc}" alt="${product.name}" class="table-product-image"/></td>
+                  <td>${product.name}</td>
+                  <td>${product.price}</td>
+                  <td>${product.category}</td>
+                  <td>${product.brand}</td>
+                  <td><span class="badge-green text-white">In stock</span></td>
+                  <td>
+                    <button id="${product._id}" class="edit-button">Edit</button>
+                    <button id="${product._id}" class="delete-button">Delete</button>
+                  </td>
+                </tr>`;
+    }).join("\n");
     return `
     <div class="wrap">
     ${DashboardMenu.render({ selected: "products" })}
@@ -46,7 +69,7 @@ const ProductList = {
           <h1>Inventory workspace</h1>
           <p>Monitor product categories, stock health, pricing, and urgent replenishment from one operating view.</p>
           <div class="dashboard-hero-actions">
-            <a class="btn-primary text-white" href="/#/createproduct">Add Product</a>
+            <a id="create-product-button" class="btn-primary text-white" href="/#/createproduct">Add Product</a>
             <a class="btn-outline-primary text-primary" href="#">Export</a>
           </div>
         </div>
@@ -193,20 +216,7 @@ const ProductList = {
                 </tr>
               </thead>
               <tbody>
-              ${products.map((product) => `
-                <tr>
-                  <td>${product._id}</td>
-                  <td><img src="${product.image}" alt="${product.name}" class="table-product-image"/></td>
-                  <td>${product.name}</td>
-                  <td>${product.price}</td>
-                  <td>${product.category}</td>
-                  <td>${product.brand}</td>
-                  <td><span class="badge-green text-white">In stock</span></td>
-                  <td>
-                    <button id="${product._id}" class="edit-button">Edit</button>
-                    <button id="${product._id}" class="delete-button">Delete</button>
-                  </td>
-                </tr>`).join("\n")}
+              ${rows}
               </tbody>
             </table>
           </div>

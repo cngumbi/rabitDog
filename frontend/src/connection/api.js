@@ -331,8 +331,8 @@ export const uploadProductImage = async(formData)=>{
             },
             data: formData,
         });
-        if(response.statusText !== 'Created'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Image upload failed');
         }
         return response.data;
     }catch(err){

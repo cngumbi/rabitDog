@@ -20,8 +20,8 @@ const ParseRequestUrl = () => {
 
     return {
         resource: rqst[1],
-        verb: rqst[2],
-        id: rqst[3],
+        id: rqst[2],
+        verb: rqst[3],
         query
 
     };
