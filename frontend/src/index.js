@@ -120,8 +120,10 @@ const router = async () => {
         '/listproduct',
         '/product/:id',
         '/createproduct',
-        '/product/:id/edit'
-
+        '/product/:id/edit',
+        '/orderlist',
+        '/placeorder',
+        '/order/:id'
 
     ];
     //get the current path

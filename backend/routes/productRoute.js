@@ -1,6 +1,7 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
 const { isAuth, isAdmin } = require('../util');
+const logActivity = require('../util/activityLogger');
 const Product = require('../models/productModel');
 
 const ProductRoute = express.Router();
@@ -30,10 +31,10 @@ ProductRoute.post('/', isAuth, isAdmin, expressAsync(async (req, res)=>{
     });
     const createProduct = await product.save();
     if(!createProduct){
-        //res.status(201).send({ message: 'Product created', product: createProduct });
         res.status(500).send({ message: 'Error in creating Product'});
     }else{
-        res.send({
+        await logActivity(req.user._id, 'PRODUCT_CREATED', `Created product ${createProduct.name} (${createProduct._id})`);
+        res.status(201).send({
             _id: createProduct._id,
             name: createProduct.name,
             price: createProduct.price,
@@ -58,6 +59,7 @@ ProductRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
         product.description =  req.body.description;
         const updateProduct = await product.save();
         if(updateProduct){
+            await logActivity(req.user._id, 'PRODUCT_UPDATED', `Updated product ${updateProduct.name} (${updateProduct._id})`);
             res.send({ message: 'Product Updated', product: updateProduct});
         }else{
             res.status(500).send({ message: 'Error in updating Product'});
@@ -70,6 +72,7 @@ ProductRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const product = await Product.findById(req.params.id);
     if(product){
         const deleteProduct = await product.remove();
+        await logActivity(req.user._id, 'PRODUCT_DELETED', `Deleted product ${product.name} (${product._id})`);
         res.send({ message: 'product Deleted', product: deleteProduct});
     }else{
         res.status(404).send({ message:' product Not Found' });

@@ -7,8 +7,13 @@ const logActivity = async (userId, action, description) => {
             {
                 $push: {
                     activityLog: {
-                        action,
-                        description
+                        $each: [{
+                            action,
+                            description,
+                            createdAt: new Date(),
+                        }],
+                        $position: 0,
+                        $slice: 50,
                     }
                 }
             }

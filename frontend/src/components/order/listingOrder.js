@@ -30,11 +30,13 @@ const OrderList = {
     });
   },
   render: async () => {
-    const orders = await getOrders();
+    const ordersResult = await getOrders();
+    const orders = Array.isArray(ordersResult) ? ordersResult : [];
+    const ordersError = ordersResult.error;
     return `
-    <div class="dashboard">
+    <div class="wrap">
     ${DashboardMenu.render({ selected: 'orderList' })}
-    <div class="dashboard-content">
+    <div class="main">
       <section class="sales-reports-hero">
         <div class="sales-reports-hero-copy">
           <span class="sales-reports-chip">Sales operations</span>
@@ -201,7 +203,7 @@ const OrderList = {
               <th>PAID AT</th>
               <th>DELIVERED AT</th>
               <th class="tr-action">ACTION</th>
-            <tr>
+            </tr>
           </thead>
           <tbody>
             ${orders
@@ -211,7 +213,7 @@ const OrderList = {
               <td>${order._id}</td>
               <td>${order.createdAt}</td>
               <td>${order.totalPrice}</td>
-              <td>${order.user.name}</td>
+              <td>${order.user?.name || 'Unknown'}</td>
               <td>${order.paidAt || 'No'}</td>
               <td>${order.deliveredAt || 'No'}</td>
               <td>
@@ -225,6 +227,7 @@ const OrderList = {
           </tbody>
         </table>
       </div>
+      ${ordersError ? `<div class="message-error">${ordersError}</div>` : ''}
     </div>
   </div>
     `;

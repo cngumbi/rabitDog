@@ -1,6 +1,7 @@
 const express = require('express');
 const expressAsync = require('express-async-handler');
 const { isAuth, isAdmin } = require('../util');
+const logActivity = require('../util/activityLogger');
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
 const Product = require('../models/productModel');
@@ -80,16 +81,24 @@ OrderRoute.post('/', isAuth, expressAsync(async(req, res) => {
         orderItems: req.body.orderItems,
         user: req.user._id,
         shipping: req.body.shipping,
-        payment: req.body.payment,
+        payment: {
+            paymentMethod: req.body.payment?.paymentMethod,
+            paymentResult: req.body.payment?.paymentResult || {},
+        },
         itemsPrice: req.body.itemsPrice,
         taxPrice: req.body.taxPrice,
         shippingPrice: req.body.shippingPrice,
         totalPrice: req.body.totalPrice,
     });
     const createOrder = await order.save();
-    res.status(201).send({
-        message: 'New Order Created', order: createOrder
-    });
+    if (createOrder) {
+        await logActivity(req.user._id, 'ORDER_CREATED', `Created order ${createOrder._id}`);
+        res.status(201).send({
+            message: 'New Order Created', order: createOrder
+        });
+    } else {
+        res.status(500).send({ message: 'Order Not Created' });
+    }
     //if (createOrder) {
     //    res.status(201).send({
     //        message: 'New Order Created', order: createOrder
@@ -102,7 +111,8 @@ OrderRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const order = await Order.findById(req.params.id);
     if(order){
         const deleteOrder = await order.remove();
-        res.send({ message: 'Order Deleted', product: deleteOrder});
+        await logActivity(req.user._id, 'ORDER_DELETED', `Deleted order ${order._id}`);
+        res.send({ message: 'Order Deleted', order: deleteOrder});
     }else{
         res.status(404).send({ message:' Order Not Found' });
     }
@@ -121,6 +131,7 @@ OrderRoute.put('/:id/pay', isAuth, expressAsync(async(req, res) => {
             orderID: req.body.orderID,
         };
         const updateOrder = await order.save();
+        await logActivity(req.user._id, 'ORDER_PAID', `Paid order ${order._id}`);
         res.send({ message: 'Order Paid', order: updateOrder });
     }else{
         res.status(404).send({ message:' Order Not Found' });
@@ -132,7 +143,8 @@ OrderRoute.put('/:id/deliver', isAuth, isAdmin, expressAsync(async(req, res)=>{
         order.isDelivered = true;
         order.deliveredAt = Date.now();
         const updateOrder = await order.save();
-        res.send({message: 'Order dDeliverd', order: updateOrder});
+        await logActivity(req.user._id, 'ORDER_DELIVERED', `Delivered order ${order._id}`);
+        res.send({message: 'Order Delivered', order: updateOrder});
     }else{
         res.status(404).send({ message:' Order Not Found' });
     }

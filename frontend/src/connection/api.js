@@ -269,8 +269,8 @@ export const createProduct = async({name, price, brand, category, countInStock, 
                 description
             },
         });
-        if(response.statusText !== 'Created'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to create product');
         }
         return response.data;
     }catch(err){
@@ -290,8 +290,8 @@ export const updateProduct = async(product)=>{
             },
             data: product,
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to update product');
         }
         return response.data;
     }catch(err){
@@ -310,8 +310,8 @@ export const deleteProduct = async(productId)=>{
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to delete product');
         }
         return response.data;
     }catch(err){
@@ -353,8 +353,8 @@ export const createOrder = async(order)=>{
             },
             data: order,
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to create order');
         }
         return response.data;
     }catch(err){
@@ -373,8 +373,8 @@ export const getOrders = async()=>{
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to load orders');
         }
         return response.data;
     }catch(err){
@@ -393,8 +393,8 @@ export const deleteOrder = async(orderId)=>{
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to delete order');
         }
         return response.data;
     }catch(err){
@@ -407,13 +407,14 @@ export const getOrder = async(id)=>{
         const { token } = getUserInfo();
         const response = await axios({
             url: `${apiURL}/api/orders/${id}`,
+            method: 'GET',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to load order');
         }
         return response.data;
     }catch(err){
@@ -426,13 +427,14 @@ export const getMyOrders = async()=>{
         const { token } = getUserInfo();
         const response = await axios({
             url: `${apiURL}/api/orders/mine`,
+            method: 'GET',
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to load your orders');
         }
         return response.data;
     }catch(err){
@@ -445,7 +447,7 @@ export const createReview = async(productId, review)=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
-            url: `${apiURL}/api/products/${productId/reviews}`,
+            url: `${apiURL}/api/products/${productId}/reviews`,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -453,8 +455,8 @@ export const createReview = async(productId, review)=>{
             },
             data: review,
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to create review');
         }
         return response.data;
     }catch(err){
@@ -529,14 +531,14 @@ export const getSummary = async()=>{
         const { token } = getUserInfo();
         const response = await axios({
             url: `${apiURL}/api/orders/summary`,
-            method: "PUT",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
         });
-        if(response.statusText !== 'OK'){
-            throw new Error(response.data.message);
+        if(response.status < 200 || response.status >= 300){
+            throw new Error(response.data.message || 'Failed to load summary');
         }
         return response.data;
     }catch(err){

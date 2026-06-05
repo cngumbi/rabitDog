@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema({
         country: String,
     },
     payment: {
-        paymentMenthod: String,
+        paymentMethod: String,
         paymentResult: {
             orderID: String,
             payerID: String,

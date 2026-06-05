@@ -49,11 +49,13 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
       const request = ParseRequestUrl();
       const product = await getProduct(request.id);
       return `
-      <div class="content">
-        <div>
-          <a href="/#/listproduct">Back to products</a>
-        </div>
-        <div class="form-container">
+      <div class="wrap">
+        ${DashboardMenu.render({ selected: "products" })}
+        <div class="main">
+          <div>
+            <a href="/#/listproduct">Back to products</a>
+          </div>
+          <div class="form-container">
           <form id="edit-product-form" enctype="multipart/form-data">
             <ul class="form-items">
               <li>
@@ -107,8 +109,8 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
               </li>
             </ul>
           </form>
+          </div>
         </div>
-  
       </div>
       `;
     },
