@@ -38,11 +38,21 @@ const ProductList = {
     const productsResult = await getProducts({});
     const products = Array.isArray(productsResult) ? productsResult : [];
     const productsError = productsResult.error;
+    const totalInventory = products.reduce((sum, product) => sum + Number(product.countInStock || 0), 0);
+    const lowStockCount = products.filter((product) => Number(product.countInStock || 0) <= 5).length;
+    const inventoryValue = products.reduce((sum, product) => sum + (Number(product.price || 0) * Number(product.countInStock || 0)), 0);
+    const activeProducts = products.length;
+    const turnoverRatio = lowStockCount ? Math.round((activeProducts / lowStockCount) * 10) / 10 : 0;
+    const topProducts = [...products].sort((a, b) => Number(b.countInStock || 0) - Number(a.countInStock || 0)).slice(0, 3);
+    const categories = [...new Set(products.map((product) => product.category || 'Uncategorized'))];
+    const lowStockProducts = products.filter((product) => Number(product.countInStock || 0) <= 5);
     const rows = products.map((product) => {
       const rawImage = product.image || '';
       const imageSrc = rawImage && (rawImage.startsWith('http') || rawImage.startsWith('/'))
         ? rawImage
         : (rawImage ? `${apiURL}/${rawImage}` : '');
+      const status = Number(product.countInStock || 0) <= 0 ? 'Out of stock' : Number(product.countInStock || 0) <= 5 ? 'Low stock' : 'In stock';
+      const statusBadge = status === 'In stock' ? 'badge-green' : status === 'Low stock' ? 'badge-primary' : 'badge-orange';
       return `
                 <tr>
                   <td>${product._id.substring(0, 7)}</td>
@@ -51,7 +61,7 @@ const ProductList = {
                   <td>${product.price}</td>
                   <td>${product.category}</td>
                   <td>${product.brand}</td>
-                  <td><span class="badge-green text-white">In stock</span></td>
+                  <td><span class="${statusBadge} text-white">${status}</span></td>
                   <td>
                     <button id="${product._id}" class="edit-button">Edit</button>
                     <button id="${product._id}" class="delete-button">Delete</button>
@@ -76,13 +86,13 @@ const ProductList = {
         <div class="dashboard-hero-meta">
           <div class="dashboard-mini-stat">
             <span class="dashboard-mini-stat-label">Active products</span>
-            <span class="dashboard-mini-stat-value">38</span>
-            <span class="dashboard-mini-stat-trend">▲ 4 added this week</span>
+            <span class="dashboard-mini-stat-value">${activeProducts}</span>
+            <span class="dashboard-mini-stat-trend">${lowStockCount} with low stock</span>
           </div>
           <div class="dashboard-mini-stat">
             <span class="dashboard-mini-stat-label">Low stock alerts</span>
-            <span class="dashboard-mini-stat-value">6</span>
-            <span class="dashboard-mini-stat-trend">⚠️ urgent review</span>
+            <span class="dashboard-mini-stat-value">${lowStockCount}</span>
+            <span class="dashboard-mini-stat-trend">${lowStockProducts.length ? 'Review replenishment' : 'Balanced levels'}</span>
           </div>
         </div>
       </section>
@@ -93,32 +103,32 @@ const ProductList = {
           <div class="icon">📦</div>
           <div>
             <div class="metric-title">Total inventory</div>
-            <div class="metric-value">1,284 units</div>
-            <div class="metric-desc metric-desc--info">Across 38 SKUs</div>
+            <div class="metric-value">${totalInventory} units</div>
+            <div class="metric-desc metric-desc--info">Across ${activeProducts} products</div>
           </div>
         </article>
         <article class="card-metric">
           <div class="icon">⚡</div>
           <div>
             <div class="metric-title">Low stock</div>
-            <div class="metric-value">6 items</div>
-            <div class="metric-desc metric-desc--danger">Needs replenishment</div>
+            <div class="metric-value">${lowStockCount} items</div>
+            <div class="metric-desc metric-desc--danger">${lowStockCount ? 'Needs replenishment' : 'Inventory healthy'}</div>
           </div>
         </article>
         <article class="card-metric">
           <div class="icon">💸</div>
           <div>
             <div class="metric-title">Inventory value</div>
-            <div class="metric-value">Ksh 184,500</div>
-            <div class="metric-desc metric-desc--success">+Ksh 9,200 this week</div>
+            <div class="metric-value">Ksh ${inventoryValue.toLocaleString()}</div>
+            <div class="metric-desc metric-desc--success">Based on current stock</div>
           </div>
         </article>
         <article class="card-metric">
           <div class="icon">🔁</div>
           <div>
             <div class="metric-title">Turnover</div>
-            <div class="metric-value">4.8x</div>
-            <div class="metric-desc metric-desc--success">Strong movement</div>
+            <div class="metric-value">${turnoverRatio.toFixed(1)}x</div>
+            <div class="metric-desc metric-desc--success">Stock rotation ratio</div>
           </div>
         </article>
       </section>
@@ -128,77 +138,37 @@ const ProductList = {
         <article class="panel product-manager-main-panel">
           <div class="card-title">Catalog overview</div>
           <div class="product-manager-catalog-grid">
-            <div class="product-manager-product-card product-manager-product-card-primary">
+            ${topProducts.map((product) => {
+              const rawImage = product.image || '';
+              const imageSrc = rawImage && (rawImage.startsWith('http') || rawImage.startsWith('/'))
+                ? rawImage
+                : (rawImage ? `${apiURL}/${rawImage}` : '');
+              const status = Number(product.countInStock || 0) <= 0 ? 'Out of stock' : Number(product.countInStock || 0) <= 5 ? 'Low stock' : 'In stock';
+              return `
+            <div class="product-manager-product-card ${status === 'In stock' ? 'product-manager-product-card-primary' : status === 'Low stock' ? '' : ''}">
               <div class="product-manager-product-header">
-                <div class="product-manager-product-icon">🌾</div>
+                <div class="product-manager-product-icon">${product.category === 'Service' ? '🧪' : product.category === 'Feed' ? '🌾' : '🥚'}</div>
                 <div>
-                  <div class="product-manager-product-name">Layer Mash</div>
-                  <div class="text-muted">Feed · 25kg bags</div>
+                  <div class="product-manager-product-name">${product.name}</div>
+                  <div class="text-muted">${product.category} · ${product.brand}</div>
                 </div>
               </div>
               <div class="product-manager-product-stats">
                 <div>
                   <div class="text-muted">Stock</div>
-                  <strong>140 bags</strong>
+                  <strong>${product.countInStock || 0}</strong>
                 </div>
                 <div>
                   <div class="text-muted">Price</div>
-                  <strong>Ksh 950</strong>
+                  <strong>Ksh ${product.price || 0}</strong>
                 </div>
               </div>
               <div class="product-manager-product-footer">
-                <span class="badge-green text-white">Healthy</span>
-                <span class="text-primary">Manage</span>
+                <span class="${status === 'In stock' ? 'badge-green' : status === 'Low stock' ? 'badge-primary' : 'badge-orange'} text-white">${status}</span>
+                <span class="text-primary">${status === 'Low stock' ? 'Restock' : 'Manage'}</span>
               </div>
-            </div>
-
-            <div class="product-manager-product-card">
-              <div class="product-manager-product-header">
-                <div class="product-manager-product-icon">🥚</div>
-                <div>
-                  <div class="product-manager-product-name">Fresh Eggs</div>
-                  <div class="text-muted">Produce · trays</div>
-                </div>
-              </div>
-              <div class="product-manager-product-stats">
-                <div>
-                  <div class="text-muted">Stock</div>
-                  <strong>24 trays</strong>
-                </div>
-                <div>
-                  <div class="text-muted">Price</div>
-                  <strong>Ksh 300</strong>
-                </div>
-              </div>
-              <div class="product-manager-product-footer">
-                <span class="badge-primary text-white">Low stock</span>
-                <span class="text-primary">Manage</span>
-              </div>
-            </div>
-
-            <div class="product-manager-product-card">
-              <div class="product-manager-product-header">
-                <div class="product-manager-product-icon">🧪</div>
-                <div>
-                  <div class="product-manager-product-name">Vaccination Pack</div>
-                  <div class="text-muted">Service · kits</div>
-                </div>
-              </div>
-              <div class="product-manager-product-stats">
-                <div>
-                  <div class="text-muted">Stock</div>
-                  <strong>16 kits</strong>
-                </div>
-                <div>
-                  <div class="text-muted">Price</div>
-                  <strong>Ksh 1,200</strong>
-                </div>
-              </div>
-              <div class="product-manager-product-footer">
-                <span class="badge-orange text-white">Restock</span>
-                <span class="text-primary">Manage</span>
-              </div>
-            </div>
+            </div>`;
+            }).join('')}
           </div>
           ${productsError ? `<div class="message-error">${productsError}</div>` : ''}
           <div class="product-manager-table-wrap">
@@ -224,11 +194,13 @@ const ProductList = {
         <aside class="panel product-manager-side-panel">
           <div class="card-title">Inventory update</div>
           <div class="form-label">Product Category</div>
-          <select class="form-select"><option>Feed</option><option>Eggs</option><option>Vaccine</option></select>
+          <select class="form-select">
+            ${categories.map((category) => `<option${category === categories[0] ? ' selected' : ''}>${category}</option>`).join('')}
+          </select>
           <div class="form-label mt-2">Stock level</div>
-          <input class="form-control" value="24 units">
+          <input class="form-control" value="${totalInventory} units" readonly>
           <div class="form-label mt-2">Reorder point</div>
-          <input class="form-control" value="30 units">
+          <input class="form-control" value="${Math.max(5, Math.ceil(totalInventory * 0.1))} units" readonly>
           <div class="mt-3 product-manager-action-row">
             <a href="#" class="btn-outline-secondary text-black">Update Inventory</a>
             <a href="#" class="btn-outline-primary text-black">Schedule Order</a>
@@ -236,7 +208,7 @@ const ProductList = {
 
           <div class="product-manager-side-note">
             <div class="product-manager-side-note-title">Replenishment focus</div>
-            <p class="text-muted">Fresh Eggs and Broiler Feed are below target thresholds and should be reviewed before the next delivery cycle.</p>
+            <p class="text-muted">${lowStockProducts.length > 0 ? `Review ${lowStockProducts.length} low stock item${lowStockProducts.length > 1 ? 's' : ''}: ${lowStockProducts.slice(0, 3).map((product) => product.name).join(', ')}.` : 'All products currently meet minimum stock levels.'}</p>
           </div>
         </aside>
       <!--end of product list-->
