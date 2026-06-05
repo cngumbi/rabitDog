@@ -45,7 +45,7 @@ const ProductList = {
         : (rawImage ? `${apiURL}/${rawImage}` : '');
       return `
                 <tr>
-                  <td>${product._id}</td>
+                  <td>${product._id.substring(0, 7)}</td>
                   <td><img src="${imageSrc}" alt="${product.name}" class="table-product-image"/></td>
                   <td>${product.name}</td>
                   <td>${product.price}</td>
