@@ -41,11 +41,11 @@ export const showMessage = (message, callback)=>{
     });
 };
 // toast notification (non-blocking)
-export const showToast = (message, timeout = 3000) => {
+export const showToast = (message, type = 'info', timeout = 3000) => {
     const container = document.getElementById('toast-container');
     if(!container) return;
     const toast = document.createElement('div');
-    toast.className = 'app-toast';
+    toast.className = `app-toast${type === 'error' ? ' app-toast-error' : ''}`;
     toast.innerText = message;
     container.appendChild(toast);
     setTimeout(()=>{
@@ -55,6 +55,9 @@ export const showToast = (message, timeout = 3000) => {
         toast.classList.remove('visible');
         setTimeout(()=> container.removeChild(toast), 300);
     }, timeout);
+};
+export const isValidSku = (sku) => {
+    return /^[A-Za-z0-9_-]+$/.test(sku);
 };
 //redirect function
 export const veer = ()=>{

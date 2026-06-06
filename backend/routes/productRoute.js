@@ -5,6 +5,19 @@ const logActivity = require('../util/activityLogger');
 const Product = require('../models/productModel');
 
 const ProductRoute = express.Router();
+
+const getMongoErrorMessage = (error) => {
+    if (!error) return 'An unknown database error occurred.';
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+        const key = error.keyValue && Object.keys(error.keyValue)[0];
+        if (key === 'sku') {
+            return `The SKU '${error.keyValue.sku}' is already in use. Please choose a different SKU.`;
+        }
+        return `Duplicate value detected for ${key || 'field'}. Please choose a different value.`;
+    }
+    return error.message || 'An unknown database error occurred.';
+};
+
 ProductRoute.get('/', expressAsync(async(req, res)=>{
     const searchKeyword = req.query.searchKeyword ? {
         name: {
@@ -20,52 +33,55 @@ ProductRoute.get('/:id',expressAsync(async(req, res)=>{
     res.send(product);
 }));
 ProductRoute.post('/', isAuth, isAdmin, expressAsync(async (req, res)=>{
-    const product = new Product({
-        name:  req.body.name,
-        price:  req.body.price,
-        image: req.body.image,
-        brand:  req.body.brand,
-        category:  req.body.category,
-        countInStock:  req.body.countInStock,
-        reorderPoint: req.body.reorderPoint,
-        description:  req.body.description,
-    });
-    const createProduct = await product.save();
-    if(!createProduct){
-        res.status(500).send({ message: 'Error in creating Product'});
-    }else{
+    try {
+        const sku = req.body.sku && String(req.body.sku).trim();
+        const product = new Product({
+            name:  req.body.name,
+            price:  req.body.price,
+            image: req.body.image,
+            brand:  req.body.brand,
+            category:  req.body.category,
+            countInStock:  req.body.countInStock,
+            reorderPoint: req.body.reorderPoint,
+            description:  req.body.description,
+            ...(sku ? { sku } : {}),
+        });
+        const createProduct = await product.save();
         await logActivity(req.user._id, 'PRODUCT_CREATED', `Created product ${createProduct.name} (${createProduct._id})`);
         res.status(201).send({
             _id: createProduct._id,
             name: createProduct.name,
+            sku: createProduct.sku,
             price: createProduct.price,
             image: createProduct.image,
             brand: createProduct.brand,
             category: createProduct.category,
-                countInStock: createProduct.countInStock,
-                reorderPoint: createProduct.reorderPoint,
-            description: createProduct.description
+            countInStock: createProduct.countInStock,
+            reorderPoint: createProduct.reorderPoint,
+            description: createProduct.description,
         });
+    } catch (error) {
+        res.status(400).send({ message: getMongoErrorMessage(error) });
     }
 }));
 ProductRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
     const productId = req.params.id;
     const product = await Product.findById(productId);
     if(product){
-        product.name =  req.body.name;
-        product.price =  req.body.price;
-        product.image =  req.body.image;
-        product.brand =  req.body.brand;
-        product.category =  req.body.category;
-        product.countInStock =  req.body.countInStock;
-            if(typeof req.body.reorderPoint !== 'undefined') product.reorderPoint = req.body.reorderPoint;
-        product.description =  req.body.description;
-        const updateProduct = await product.save();
-        if(updateProduct){
+        if (typeof req.body.name !== 'undefined') product.name = req.body.name;
+        if (typeof req.body.price !== 'undefined') product.price = req.body.price;
+        if (typeof req.body.image !== 'undefined') product.image = req.body.image;
+        if (typeof req.body.brand !== 'undefined') product.brand = req.body.brand;
+        if (typeof req.body.category !== 'undefined') product.category = req.body.category;
+        if (typeof req.body.countInStock !== 'undefined') product.countInStock = req.body.countInStock;
+        if (typeof req.body.reorderPoint !== 'undefined') product.reorderPoint = req.body.reorderPoint;
+        if (typeof req.body.description !== 'undefined') product.description = req.body.description;
+        try {
+            const updateProduct = await product.save();
             await logActivity(req.user._id, 'PRODUCT_UPDATED', `Updated product ${updateProduct.name} (${updateProduct._id})`);
             res.send({ message: 'Product Updated', product: updateProduct});
-        }else{
-            res.status(500).send({ message: 'Error in updating Product'});
+        } catch (error) {
+            res.status(400).send({ message: getMongoErrorMessage(error) });
         }
     }else{
         res.status(404).send({ message: 'Product Not Found' });

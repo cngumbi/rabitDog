@@ -250,7 +250,7 @@ export const getProduct = async(id)=>{
         return { error: err.response ? err.response.data.message : err.message };
     }
 };
-export const createProduct = async({name, price, brand, category, countInStock, description})=>{
+export const createProduct = async({name, price, brand, category, countInStock, description, image, sku, reorderPoint})=>{
     try{
         const { token } = getUserInfo();
         const response = await axios({
@@ -266,7 +266,10 @@ export const createProduct = async({name, price, brand, category, countInStock, 
                 brand,
                 category,
                 countInStock,
-                description
+                description,
+                image,
+                sku,
+                reorderPoint
             },
         });
         if(response.status < 200 || response.status >= 300){
@@ -327,7 +330,6 @@ export const uploadProductImage = async(formData)=>{
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "multipart/form-data",
             },
             data: formData,
         });

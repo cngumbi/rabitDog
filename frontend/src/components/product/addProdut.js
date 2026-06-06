@@ -1,5 +1,5 @@
-import { createProduct, uploadProductImage } from "../../connection/api";
-import { hideLoading, showLoading, showMessage } from "../../utils";
+import { createProduct, uploadProductImage, getProducts } from "../../connection/api";
+import { hideLoading, showLoading, showMessage, showToast } from "../../utils";
 import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
  
@@ -53,15 +53,44 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
             countInStock: document.getElementById('countInStock').value,
             description: document.getElementById('description').value,
             image: imagePath,
+            reorderPoint: document.getElementById('reorderPoint') ? document.getElementById('reorderPoint').value : undefined,
           });
+
 
           hideLoading();
           if (data.error) {
-            showMessage(data.error);
+            showToast(data.error, 'error');
           } else {
             document.location.hash = '/listproduct';
           }
         });
+      // attach hero helpers after vignette setup
+      try{ AddProduct.attachHeroHelpers(); }catch(e){}
+    },
+    attachHeroHelpers: async () => {
+      // update average price and ready-to-publish indicator
+      try{
+        const avgEl = document.getElementById('avg-price');
+        const readyEl = document.getElementById('ready-publish');
+        const result = await getProducts({});
+        const products = Array.isArray(result) ? result : [];
+        const avg = products.length ? Math.round(products.reduce((s,p)=> s + Number(p.price || 0), 0) / products.length) : 0;
+        if(avgEl) avgEl.innerText = `Ksh ${avg}`;
+
+        const form = document.getElementById('add-product-form');
+        const fields = ['productName','price','category','countInStock'];
+        const calcReady = () => {
+          const total = fields.length;
+          let filled = 0;
+          fields.forEach(id=>{ const el = document.getElementById(id); if(el && String(el.value).trim()) filled++; });
+          const pct = Math.round((filled/total) * 100);
+          if(readyEl) readyEl.innerText = `${pct}%`;
+        };
+        if(form){
+          fields.forEach(id=>{ const el = document.getElementById(id); if(el) el.addEventListener('input', calcReady); });
+          calcReady();
+        }
+      }catch(e){/* ignore */}
     },
     render: async () => {
       return `
@@ -78,18 +107,18 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
                 <a class="btn-outline-secondary text-black" href="/#/listproduct">Back to products</a>
               </div>
             </div>
-            <div class="dashboard-hero-meta">
-              <div class="dashboard-mini-stat">
-                <span class="dashboard-mini-stat-label">Average price</span>
-                <span class="dashboard-mini-stat-value">Ksh 820</span>
-                <span class="dashboard-mini-stat-trend">Current catalog</span>
-              </div>
-              <div class="dashboard-mini-stat">
-                <span class="dashboard-mini-stat-label">Ready to publish</span>
-                <span class="dashboard-mini-stat-value">98%</span>
-                <span class="dashboard-mini-stat-trend">Form completion</span>
-              </div>
+          <div class="dashboard-hero-meta">
+            <div class="dashboard-mini-stat">
+              <span class="dashboard-mini-stat-label">Average price</span>
+              <span id="avg-price" class="dashboard-mini-stat-value">Ksh --</span>
+              <span class="dashboard-mini-stat-trend">Current catalog</span>
             </div>
+            <div class="dashboard-mini-stat">
+              <span class="dashboard-mini-stat-label">Ready to publish</span>
+              <span id="ready-publish" class="dashboard-mini-stat-value">--%</span>
+              <span class="dashboard-mini-stat-trend">Form completion</span>
+            </div>
+          </div>
           </section>
           <!--end hero-->
           <!--The add Product section-->
@@ -123,10 +152,7 @@ import DashboardMenu from "../../components/dashboard/dashboardMenu";
                     <option value="Service">Service</option>
                   </select>
                 </div>
-                <div>
-                  <label class="form-label">SKU</label>
-                  <input class="form-control" type="text" name="sku" id="sku" placeholder="SKU code">
-                </div>
+              <!-- SKU is generated automatically by the server -->
                 <div>
                   <label class="form-label">Product image</label>
                   <input class="form-control" type="file" id="image" accept="image/*">

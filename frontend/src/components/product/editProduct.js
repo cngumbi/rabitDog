@@ -2,7 +2,7 @@ import ParseRequestUrl from "../../config/parseUrl";
 import { apiURL } from "../../config/config";
 import DashboardMenu from "../../components/dashboard/dashboardMenu";
 import { getProduct, updateProduct, uploadProductImage } from "../../connection/api";
-import { hideLoading, showLoading, showMessage } from "../../utils";
+import { hideLoading, showLoading, showMessage, showToast } from "../../utils";
 
  
   const EditProduct = {
@@ -17,7 +17,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
           showLoading();
-          const data = await updateProduct({
+          const payload = {
             _id: productId,
             name: document.getElementById('name').value,
             price: document.getElementById('price').value,
@@ -26,10 +26,12 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
             category: document.getElementById('category').value,
             countInStock: document.getElementById('countInStock').value,
             description: document.getElementById('description').value,
-          });
+            reorderPoint: document.getElementById('reorderPoint') ? document.getElementById('reorderPoint').value : undefined,
+          };
+          const data = await updateProduct(payload);
           hideLoading();
           if (data.error) {
-            showMessage(data.error);
+            showToast(data.error, 'error');
           } else {
             document.location.hash = '/listproduct';
           }
@@ -134,6 +136,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
                   <input type="text" name="image" value="${product.image || ''}" id="image" />
                   <input type="file" name="image-file" id="image-file" />
                 </div>
+                <!-- SKU is generated server-side and cannot be edited here -->
               </div>
 
               <div class="add-product-section-header mt-3">
@@ -218,7 +221,7 @@ import { hideLoading, showLoading, showMessage } from "../../utils";
             <div class="add-product-summary-list">
               <div class="add-product-summary-item">
                 <div class="add-product-summary-label">SKU</div>
-                <strong>${product._id.substring(0, 8)}</strong>
+                <strong>${product.sku || product._id.substring(0, 8)}</strong>
               </div>
               <div class="add-product-summary-item">
                 <div class="add-product-summary-label">Last updated</div>

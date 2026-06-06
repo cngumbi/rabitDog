@@ -109,6 +109,7 @@ const ProductList = {
       return `
                 <tr>
                   <td>${product._id.substring(0, 7)}</td>
+                  <td>${product.sku || ''}</td>
                   <td><img src="${imageSrc}" alt="${product.name}" class="table-product-image"/></td>
                   <td>${product.name}</td>
                   <td>${product.price}</td>
@@ -229,6 +230,7 @@ const ProductList = {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>SKU</th>
                   <th>IMAGE</th>
                   <th>NAME</th>
                   <th>PRICE</th>
