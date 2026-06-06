@@ -1,4 +1,5 @@
 // migration script: populate reorderPoint for existing products
+//how to run: node backend/scripts/migrateAddReorderPoint.js
 const mongooseConnector = require('../config/mongoosDB');
 const Product = require('../models/productModel');
 

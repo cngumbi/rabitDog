@@ -1,4 +1,5 @@
 // migration script: populate sku for existing products
+//how to run: node backend/scripts/migrateAddSku.js   
 const mongoose = require('mongoose');
 const config = require('../config/config');
 const Product = require('../models/productModel');
