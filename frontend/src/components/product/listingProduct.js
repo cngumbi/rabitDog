@@ -1,6 +1,6 @@
-import { deleteProduct, getProducts } from "../../connection/api";
+import { deleteProduct, getProducts, updateProduct } from "../../connection/api";
 import { apiURL } from "../../config/config";
-import { hideLoading, showLoading, showMessage, vitalize } from "../../utils";
+import { hideLoading, showLoading, showMessage, showToast, vitalize } from "../../utils";
 import DashboardMenu from "../../components/dashboard/dashboardMenu";
 
 const ProductList = {
@@ -33,6 +33,59 @@ const ProductList = {
         }
       });
     });
+
+    // Inventory side-panel interactions
+    const productSelect = document.getElementById('inventory-product-select');
+    const stockInput = document.getElementById('inventory-stock');
+    const reorderInput = document.getElementById('inventory-reorder');
+    const updateBtn = document.getElementById('update-inventory-button');
+    const findProductById = (id) => {
+      try{
+        return window.__products__ ? window.__products__.find(p => p._id === id) : null;
+      }catch(e){ return null }
+    }
+    if (productSelect) {
+      productSelect.addEventListener('change', (e) => {
+        const p = findProductById(e.target.value);
+        if (p) {
+          if (stockInput) stockInput.value = p.countInStock || 0;
+          if (reorderInput) reorderInput.value = p.reorderPoint || Math.max(5, Math.ceil((p.countInStock || 0) * 0.2));
+        }
+      });
+      // populate initial values
+      if (productSelect.options.length > 0) {
+        const firstId = productSelect.options[0].value;
+        const p = findProductById(firstId);
+        if (p) {
+          if (stockInput) stockInput.value = p.countInStock || 0;
+          if (reorderInput) reorderInput.value = p.reorderPoint || Math.max(5, Math.ceil((p.countInStock || 0) * 0.2));
+        }
+      }
+    }
+    if (updateBtn) {
+      updateBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const selectedId = productSelect ? productSelect.value : null;
+        if (!selectedId) {
+          showMessage('Please select a product to update');
+          return;
+        }
+        showLoading();
+        const payload = {
+          _id: selectedId,
+          countInStock: Number(stockInput ? stockInput.value : 0),
+          reorderPoint: reorderInput ? reorderInput.value : undefined,
+        };
+        const data = await updateProduct(payload);
+        hideLoading();
+        if (data.error) showMessage(data.error);
+        else {
+          // non-blocking toast, then refresh
+          try{ showToast('Inventory updated'); }catch(e){}
+          setTimeout(()=> vitalize(ProductList), 600);
+        }
+      });
+    }
   },
   render: async () => {
     const productsResult = await getProducts({});
@@ -193,16 +246,16 @@ const ProductList = {
         </article>
         <aside class="panel product-manager-side-panel">
           <div class="card-title">Inventory update</div>
-          <div class="form-label">Product Category</div>
-          <select class="form-select">
-            ${categories.map((category) => `<option${category === categories[0] ? ' selected' : ''}>${category}</option>`).join('')}
+          <div class="form-label">Select product</div>
+          <select id="inventory-product-select" class="form-select">
+            ${products.map((p) => `<option value="${p._id}">${p.name} (${p._id.substring(0,7)})</option>`).join('')}
           </select>
           <div class="form-label mt-2">Stock level</div>
-          <input class="form-control" value="${totalInventory} units" readonly>
+          <input id="inventory-stock" class="form-control" value="${products.length ? (products[0].countInStock || 0) : 0}">
           <div class="form-label mt-2">Reorder point</div>
-          <input class="form-control" value="${Math.max(5, Math.ceil(totalInventory * 0.1))} units" readonly>
+          <input id="inventory-reorder" class="form-control" value="${products.length ? (products[0].reorderPoint || Math.max(5, Math.ceil((products[0].countInStock || 0) * 0.1))) : Math.max(5, Math.ceil(totalInventory * 0.1))}">
           <div class="mt-3 product-manager-action-row">
-            <a href="#" class="btn-outline-secondary text-black">Update Inventory</a>
+            <button id="update-inventory-button" class="btn-outline-secondary text-black">Update Inventory</button>
             <a href="#" class="btn-outline-primary text-black">Schedule Order</a>
           </div>
 
@@ -211,6 +264,7 @@ const ProductList = {
             <p class="text-muted">${lowStockProducts.length > 0 ? `Review ${lowStockProducts.length} low stock item${lowStockProducts.length > 1 ? 's' : ''}: ${lowStockProducts.slice(0, 3).map((product) => product.name).join(', ')}.` : 'All products currently meet minimum stock levels.'}</p>
           </div>
         </aside>
+        <script>window.__products__ = ${JSON.stringify(products)};</script>
       <!--end of product list-->
     </div>
   </div>

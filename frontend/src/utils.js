@@ -40,6 +40,22 @@ export const showMessage = (message, callback)=>{
         }
     });
 };
+// toast notification (non-blocking)
+export const showToast = (message, timeout = 3000) => {
+    const container = document.getElementById('toast-container');
+    if(!container) return;
+    const toast = document.createElement('div');
+    toast.className = 'app-toast';
+    toast.innerText = message;
+    container.appendChild(toast);
+    setTimeout(()=>{
+        toast.classList.add('visible');
+    }, 10);
+    setTimeout(()=>{
+        toast.classList.remove('visible');
+        setTimeout(()=> container.removeChild(toast), 300);
+    }, timeout);
+};
 //redirect function
 export const veer = ()=>{
     //if(getCartItems().lenght !== 0){

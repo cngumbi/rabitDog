@@ -27,6 +27,7 @@ ProductRoute.post('/', isAuth, isAdmin, expressAsync(async (req, res)=>{
         brand:  req.body.brand,
         category:  req.body.category,
         countInStock:  req.body.countInStock,
+        reorderPoint: req.body.reorderPoint,
         description:  req.body.description,
     });
     const createProduct = await product.save();
@@ -41,7 +42,8 @@ ProductRoute.post('/', isAuth, isAdmin, expressAsync(async (req, res)=>{
             image: createProduct.image,
             brand: createProduct.brand,
             category: createProduct.category,
-            countInStock: createProduct.countInStock,
+                countInStock: createProduct.countInStock,
+                reorderPoint: createProduct.reorderPoint,
             description: createProduct.description
         });
     }
@@ -56,6 +58,7 @@ ProductRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res)=>{
         product.brand =  req.body.brand;
         product.category =  req.body.category;
         product.countInStock =  req.body.countInStock;
+            if(typeof req.body.reorderPoint !== 'undefined') product.reorderPoint = req.body.reorderPoint;
         product.description =  req.body.description;
         const updateProduct = await product.save();
         if(updateProduct){
