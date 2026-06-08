@@ -24,19 +24,14 @@ import EditProduct from './components/product/editProduct';
 import OrderPage from './components/order/order';
 import OrderList from './components/order/listingOrder';
 import PlaceOrder from './components/order/PlaceOrder';
+import CartPage from './components/order/cartpage';
+import ShippingPage from './shipping/Shipping';
+import PaymentMethods from './components/payment/payment';
 
-//Chicken (Nested Layout)
-//import Chicken from './components/pages/poultry/Chicken/chicken';
-//import MedicalLogs from './components/pages/utils/medicalLogs';
-//import Breeds from './components/pages/utils/breeds';
+import MedicalLogs from './components/mediacal/medicalLogs';
 //utils
 import { getUserInfo } from './localStorage';
 import SalesList from './components/order/sales';
-//import CartPage from './components/order/cartpage';
-//import ShippingPage from './shipping/Shipping';
-//import PaymentMethods from './components/payment/payment';
-//import NewSubscriber from './components/profile/pages/newSubscriber';
-//import NewSubscriber from './components/profile/pages/newSubscriber';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -73,10 +68,10 @@ const routes = {
     '/createproduct': AddProduct,
     '/product/:id/edit': EditProduct,
     //orders
-    'listingorder': OrderList,
+    '/orderlist': OrderList,
     '/saleslist': SalesList,
     '/placeorder': PlaceOrder,
-    '/order/:id':OrderPage,
+    '/order/:id': OrderPage,
     '/cart': CartPage,
     '/cart/:id': CartPage,
     '/shipping': ShippingPage,
@@ -114,7 +109,7 @@ const router = async () => {
         '/createproduct',
         '/product/:id/edit',
         '/orderlist',
-        'saleslist',
+        '/saleslist',
         '/placeorder',
         '/order/:id',
         '/cart',

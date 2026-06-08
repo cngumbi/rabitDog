@@ -1,3 +1,5 @@
+import DashboardMenu from '../dashboard/dashboardMenu';
+
 const MedicalLogs = {
     vignette: () => {
         // Add event listeners or any interactive behavior here if needed
