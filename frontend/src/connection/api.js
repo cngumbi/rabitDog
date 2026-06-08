@@ -683,4 +683,668 @@ export const getSummary = async()=>{
 //        return { error: err.response ? err.response.data.message : err.message };
 //    }
 //};
+
+// ============= PARTIES =============
+export const getParties = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load parties');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getPartiesByType = async (type) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties/type/${type}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load parties');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getPartyStats = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties/summary/stats`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load party stats');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getParty = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties/${id}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load party');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const createParty = async (partyData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: partyData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to create party');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const updateParty = async (id, partyData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties/${id}`,
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: partyData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to update party');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const deleteParty = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/parties/${id}`,
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to delete party');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+// ============= PURCHASES =============
+export const getPurchases = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load purchases');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getPurchaseStats = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/summary/stats`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load purchase stats');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getPurchaseLedger = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/export/ledger`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to export purchase ledger');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getPurchase = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/${id}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load purchase');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const createPurchase = async (purchaseData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: purchaseData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to create purchase');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const updatePurchase = async (id, purchaseData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/${id}`,
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: purchaseData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to update purchase');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const approvePurchase = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/${id}/approve`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to approve purchase');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const receivePurchase = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/purchases/${id}/receive`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to mark purchase as received');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+// ============= TRANSFERS =============
+export const getTransfers = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load transfers');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getTransferStats = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/summary/stats`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load transfer stats');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getTransferLog = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/export/log`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to export transfer log');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getTransfer = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/${id}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load transfer');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const createTransfer = async (transferData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: transferData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to create transfer');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const updateTransfer = async (id, transferData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/${id}`,
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: transferData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to update transfer');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const dispatchTransfer = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/${id}/dispatch`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to dispatch transfer');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const receiveTransfer = async (id, items) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/transfers/${id}/receive`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: { items },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to mark transfer as received');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+// ============= EXPENSES =============
+export const getExpenses = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load expenses');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getExpenseStats = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/summary/stats`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load expense stats');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getExpenseLedger = async () => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/export/ledger`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to export expense ledger');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const getExpense = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/${id}`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to load expense');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const createExpense = async (expenseData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: expenseData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to create expense');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const updateExpense = async (id, expenseData) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/${id}`,
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            data: expenseData,
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to update expense');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const approveExpense = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/${id}/approve`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to approve expense');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
+export const payExpense = async (id) => {
+    try {
+        const { token } = getUserInfo();
+        const response = await axios({
+            url: `${apiURL}/api/expenses/${id}/pay`,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to mark expense as paid');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
 //

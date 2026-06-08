@@ -32,9 +32,22 @@ import MedicalLogs from './components/mediacal/medicalLogs';
 import ListMedicalLogs from './components/mediacal/listingMedical';
 import EditHealthRecord from './components/mediacal/editHealthRecord';
 import ManageBatches from './components/mediacal/manageBatches';
+//parties
+import Parties from './components/partner/parties';
+import AddParties from './components/partner/addParties';
 //utils
 import { getUserInfo } from './localStorage';
+//Sales
 import SalesList from './components/order/sales';
+//purchases
+import Purchases from './components/purchases/purchases';
+import CreatePO from './components/purchases/addPurchases';
+//transfers
+import StackTransfers from './components/transfers/transfers';
+import NewTransfer from './components/transfers/createTransfer';
+//expenses
+import Expenses from './components/expenses/expenses';
+import RecordExpenses from './components/expenses/recordExpenses';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -83,7 +96,19 @@ const routes = {
     '/medicallogs': MedicalLogs,
     '/listingmedical': ListMedicalLogs,
     '/health/:id/edit': EditHealthRecord,
-    '/manage-batches': ManageBatches
+    '/manage-batches': ManageBatches,
+    //parties
+    '/parties': Parties,
+    '/add-party': AddParties,
+    //purchases
+    '/purchases': Purchases,
+    '/create-po': CreatePO,
+    //transfers
+    '/transfers': StackTransfers,
+    '/new-transfer': NewTransfer,
+    //expenses
+    '/expenses': Expenses,
+    '/record-expense': RecordExpenses,
 };
 
 const router = async () => {
@@ -125,7 +150,16 @@ const router = async () => {
         '/medicallogs',
         '/listingmedical',
         '/health/:id/edit',
-        '/manage-batches'
+        '/manage-batches',
+        '/parties',
+        '/add-party',
+        '/purchases',
+        '/create-po',
+        '/transfers',
+        '/new-transfer',
+        '/expenses',
+        '/record-expense',
+        
 
     ];
     //get the current hash path and route pattern for nested routes

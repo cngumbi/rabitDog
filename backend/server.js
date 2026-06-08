@@ -14,6 +14,10 @@ const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 const ProfileRoute = require("./routes/profileRoute");
 const HealthRecordRoute = require("./routes/healthRecordRoute");
+const PartyRoute = require("./routes/partyRoute");
+const PurchaseRoute = require("./routes/purchaseRoute");
+const TransferRoute = require("./routes/transferRoute");
+const ExpenseRoute = require("./routes/expenseRoute");
 
 const app = express();
 //middleware
@@ -74,6 +78,10 @@ app.use('/api/health-records', HealthRecordRoute);
 app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/orders', OrderRoute);
+app.use('/api/parties', PartyRoute);
+app.use('/api/purchases', PurchaseRoute);
+app.use('/api/transfers', TransferRoute);
+app.use('/api/expenses', ExpenseRoute);
 
 app.get('/api/paypal/clientId', (req, res)=>{
   res.send({ clientId: config.PAYPAL_CLIENT_ID });
