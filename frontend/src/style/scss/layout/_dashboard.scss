@@ -6,6 +6,11 @@
   display: block;
   //background-color: aqua;
 }
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
 //dashboard design
 .dashboard-row {
   display: flex;

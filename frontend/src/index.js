@@ -27,11 +27,12 @@ import PlaceOrder from './components/order/PlaceOrder';
 import CartPage from './components/order/cartpage';
 import ShippingPage from './shipping/Shipping';
 import PaymentMethods from './components/payment/payment';
-
+//Health records
 import MedicalLogs from './components/mediacal/medicalLogs';
 //utils
 import { getUserInfo } from './localStorage';
 import SalesList from './components/order/sales';
+import ListMedicalLogs from './components/mediacal/listingMedical';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -78,6 +79,7 @@ const routes = {
     '/payment': PaymentMethods,
     //medical records
     '/medicallogs': MedicalLogs,
+    '/listingmedical': ListMedicalLogs
 };
 
 const router = async () => {
@@ -117,6 +119,7 @@ const router = async () => {
         '/shipping',
         '/payment',
         '/medicallogs',
+        '/listingmedical'
 
     ];
     //get the current hash path and route pattern for nested routes
