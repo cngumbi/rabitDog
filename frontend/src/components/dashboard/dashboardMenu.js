@@ -8,15 +8,15 @@ const DashboardMenu = {
                     <li><a href="/#/dashboard" class="${cons.selected === 'dashboard' ? 'selected':''}">DASHBOARD</a></li>
                     <li><a href="#" class="${cons.selected === 'chicken' ? 'selected':''}">Parties</a></li>
                     <li><a href="/#/listproduct" class="${cons.selected === 'products' ? 'selected': ''}">Product Manager</a></li>
-                    <li><a href="/#/orderlist" class="${cons.selected === 'orderList' ? 'selected': ''}">Sales</a></li>
+                    <li><a href="/#/saleslist" class="${cons.selected === 'salesList' ? 'selected': ''}">Sales</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Purchases</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Stock Transfers</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">POS</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Cash & Bank</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Expenses</a></li>
-                    <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Health Records</a></li>
+                    <li><a href="/#/medicallogs" class="${cons.selected === 'medicallogs' ? 'selected': ''}">Health Records</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Sales Reports</a></li>
-                    <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Online Orders</a></li>
+                    <li><a href="/#/orderlist" class="${cons.selected === 'onlineOrders' ? 'selected': ''}">Online Orders</a></li>
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">STAFF MEMBERS</a></li>
                 </ul>
             </nav>

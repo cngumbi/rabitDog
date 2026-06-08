@@ -31,6 +31,7 @@ import PlaceOrder from './components/order/PlaceOrder';
 //import Breeds from './components/pages/utils/breeds';
 //utils
 import { getUserInfo } from './localStorage';
+import SalesList from './components/order/sales';
 //import CartPage from './components/order/cartpage';
 //import ShippingPage from './shipping/Shipping';
 //import PaymentMethods from './components/payment/payment';
@@ -72,26 +73,17 @@ const routes = {
     '/createproduct': AddProduct,
     '/product/:id/edit': EditProduct,
     //orders
-    '/orderlist': OrderList,
+    'listingorder': OrderList,
+    '/saleslist': SalesList,
     '/placeorder': PlaceOrder,
     '/order/:id':OrderPage,
-    //'/checken': Chicken,
-    //'/chicken': { 
-    //    component: Chicken,
-    //    children: {
-    //        'breeds': Breeds,
-    //        'medicallogs': MedicalLogs,
-    //    }
-    //},
-   /* '/newsubscriber': NewSubscriber,
     '/cart': CartPage,
     '/cart/:id': CartPage,
     '/shipping': ShippingPage,
     '/payment': PaymentMethods,
-    '/chicken/medicallogs': MedicalLogs,
-    '/chicken/breeds': Breeds, */
+    //medical records
+    '/medicallogs': MedicalLogs,
 };
-
 
 const router = async () => {
 
@@ -122,8 +114,14 @@ const router = async () => {
         '/createproduct',
         '/product/:id/edit',
         '/orderlist',
+        'saleslist',
         '/placeorder',
-        '/order/:id'
+        '/order/:id',
+        '/cart',
+        '/cart/:id',
+        '/shipping',
+        '/payment',
+        '/medicallogs',
 
     ];
     //get the current hash path and route pattern for nested routes
