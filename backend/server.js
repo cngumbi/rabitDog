@@ -13,7 +13,7 @@ const OrderRoute = require("./routes/ordrerRoute");
 const UploadRoute = require("./routes/uploadRoute");
 const ProductRoute = require("./routes/productRoute");
 const ProfileRoute = require("./routes/profileRoute");
-
+const HealthRecordRoute = require("./routes/healthRecordRoute");
 
 const app = express();
 //middleware
@@ -70,6 +70,7 @@ app.use(express.static(path.join(__dirname, "/../frontend/dist")));
 //routes
 app.use('/api/users', UserRoute);
 app.use("/api/profile", ProfileRoute);
+app.use('/api/health-records', HealthRecordRoute);
 app.use('/api/uploads', UploadRoute);
 app.use('/api/products', ProductRoute);
 app.use('/api/orders', OrderRoute);

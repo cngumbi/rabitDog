@@ -190,6 +190,73 @@ export const updateSettings = async(settingsData)=>{
     }
 };
 
+export const getHealthSummary = async () => {
+    try {
+        const response = await apiClient({
+            url: '/api/health-records/summary',
+            method: 'GET',
+        });
+        return response.data;
+    } catch (error) {
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
+export const getHealthRecords = async ({ searchKeyword = '', severity = '', action = '' } = {}) => {
+    try {
+        const queryParams = [];
+        if (searchKeyword) queryParams.push(`searchKeyword=${encodeURIComponent(searchKeyword)}`);
+        if (severity) queryParams.push(`severity=${encodeURIComponent(severity)}`);
+        if (action) queryParams.push(`action=${encodeURIComponent(action)}`);
+        const queryString = queryParams.length ? `?${queryParams.join('&')}` : '';
+        const response = await apiClient({
+            url: `/api/health-records${queryString}`,
+            method: 'GET',
+        });
+        return response.data;
+    } catch (error) {
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
+export const createHealthRecord = async (data) => {
+    try {
+        const response = await apiClient({
+            url: '/api/health-records',
+            method: 'POST',
+            data,
+        });
+        return response.data;
+    } catch (error) {
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
+export const updateHealthRecord = async (id, data) => {
+    try {
+        const response = await apiClient({
+            url: `/api/health-records/${id}`,
+            method: 'PUT',
+            data,
+        });
+        return response.data;
+    } catch (error) {
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
+export const deleteHealthRecord = async (id) => {
+    try {
+        const response = await apiClient({
+            url: `/api/health-records/${id}`,
+            method: 'DELETE',
+        });
+        return response.data;
+    } catch (error) {
+        return { error: error.response ? error.response.data.message : error.message };
+    }
+};
+
 //get paginated activity logs
 export const getActivityLog = async(page = 1, limit = 15) => {
     try{

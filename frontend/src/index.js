@@ -29,10 +29,12 @@ import ShippingPage from './shipping/Shipping';
 import PaymentMethods from './components/payment/payment';
 //Health records
 import MedicalLogs from './components/mediacal/medicalLogs';
+import ListMedicalLogs from './components/mediacal/listingMedical';
+import EditHealthRecord from './components/mediacal/editHealthRecord';
+import ManageBatches from './components/mediacal/manageBatches';
 //utils
 import { getUserInfo } from './localStorage';
 import SalesList from './components/order/sales';
-import ListMedicalLogs from './components/mediacal/listingMedical';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -79,7 +81,9 @@ const routes = {
     '/payment': PaymentMethods,
     //medical records
     '/medicallogs': MedicalLogs,
-    '/listingmedical': ListMedicalLogs
+    '/listingmedical': ListMedicalLogs,
+    '/health/:id/edit': EditHealthRecord,
+    '/manage-batches': ManageBatches
 };
 
 const router = async () => {
@@ -119,7 +123,9 @@ const router = async () => {
         '/shipping',
         '/payment',
         '/medicallogs',
-        '/listingmedical'
+        '/listingmedical',
+        '/health/:id/edit',
+        '/manage-batches'
 
     ];
     //get the current hash path and route pattern for nested routes

@@ -1,8 +1,101 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
+import { getHealthRecords } from '../../connection/api';
 
 const ListMedicalLogs = {
-    vignette: () => {
-        // Add event listeners or any interactive behavior here if needed
+    vignette: async () => {
+        const searchInput = document.getElementById('health-search-keyword');
+        const filterSelect = document.getElementById('health-severity-filter');
+        const tableBody = document.getElementById('health-records-body');
+        const searchButton = document.getElementById('health-search-button');
+        const exportButton = document.getElementById('health-export-button');
+
+        const formatDate = (iso) => {
+            const date = new Date(iso);
+            if (Number.isNaN(date.getTime())) return '';
+            const month = `${date.getMonth() + 1}`.padStart(2, '0');
+            const day = `${date.getDate()}`.padStart(2, '0');
+            return `${date.getFullYear()}-${month}-${day}`;
+        };
+
+        const getBadgeClass = (value) => {
+            if (value === 'Critical') return 'badge-red';
+            if (value === 'Watch') return 'badge-orange';
+            return 'badge-primary';
+        };
+
+        const loadRecords = async () => {
+            const records = await getHealthRecords({
+                searchKeyword: searchInput?.value || '',
+                severity: filterSelect?.value || '',
+            });
+            if (!Array.isArray(records)) {
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-danger">Failed to load health records.</td></tr>';
+                return;
+            }
+            if (!records.length) {
+                tableBody.innerHTML = '<tr><td colspan="8" class="text-muted">No records matched your search.</td></tr>';
+                return;
+            }
+            tableBody.innerHTML = records.map((record) => `
+                <tr>
+                  <td>${record.batch}</td>
+                  <td>${formatDate(record.date)}</td>
+                  <td>${record.issue}</td>
+                  <td><span class="${getBadgeClass(record.severity)} text-white">${record.severity}</span></td>
+                  <td>${record.action}</td>
+                  <td><span class="${record.status === 'Recovered' || record.status === 'Resolved' ? 'badge-green' : record.status === 'Critical' ? 'badge-red' : 'badge-primary'} text-white">${record.status}</span></td>
+                  <td>${record.notes ? record.notes : '—'}</td>
+                  <td><a href="/#/health/${record._id}/edit">Edit</a></td>
+                </tr>
+            `).join('');
+        };
+
+        if (searchButton) {
+            searchButton.addEventListener('click', async (event) => {
+                event.preventDefault();
+                await loadRecords();
+            });
+        }
+
+        if (filterSelect) {
+            filterSelect.addEventListener('change', async () => {
+                await loadRecords();
+            });
+        }
+
+        if (exportButton) {
+            exportButton.addEventListener('click', async () => {
+                const records = await getHealthRecords({
+                    searchKeyword: searchInput?.value || '',
+                    severity: filterSelect?.value || '',
+                });
+                if (!Array.isArray(records) || !records.length) {
+                    return;
+                }
+                const csv = [
+                    ['Batch', 'Date', 'Issue', 'Severity', 'Action', 'Status', 'Notes'],
+                    ...records.map((record) => [
+                        record.batch,
+                        formatDate(record.date),
+                        record.issue,
+                        record.severity,
+                        record.action,
+                        record.status,
+                        record.notes || '',
+                    ])
+                ].map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'health-records.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        }
+
+        await loadRecords();
     },
     render: async () => {
 
@@ -24,16 +117,16 @@ const ListMedicalLogs = {
                     <div class="card-title">All Health Entries</div>
                       <div class="row gap-1 page-controls" style="margin-bottom:1rem;">
                       <div class="col-xs-12 col-sm-8">
-                        <input aria-label="Search health records" placeholder="Search by batch, issue or note" class="form-control" type="search">
+                        <input id="health-search-keyword" aria-label="Search health records" placeholder="Search by batch, issue or note" class="form-control" type="search">
                       </div>
                       <div class="col-xs-12 col-sm-4" style="display:flex;gap:0.5rem;justify-content:flex-end;align-items:center;">
-                        <select class="form-select">
+                        <select id="health-severity-filter" class="form-select">
                           <option value="">All Severities</option>
                           <option>Normal</option>
                           <option>Watch</option>
                           <option>Critical</option>
                         </select>
-                        <a class="btn-primary text-white" href="#">Search</a>
+                        <button id="health-search-button" type="button" class="btn-primary text-white">Search</button>
                       </div>
                     </div>
                     <div class="row" style="align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
@@ -43,7 +136,7 @@ const ListMedicalLogs = {
                         <span class="badge-red">Critical</span>
                       </div>
                       <div style="margin-left:auto;">
-                        <a href="#" class="btn-outline-primary">Export CSV</a>
+                        <button id="health-export-button" type="button" class="btn-outline-primary">Export CSV</button>
                       </div>
                     </div>
                     <div style="overflow-x:auto;">
@@ -57,36 +150,11 @@ const ListMedicalLogs = {
                             <th>Action</th>
                             <th>Status</th>
                             <th>Notes</th>
+                            <th>Actions</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <tr>
-                            <td>Batch A-12</td>
-                            <td>2026-05-29</td>
-                            <td>Respiratory irritation</td>
-                            <td><span class="badge-orange text-white">Watch</span></td>
-                            <td>Monitor</td>
-                            <td><span class="badge-green text-white">Recovered</span></td>
-                            <td>Observed coughing; waterlines cleaned.</td>
-                          </tr>
-                          <tr>
-                            <td>House 3</td>
-                            <td>2026-05-28</td>
-                            <td>Wet litter</td>
-                            <td><span class="badge-primary text-white">Normal</span></td>
-                            <td>Cleaned</td>
-                            <td><span class="badge-green text-white">Resolved</span></td>
-                            <td>Increased bedding and ventilation.</td>
-                          </tr>
-                          <tr>
-                            <td>Batch B-06</td>
-                            <td>2026-05-27</td>
-                            <td>Fever spike</td>
-                            <td><span class="badge-red text-white">Critical</span></td>
-                            <td>Treat</td>
-                            <td><span class="badge-orange text-white">Monitoring</span></td>
-                            <td>Vet notified; treatment started.</td>
-                          </tr>
+                        <tbody id="health-records-body">
+                          <tr><td colspan="8" class="text-muted">Loading health records…</td></tr>
                         </tbody>
                       </table>
                     </div>
