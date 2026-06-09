@@ -1,0 +1,437 @@
+@use '../abstracts/variables' as *;
+@use 'sass:color' as *;
+
+// Parties table section
+.parties-table-section {
+    margin-top: 2rem;
+
+    .panel {
+        padding: 2rem;
+    }
+}
+
+// Table header with search and controls
+.parties-table-header {
+    margin-bottom: 2rem;
+}
+
+.parties-table-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1.5rem;
+}
+
+.parties-table-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        
+        input,
+        select,
+        button {
+            width: 100%;
+        }
+    }
+}
+
+.parties-search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 0.75rem 1rem;
+    border: 2px solid mix(black, white, 85%);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        min-width: auto;
+    }
+}
+
+.parties-type-filter {
+    padding: 0.75rem 1rem;
+    border: 2px solid mix(black, white, 85%);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background-color: #fff;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+}
+
+// Enhanced table styling
+.parties-table {
+    margin: 0;
+
+    thead {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid mix(black, white, 85%);
+
+        th {
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: mix(black, white, 40%);
+            background-color: #f8f9fa;
+            border: none;
+        }
+    }
+
+    tbody {
+        tr {
+            border-bottom: 1px solid mix(black, white, 92%);
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: mix(white, $primary, 97%);
+            }
+
+            td {
+                padding: 1rem;
+                vertical-align: middle;
+                color: #333;
+            }
+        }
+    }
+}
+
+// Badge styling
+.badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+
+    &.badge-success {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.badge-warning {
+        background-color: #fff3e0;
+        color: #f57c00;
+    }
+
+    &.badge-danger {
+        background-color: #ffebee;
+        color: #c62828;
+    }
+
+    &.badge-primary {
+        background-color: mix(white, $primary, 85%);
+        color: $primary;
+    }
+
+    &.badge-info {
+        background-color: #e3f2fd;
+        color: #1565c0;
+    }
+}
+
+// Action links
+.action-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: mix(white, $primary, 90%);
+    color: $primary;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    border: 1px solid mix(white, $primary, 70%);
+
+    &:hover {
+        background-color: $primary;
+        color: white;
+        box-shadow: 0 2px 8px rgba($primary, 0.2);
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+// Pagination styling
+.pagination-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1.5rem;
+    border-top: 1px solid mix(black, white, 90%);
+}
+
+.pagination-btn {
+    padding: 0.6rem 1rem;
+    border: 1px solid mix(black, white, 80%);
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    font-weight: 600;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+        background-color: $primary;
+        color: white;
+        border-color: $primary;
+        box-shadow: 0 2px 8px rgba($primary, 0.15);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.pagination-page-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid mix(black, white, 80%);
+    border-radius: 6px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    min-width: 2.5rem;
+    text-align: center;
+
+    &:hover {
+        background-color: mix(white, $primary, 90%);
+        border-color: $primary;
+    }
+
+    &.active {
+        background-color: $primary;
+        color: white;
+        border-color: $primary;
+    }
+}
+
+.pagination-info {
+    font-weight: 600;
+    color: mix(black, white, 40%);
+    white-space: nowrap;
+}
+
+// Party cards styling - Compact design
+.parties-directory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.party-card {
+    border: 1px solid mix(black, white, 85%);
+    border-radius: 12px;
+    padding: 1rem;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+
+    &.party-card-primary {
+        border-color: $primary;
+        background: linear-gradient(135deg, mix(white, $primary, 97%) 0%, #fff 100%);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+}
+
+.party-card-header {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    align-items: flex-start;
+}
+
+.party-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: mix(white, $primary, 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: $primary;
+    flex-shrink: 0;
+}
+
+.party-card-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #000;
+    margin-bottom: 0.15rem;
+    line-height: 1.2;
+}
+
+.party-card-role {
+    font-size: 0.75rem;
+    color: mix(black, white, 50%);
+    line-height: 1.2;
+}
+
+.party-card-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid mix(black, white, 90%);
+    font-size: 0.8rem;
+    color: mix(black, white, 50%);
+}
+
+.party-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+
+    a {
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.8rem;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Recent parties layout
+.parties-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    .parties-main-panel {
+        grid-column: 1;
+    }
+
+    .parties-side-panel {
+        grid-column: 2;
+    }
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+
+        .parties-main-panel,
+        .parties-side-panel {
+            grid-column: auto;
+        }
+    }
+}
+
+.party-summary-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.party-summary-item {
+    padding: 1rem;
+    background-color: mix(white, $primary, 95%);
+    border-radius: 6px;
+    border-left: 4px solid $primary;
+}
+
+.party-summary-label {
+    font-size: 0.75rem;
+    color: mix(black, white, 50%);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.party-summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.top-partner-channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.top-partner-channel {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: mix(white, $primary, 90%);
+    border: 1px solid mix(white, $primary, 70%);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    color: $primary;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .parties-directory-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .pagination-buttons {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .party-card {
+        padding: 0.75rem;
+    }
+
+    .pagination-page-btn {
+        padding: 0.4rem 0.6rem;
+        min-width: 2rem;
+        font-size: 0.875rem;
+    }
+
+    .parties-table {
+        th, td {
+            padding: 0.75rem;
+            font-size: 0.85rem;
+        }
+    }
+}
+
