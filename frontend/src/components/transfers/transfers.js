@@ -25,9 +25,12 @@ const StackTransfers = {
                 const statusBadge = transfer.status === 'completed' ? 'badge-green' : 
                                    transfer.status === 'in-transit' ? 'badge-primary' :
                                    transfer.status === 'pending' ? 'badge-orange' :
+                                   transfer.status === 'draft' ? 'badge-secondary' :
                                    'badge-gray';
                 const icon = transfer.status === 'received' ? '📦' : 
-                            transfer.status === 'in-transit' ? '🚚' : '📍';
+                            transfer.status === 'in-transit' ? '🚚' :
+                            transfer.status === 'draft' ? '📝' :
+                            '📍';
                 
                 return `
                     <div class="stock-transfer-row">

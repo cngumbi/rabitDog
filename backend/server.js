@@ -105,6 +105,41 @@ app.use((err, req, res, next) => {
 });
 //-0000000000000000000000000000000000000000000000000000000000
 //-0000000000000000000000000000000000000000000000000000000000
-app.listen(config.PORT, () => {
-  console.log(`server running on port ${config.PORT}`);
-});
+const basePort = config.PORT || 5000;
+const retryList = Array.isArray(config.PORT_RETRY_LIST) ? config.PORT_RETRY_LIST : [];
+const maxRetries = retryList.length > 0 ? retryList.length : config.PORT_RETRY_COUNT || 10;
+const fallbackMode = retryList.length > 0 ? 'explicit list' : 'sequential step';
+const retryStep = retryList.length > 0 ? null : 1;
+let retryCount = 0;
+
+const getNextPort = () => {
+  if (retryList.length > 0) {
+    return retryList[retryCount];
+  }
+  return basePort + (retryCount + 1) * retryStep;
+};
+
+const startServer = (portToUse) => {
+  const server = app.listen(portToUse, () => {
+    console.log(`server running on port ${portToUse}`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      if (retryCount >= maxRetries) {
+        console.error(`Unable to start server: port ${portToUse} is in use and retry limit of ${maxRetries} has been reached.`);
+        process.exit(1);
+      }
+
+      const nextPort = getNextPort();
+      retryCount += 1;
+      console.warn(`Port ${portToUse} is already in use. Attempting fallback port ${nextPort} from ${fallbackMode} (${retryCount}/${maxRetries})...`);
+      startServer(nextPort);
+    } else {
+      console.error('Server error:', error);
+      process.exit(1);
+    }
+  });
+};
+
+startServer(basePort);

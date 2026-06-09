@@ -37,7 +37,7 @@ const transferSchema = new mongoose.Schema({
     items: [transferItemSchema],
     status: {
         type: String,
-        enum: ['pending', 'in-transit', 'received', 'cancelled'],
+        enum: ['draft', 'pending', 'in-transit', 'received', 'cancelled'],
         default: 'pending'
     },
     activeMoves: {

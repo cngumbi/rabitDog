@@ -89,7 +89,7 @@ TransferRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
         items: req.body.items || [],
-        status: 'pending',
+        status: req.body.status || 'pending',
         shipmentDate: req.body.shipmentDate,
         expectedReceiptDate: req.body.expectedReceiptDate,
         notes: req.body.notes,

@@ -1,8 +1,63 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
+import { createTransfer, getProducts, getParties } from '../../connection/api';
+
 const NewTransfer = {
-    vignette: ()=> {},
-    render: ()=>{
-        return `
+    vignette: ()=> {
+        // Handle form submission
+        const createBtn = document.querySelector('#create-transfer-btn');
+        const saveDraftBtn = document.querySelector('#save-draft-btn');
+        const addLineBtn = document.querySelector('#add-line-btn');
+        const cancelBtn = document.querySelector('#cancel-transfer-btn');
+        
+        if (createBtn) {
+            createBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleCreateTransfer(true);
+            });
+        }
+
+        if (saveDraftBtn) {
+            saveDraftBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleCreateTransfer(false);
+            });
+        }
+
+        if (addLineBtn) {
+            addLineBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                addLineItem();
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                if (confirm('Discard changes and go back?')) {
+                    window.location.hash = '/transfers';
+                }
+            });
+        }
+
+        // Setup line item actions
+        setupLineItemActions();
+
+        // Setup form change listeners for summary
+        setupSummaryUpdates();
+    },
+    render: async ()=>{
+        try {
+            const products = await getProducts({ searchKeyword: "" });
+            const parties = await getParties();
+
+            const productsOptions = !products.error && products.length > 0
+                ? products.map(p => `<option value="${p._id}" data-name="${p.productName || ''}">${p.productName || 'Unknown'}</option>`).join('')
+                : '<option value="">No products available</option>';
+
+            const partiesOptions = !parties.error && parties.length > 0
+                ? parties.map(p => `<option value="${p._id}">${p.name}</option>`).join('')
+                : '<option value="">No locations available</option>';
+
+            return `
         <div class="wrap">
             ${DashboardMenu.render({ selected: "transfers" })}
             <div class="main">
@@ -17,17 +72,19 @@ const NewTransfer = {
                   </div>
                   <div class="dashboard-hero-meta">
                     <div class="dashboard-mini-stat">
-                      <span class="dashboard-mini-stat-label">Average lead time</span>
-                      <span class="dashboard-mini-stat-value">1.8 hrs</span>
-                      <span class="dashboard-mini-stat-trend">Across branches</span>
+                      <span class="dashboard-mini-stat-label">Items to transfer</span>
+                      <span class="dashboard-mini-stat-value" id="transfer-items-count">0</span>
+                      <span class="dashboard-mini-stat-trend">Units ready</span>
                     </div>
                     <div class="dashboard-mini-stat">
-                      <span class="dashboard-mini-stat-label">Ready to dispatch</span>
-                      <span class="dashboard-mini-stat-value">92%</span>
-                      <span class="dashboard-mini-stat-trend">Checklist complete</span>
+                      <span class="dashboard-mini-stat-label">Total units</span>
+                      <span class="dashboard-mini-stat-value" id="transfer-units-total">0</span>
+                      <span class="dashboard-mini-stat-trend">To be moved</span>
                     </div>
                   </div>
                 </section>
+
+                <div id="alert-container"></div>
 
                 <section class="new-transfer-layout">
                   <article class="panel new-transfer-main-panel">
@@ -44,72 +101,100 @@ const NewTransfer = {
                     <div class="new-transfer-form-grid">
                       <div>
                         <label class="form-label">From location</label>
-                        <select class="form-select">
-                          <option>Main Store</option>
-                          <option>Brooder House</option>
-                          <option>Retail Outlet</option>
+                        <select id="transferFromLocation" class="form-select">
+                          <option value="">Select source location</option>
+                          ${partiesOptions}
                         </select>
+                        <input id="transferFromLocationCustom" class="form-control mt-2" type="text" placeholder="Or enter a new source location">
                       </div>
                       <div>
                         <label class="form-label">To location</label>
-                        <select class="form-select">
-                          <option>Retail Outlet</option>
-                          <option>Main Store</option>
-                          <option>North House</option>
+                        <select id="transferToLocation" class="form-select">
+                          <option value="">Select destination location</option>
+                          ${partiesOptions}
                         </select>
+                        <input id="transferToLocationCustom" class="form-control mt-2" type="text" placeholder="Or enter a new destination location">
                       </div>
+                    </div>
+                    <div class="text-muted mt-1">
+                      If your location is not listed, type it above or <a href="/#/add-party" class="text-primary">add a new location</a> first.
                     </div>
 
                     <div class="new-transfer-section-header mt-3">
                       <div>
-                        <div class="new-transfer-section-title">Item & quantity</div>
-                        <div class="text-muted">Inventory selection and volume</div>
+                        <div class="new-transfer-section-title">Items & quantity</div>
+                        <div class="text-muted">Products to transfer and quantities</div>
                       </div>
                     </div>
 
                     <div class="new-transfer-form-grid">
                       <div>
                         <label class="form-label">Item</label>
-                        <select class="form-select">
-                          <option>Layer Mash</option>
-                          <option>Fresh Eggs</option>
-                          <option>Vaccination Pack</option>
+                        <select id="lineItemProduct" class="form-select" required>
+                          <option value="">Select product</option>
+                          ${productsOptions}
                         </select>
                       </div>
                       <div>
                         <label class="form-label">Quantity</label>
-                        <input class="form-control" value="15">
+                        <input id="lineItemQuantity" class="form-control" type="number" min="1" value="1" required>
                       </div>
                       <div class="new-transfer-span-2">
                         <label class="form-label">Transfer note</label>
-                        <textarea class="form-control" rows="4">Prioritize warehouse pick-up and confirm receiving team before dispatch.</textarea>
+                        <textarea id="transferNotes" class="form-control" rows="4" placeholder="Add delivery instructions or special handling notes"></textarea>
                       </div>
+                    </div>
+
+                    <div class="new-transfer-action-row mt-2">
+                      <button id="add-line-btn" class="btn-outline-primary text-primary">Add another item</button>
                     </div>
 
                     <div class="new-transfer-section-header mt-3">
                       <div>
-                        <div class="new-transfer-section-title">Dispatch window</div>
-                        <div class="text-muted">Schedule and handling details</div>
+                        <div class="new-transfer-section-title">Items preview</div>
+                        <div class="text-muted">Current transfer composition</div>
+                      </div>
+                    </div>
+
+                    <div class="table-wrap">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody id="line-items-body">
+                          <tr id="empty-row">
+                            <td colspan="3" class="text-center text-muted">No items added yet</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div class="new-transfer-section-header mt-3">
+                      <div>
+                        <div class="new-transfer-section-title">Dates</div>
+                        <div class="text-muted">Schedule and expected receipt</div>
                       </div>
                     </div>
 
                     <div class="new-transfer-form-grid">
                       <div>
-                        <label class="form-label">Requested time</label>
-                        <input class="form-control" type="time" value="09:30">
+                        <label class="form-label">Shipment date</label>
+                        <input id="transferShipmentDate" class="form-control" type="date" required>
                       </div>
                       <div>
-                        <label class="form-label">Courier/driver</label>
-                        <select class="form-select">
-                          <option>Delivery Team A</option>
-                          <option>Transport Driver</option>
-                        </select>
+                        <label class="form-label">Expected receipt date</label>
+                        <input id="transferExpectedReceiptDate" class="form-control" type="date" required>
                       </div>
                     </div>
 
                     <div class="new-transfer-action-row">
-                      <a class="btn-primary text-white" href="stock-transfer.html">Create Transfer</a>
-                      <a class="btn-outline-primary text-primary" href="stock-transfer.html">Save Draft</a>
+                      <button id="create-transfer-btn" class="btn-primary text-white">Create Transfer</button>
+                      <button id="save-draft-btn" class="btn-outline-primary text-primary">Save Draft</button>
+                      <button id="cancel-transfer-btn" class="btn-red text-white">Cancel</button>
                     </div>
                   </article>
 
@@ -117,37 +202,246 @@ const NewTransfer = {
                     <div class="card-title">Transfer summary</div>
                     <div class="new-transfer-summary-list">
                       <div class="new-transfer-summary-item">
-                        <div class="new-transfer-summary-label">Route</div>
-                        <strong>Main Store → Retail Outlet</strong>
+                        <div class="new-transfer-summary-label">From</div>
+                        <strong id="summary-from">Not selected</strong>
                       </div>
                       <div class="new-transfer-summary-item">
-                        <div class="new-transfer-summary-label">Item</div>
-                        <strong>Layer Mash</strong>
+                        <div class="new-transfer-summary-label">To</div>
+                        <strong id="summary-to">Not selected</strong>
                       </div>
                       <div class="new-transfer-summary-item">
-                        <div class="new-transfer-summary-label">Quantity</div>
-                        <strong>15 units</strong>
+                        <div class="new-transfer-summary-label">Items</div>
+                        <strong id="summary-items">0 items</strong>
                       </div>
                       <div class="new-transfer-summary-item">
-                        <div class="new-transfer-summary-label">ETA</div>
-                        <strong>09:30 AM</strong>
+                        <div class="new-transfer-summary-label">Total units</div>
+                        <strong id="summary-units">0 units</strong>
+                      </div>
+                      <div class="new-transfer-summary-item">
+                        <div class="new-transfer-summary-label">Shipment date</div>
+                        <strong id="summary-shipment">Not set</strong>
+                      </div>
+                      <div class="new-transfer-summary-item">
+                        <div class="new-transfer-summary-label">Expected receipt</div>
+                        <strong id="summary-receipt">Not set</strong>
                       </div>
                     </div>
 
                     <div class="new-transfer-helper-card">
-                      <div class="new-transfer-helper-title">Checklist</div>
-                      <p class="text-muted">Make sure the receiving outlet is ready and the transfer note matches the delivery handling instructions.</p>
+                      <div class="new-transfer-helper-title">Create checklist</div>
                       <div class="new-transfer-check-list">
-                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">✓</span><span>Inventory reserved</span></div>
-                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">✓</span><span>Receiving point notified</span></div>
-                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">✓</span><span>Dispatch slot assigned</span></div>
+                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">○</span><span>Select locations</span></div>
+                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">○</span><span>Add items</span></div>
+                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">○</span><span>Set dates</span></div>
+                        <div class="new-transfer-check-item"><span class="new-transfer-check-dot">○</span><span>Confirm transfer</span></div>
                       </div>
                     </div>
                   </aside>
                 </section>
             </div>
         </div> 
-        `
+        `;
+        } catch (error) {
+            console.error('Error rendering new transfer:', error);
+            return `
+                <div class="wrap">
+                    ${DashboardMenu.render({ selected: "transfers" })}
+                    <div class="main">
+                        <div class="alert alert-danger">Error loading form data: ${error.message}</div>
+                        <a class="btn-primary text-white" href="/#/transfers">Back to Transfers</a>
+                    </div>
+                </div>
+            `;
+        }
     }
 };
+
+let lineItems = [];
+
+const addLineItem = () => {
+    const productSelect = document.querySelector('#lineItemProduct');
+    const quantityInput = document.querySelector('#lineItemQuantity');
+    const alertContainer = document.querySelector('#alert-container');
+
+    const productId = productSelect.value;
+    const productName = productSelect.selectedOptions[0]?.text || '';
+    const quantity = parseInt(quantityInput.value) || 0;
+
+    if (!productId) {
+        showAlert(alertContainer, 'error', 'Please select a product before adding an item.');
+        return;
+    }
+    if (quantity <= 0) {
+        showAlert(alertContainer, 'error', 'Quantity must be at least 1.');
+        return;
+    }
+
+    // Check if product already exists
+    const existingItem = lineItems.find(item => item.product === productId);
+    if (existingItem) {
+        showAlert(alertContainer, 'error', 'This product is already in the transfer. Edit the quantity in the preview table.');
+        return;
+    }
+
+    lineItems.push({
+        product: productId,
+        name: productName,
+        quantity: quantity
+    });
+
+    // Reset inputs
+    productSelect.value = '';
+    quantityInput.value = '1';
+
+    renderLineItems();
+    updateSummary();
+    showAlert(alertContainer, 'success', `${productName} added successfully!`);
+};
+
+const renderLineItems = () => {
+    const lineItemsBody = document.querySelector('#line-items-body');
+    const emptyRow = document.querySelector('#empty-row');
+
+    if (lineItems.length === 0) {
+        lineItemsBody.innerHTML = '<tr id="empty-row"><td colspan="3" class="text-center text-muted">No items added yet</td></tr>';
+        return;
+    }
+
+    if (emptyRow) emptyRow.remove();
+
+    lineItemsBody.innerHTML = lineItems.map((item, index) => `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td><button type="button" class="btn-sm btn-red" onclick="window.deleteLineItem(${index})">Remove</button></td>
+        </tr>
+    `).join('');
+};
+
+window.deleteLineItem = (index) => {
+    lineItems.splice(index, 1);
+    renderLineItems();
+    updateSummary();
+};
+
+const setupLineItemActions = () => {
+    // Any additional setup for line items
+};
+
+const setupSummaryUpdates = () => {
+    const fromSelect = document.querySelector('#transferFromLocation');
+    const toSelect = document.querySelector('#transferToLocation');
+    const fromCustomInput = document.querySelector('#transferFromLocationCustom');
+    const toCustomInput = document.querySelector('#transferToLocationCustom');
+    const shipmentDateInput = document.querySelector('#transferShipmentDate');
+    const receiptDateInput = document.querySelector('#transferExpectedReceiptDate');
+
+    if (fromSelect) fromSelect.addEventListener('change', updateSummary);
+    if (toSelect) toSelect.addEventListener('change', updateSummary);
+    if (fromCustomInput) fromCustomInput.addEventListener('input', updateSummary);
+    if (toCustomInput) toCustomInput.addEventListener('input', updateSummary);
+    if (shipmentDateInput) shipmentDateInput.addEventListener('change', updateSummary);
+    if (receiptDateInput) receiptDateInput.addEventListener('change', updateSummary);
+};
+
+const getLocationValue = (selectId, inputId) => {
+    const customValue = document.querySelector(`#${inputId}`)?.value.trim();
+    if (customValue) return customValue;
+    const select = document.querySelector(`#${selectId}`);
+    if (!select || !select.value) return '';
+    return select.selectedOptions[0]?.text || '';
+};
+
+const updateSummary = () => {
+    const fromLocation = getLocationValue('transferFromLocation', 'transferFromLocationCustom') || 'Not selected';
+    const toLocation = getLocationValue('transferToLocation', 'transferToLocationCustom') || 'Not selected';
+    const shipmentDate = document.querySelector('#transferShipmentDate')?.value || 'Not set';
+    const receiptDate = document.querySelector('#transferExpectedReceiptDate')?.value || 'Not set';
+    const itemCount = lineItems.length;
+    const totalUnits = lineItems.reduce((sum, item) => sum + item.quantity, 0);
+
+    document.querySelector('#summary-from').textContent = fromLocation;
+    document.querySelector('#summary-to').textContent = toLocation;
+    document.querySelector('#summary-items').textContent = `${itemCount} item${itemCount !== 1 ? 's' : ''}`;
+    document.querySelector('#summary-units').textContent = `${totalUnits} unit${totalUnits !== 1 ? 's' : ''}`;
+    document.querySelector('#summary-shipment').textContent = shipmentDate ? new Date(shipmentDate).toLocaleDateString() : 'Not set';
+    document.querySelector('#summary-receipt').textContent = receiptDate ? new Date(receiptDate).toLocaleDateString() : 'Not set';
+
+    document.querySelector('#transfer-items-count').textContent = itemCount;
+    document.querySelector('#transfer-units-total').textContent = totalUnits;
+};
+
+const handleCreateTransfer = async (isCreate) => {
+    const fromLocation = getLocationValue('transferFromLocation', 'transferFromLocationCustom');
+    const toLocation = getLocationValue('transferToLocation', 'transferToLocationCustom');
+    const shipmentDate = document.querySelector('#transferShipmentDate')?.value;
+    const expectedReceiptDate = document.querySelector('#transferExpectedReceiptDate')?.value;
+    const notes = document.querySelector('#transferNotes')?.value;
+    const alertContainer = document.querySelector('#alert-container');
+
+    // Validation
+    if (!fromLocation) {
+        showAlert(alertContainer, 'error', 'Please provide a source location.');
+        return;
+    }
+    if (!toLocation) {
+        showAlert(alertContainer, 'error', 'Please provide a destination location.');
+        return;
+    }
+    if (fromLocation.trim().toLowerCase() === toLocation.trim().toLowerCase()) {
+        showAlert(alertContainer, 'error', 'Source and destination locations must be different.');
+        return;
+    }
+    if (isCreate && lineItems.length === 0) {
+        showAlert(alertContainer, 'error', 'Please add at least one item to the transfer.');
+        return;
+    }
+    if (isCreate && !shipmentDate) {
+        showAlert(alertContainer, 'error', 'Please set a shipment date.');
+        return;
+    }
+    if (isCreate && !expectedReceiptDate) {
+        showAlert(alertContainer, 'error', 'Please set an expected receipt date.');
+        return;
+    }
+
+    const transferData = {
+        fromLocation: fromLocation.trim(),
+        toLocation: toLocation.trim(),
+        items: lineItems,
+        shipmentDate: shipmentDate ? new Date(shipmentDate) : undefined,
+        expectedReceiptDate: expectedReceiptDate ? new Date(expectedReceiptDate) : undefined,
+        notes,
+        status: isCreate ? 'pending' : 'draft'
+    };
+
+    try {
+        showAlert(alertContainer, 'info', isCreate ? 'Creating transfer...' : 'Saving draft...');
+        const result = await createTransfer(transferData);
+
+        if (result.error) {
+            showAlert(alertContainer, 'error', `Failed: ${result.error}`);
+            return;
+        }
+
+        showAlert(alertContainer, 'success', isCreate ? 'Transfer created successfully!' : 'Draft saved successfully!');
+        setTimeout(() => {
+            window.location.hash = '/transfers';
+        }, 1500);
+    } catch (error) {
+        showAlert(alertContainer, 'error', `Error: ${error.message}`);
+    }
+};
+
+const showAlert = (container, type, message) => {
+    const alertClass = type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info';
+    container.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+    
+    if (type === 'success') {
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 3000);
+    }
+};
+
 export default NewTransfer;
