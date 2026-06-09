@@ -42,7 +42,7 @@ import { getUserInfo } from './localStorage';
 import SalesList from './components/order/sales';
 //purchases
 import Purchases from './components/purchases/purchases';
-import CreatePO from './components/purchases/addPurchases';
+import AddPurchases from './components/purchases/addPurchases';
 //transfers
 import StackTransfers from './components/transfers/transfers';
 import NewTransfer from './components/transfers/createTransfer';
@@ -104,7 +104,7 @@ const routes = {
     '/party/:id': Party,
     //purchases
     '/purchases': Purchases,
-    '/create-po': CreatePO,
+    '/create-po': AddPurchases,
     //transfers
     '/transfers': StackTransfers,
     '/new-transfer': NewTransfer,
