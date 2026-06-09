@@ -104,6 +104,14 @@ const AddPurchases = {
                         </select>
                       </div>
                       <div>
+                        <label class="form-label">Order owner</label>
+                        <select id="poOwner" class="form-select">
+                          <option value="Admin">Admin</option>
+                          <option value="Procurement">Procurement</option>
+                          <option value="Finance">Finance</option>
+                        </select>
+                      </div>
+                      <div>
                         <label class="form-label">Delivery date</label>
                         <input id="poDeliveryDate" class="form-control" type="date" required>
                       </div>
@@ -112,9 +120,9 @@ const AddPurchases = {
                         <select id="poPaymentTerms" class="form-select">
                           <option value="">Select payment terms</option>
                           <option value="Cash on delivery">Cash on delivery</option>
-                          <option value="Net 7">Net 7 days</option>
-                          <option value="Net 14">Net 14 days</option>
-                          <option value="Net 30">Net 30 days</option>
+                          <option value="Net 15">Net 15</option>
+                          <option value="Net 30">Net 30</option>
+                          <option value="Cash on delivery">Cash on delivery</option>
                         </select>
                       </div>
                     </div>
@@ -124,23 +132,61 @@ const AddPurchases = {
                         <div class="create-po-section-title">Line items</div>
                         <div class="text-muted">Select product, quantity, and unit pricing</div>
                       </div>
-                      <button id="add-line-btn" class="btn-outline-primary text-primary">+ Add Line</button>
+                    </div>
+
+                    <div class="create-po-form-grid">
+                      <div>
+                        <label class="form-label">Product</label>
+                        <select id="lineItemProduct" class="form-select">
+                          <option value="">Select product</option>
+                          ${productsOptions}
+                        </select>
+                      </div>
+                      <div>
+                        <label class="form-label">Category</label>
+                        <select id="lineItemCategory" class="form-select">
+                          <option value="Feed">Feed</option>
+                          <option value="Medicine">Medicine</option>
+                          <option value="Equipment">Equipment</option>
+                          <option value="Miscellaneous">Miscellaneous</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="form-label">Quantity</label>
+                        <input id="lineItemQuantity" class="form-control" type="number" min="1" value="1">
+                      </div>
+                      <div>
+                        <label class="form-label">Unit price</label>
+                        <input id="lineItemUnitPrice" class="form-control" type="number" min="0" step="0.01" value="0">
+                      </div>
+                    </div>
+
+                    <div class="create-po-action-row mt-2">
+                      <button id="add-line-btn" class="btn-outline-primary text-primary">Add another line</button>
+                    </div>
+
+                    <div class="create-po-section-header mt-3">
+                      <div>
+                        <div class="create-po-section-title">Line item preview</div>
+                        <div class="text-muted">Current order composition</div>
+                      </div>
                     </div>
 
                     <div class="table-wrap">
                       <table class="table table-striped">
                         <thead>
                           <tr>
-                            <th>Product</th>
+                            <th>Item</th>
+                            <th>Category</th>
                             <th>Qty</th>
-                            <th>Unit Price (Ksh)</th>
-                            <th>Amount (Ksh)</th>
-                            <th>Action</th>
+                            <th>Unit Price</th>
+                            <th>Amount</th>
+                            <th></th>
                           </tr>
                         </thead>
                         <tbody id="line-items-body">
                           <tr id="empty-row">
-                            <td colspan="5" class="text-center text-muted">No items added yet</td>
+                            <td colspan="6" class="text-center text-muted">No items added yet</td>
                           </tr>
                         </tbody>
                       </table>
@@ -173,8 +219,16 @@ const AddPurchases = {
                         <strong id="summary-supplier">Not selected</strong>
                       </div>
                       <div class="create-po-summary-item">
+                        <div class="create-po-summary-label">Order owner</div>
+                        <strong id="summary-owner">Admin</strong>
+                      </div>
+                      <div class="create-po-summary-item">
                         <div class="create-po-summary-label">Delivery date</div>
                         <strong id="summary-delivery">Not set</strong>
+                      </div>
+                      <div class="create-po-summary-item">
+                        <div class="create-po-summary-label">Payment terms</div>
+                        <strong id="summary-payment">Not set</strong>
                       </div>
                       <div class="create-po-summary-item">
                         <div class="create-po-summary-label">Items</div>
@@ -217,51 +271,62 @@ const AddPurchases = {
 };
 
 const addLineItem = () => {
+    const productSelect = document.querySelector('#lineItemProduct');
+    const categorySelect = document.querySelector('#lineItemCategory');
+    const quantityInput = document.querySelector('#lineItemQuantity');
+    const priceInput = document.querySelector('#lineItemUnitPrice');
+    const alertContainer = document.querySelector('#alert-container');
+
+    const productId = productSelect.value;
+    const productName = productSelect.selectedOptions[0]?.text || '';
+    const category = categorySelect.value;
+    const quantity = parseFloat(quantityInput.value) || 0;
+    const unitPrice = parseFloat(priceInput.value) || 0;
+
+    if (!productId) {
+        showAlert(alertContainer, 'error', 'Please select a product before adding a line.');
+        return;
+    }
+    if (quantity <= 0) {
+        showAlert(alertContainer, 'error', 'Quantity must be at least 1.');
+        return;
+    }
+    if (unitPrice <= 0) {
+        showAlert(alertContainer, 'error', 'Unit price must be greater than 0.');
+        return;
+    }
+
     const lineItemsBody = document.querySelector('#line-items-body');
     const emptyRow = document.querySelector('#empty-row');
-    
     if (emptyRow) {
         emptyRow.remove();
     }
 
+    const totalPrice = quantity * unitPrice;
     const rowId = `line-${Date.now()}`;
     const row = document.createElement('tr');
     row.id = rowId;
+    row.dataset.productId = productId;
+    row.dataset.productName = productName;
+    row.dataset.category = category;
+    row.dataset.quantity = quantity;
+    row.dataset.unitPrice = unitPrice;
+    row.dataset.totalPrice = totalPrice;
     row.innerHTML = `
-        <td>
-            <select class="form-select line-product" data-row="${rowId}">
-                <option value="">Select product</option>
-            </select>
-        </td>
-        <td>
-            <input class="form-control line-quantity" type="number" min="1" value="1" data-row="${rowId}">
-        </td>
-        <td>
-            <input class="form-control line-price" type="number" min="0" step="0.01" value="0" data-row="${rowId}">
-        </td>
-        <td>
-            <input class="form-control line-amount" type="number" disabled value="0" data-row="${rowId}">
-        </td>
-        <td>
-            <button class="btn-remove-line" data-row="${rowId}">Remove</button>
-        </td>
+        <td>${productName}</td>
+        <td>${category}</td>
+        <td>${quantity}</td>
+        <td>Ksh ${unitPrice.toLocaleString('en-KE', {minimumFractionDigits: 2})}</td>
+        <td>Ksh ${totalPrice.toLocaleString('en-KE', {minimumFractionDigits: 2})}</td>
+        <td><button class="btn-remove-line" data-row="${rowId}">Remove</button></td>
     `;
-    
-    lineItemsBody.appendChild(row);
-    
-    // Re-populate product select
-    const products = document.querySelectorAll('.line-product');
-    getProducts({ searchKeyword: "" }).then(prods => {
-        if (!prods.error) {
-            const options = prods.map(p => `<option value="${p._id}" data-price="${p.sellingPrice || 0}">${p.productName}</option>`).join('');
-            products.forEach(select => {
-                select.innerHTML = '<option value="">Select product</option>' + options;
-            });
-        }
-    });
 
+    lineItemsBody.appendChild(row);
     setupLineItemActions();
     updateTotal();
+
+    quantityInput.value = '1';
+    priceInput.value = '0';
 };
 
 const setupLineItemActions = () => {
@@ -269,12 +334,6 @@ const setupLineItemActions = () => {
     document.querySelectorAll('.btn-remove-line').forEach(btn => {
         btn.removeEventListener('click', removeLineItem);
         btn.addEventListener('click', removeLineItem);
-    });
-
-    // Line item change handlers
-    document.querySelectorAll('.line-quantity, .line-price').forEach(input => {
-        input.removeEventListener('change', updateLineAmount);
-        input.addEventListener('change', updateLineAmount);
     });
 
     // Supplier change
@@ -325,9 +384,11 @@ const updateTotal = () => {
     let total = 0;
     let itemCount = 0;
 
-    document.querySelectorAll('.line-amount').forEach(input => {
-        total += parseFloat(input.value) || 0;
-        itemCount++;
+    document.querySelectorAll('#line-items-body tr').forEach(row => {
+        if (row.id === 'empty-row') return;
+        const amount = parseFloat(row.dataset.totalPrice) || 0;
+        total += amount;
+        itemCount += 1;
     });
 
     // Update summary
@@ -339,10 +400,20 @@ const updateTotal = () => {
 
 const updateSummary = () => {
     const supplierSelect = document.querySelector('#poSupplier');
+    const ownerSelect = document.querySelector('#poOwner');
+    const paymentTerms = document.querySelector('#poPaymentTerms');
     const deliveryDate = document.querySelector('#poDeliveryDate');
 
-    if (supplierSelect.selectedOptions[0]) {
+    if (supplierSelect && supplierSelect.selectedOptions[0]) {
         document.querySelector('#summary-supplier').textContent = supplierSelect.selectedOptions[0].text;
+    }
+
+    if (ownerSelect) {
+        document.querySelector('#summary-owner').textContent = ownerSelect.value || 'Not selected';
+    }
+
+    if (paymentTerms) {
+        document.querySelector('#summary-payment').textContent = paymentTerms.value || 'Not set';
     }
 
     if (deliveryDate.value) {
@@ -356,6 +427,7 @@ const handleSavePurchase = async (isPublished = true) => {
     
     // Get form values
     const supplier = document.querySelector('#poSupplier').value;
+    const orderOwner = document.querySelector('#poOwner').value;
     const deliveryDate = document.querySelector('#poDeliveryDate').value;
     const paymentTerms = document.querySelector('#poPaymentTerms').value;
     const notes = document.querySelector('#poNotes').value.trim();
@@ -364,18 +436,20 @@ const handleSavePurchase = async (isPublished = true) => {
     const purchaseItems = [];
     let totalAmount = 0;
 
-    document.querySelectorAll('#line-items-body tr:not(#empty-row)').forEach(row => {
-        const productSelect = row.querySelector('.line-product');
-        const productId = productSelect.value;
-        const productName = productSelect.selectedOptions[0]?.text || '';
-        const quantity = parseFloat(row.querySelector('.line-quantity').value) || 0;
-        const unitPrice = parseFloat(row.querySelector('.line-price').value) || 0;
-        const totalPrice = quantity * unitPrice;
+    document.querySelectorAll('#line-items-body tr').forEach(row => {
+        if (row.id === 'empty-row') return;
+        const productId = row.dataset.productId;
+        const productName = row.dataset.productName || '';
+        const category = row.dataset.category || '';
+        const quantity = parseFloat(row.dataset.quantity) || 0;
+        const unitPrice = parseFloat(row.dataset.unitPrice) || 0;
+        const totalPrice = parseFloat(row.dataset.totalPrice) || 0;
 
         if (productId && quantity > 0 && unitPrice > 0) {
             purchaseItems.push({
                 product: productId,
                 name: productName,
+                category,
                 quantity,
                 unitPrice,
                 totalPrice
@@ -404,6 +478,7 @@ const handleSavePurchase = async (isPublished = true) => {
     try {
         const purchaseData = {
             supplier,
+            orderOwner,
             purchaseItems,
             estimatedTotal: totalAmount,
             expectedDeliveryDate: deliveryDate,
