@@ -687,14 +687,9 @@ export const getSummary = async()=>{
 // ============= PARTIES =============
 export const getParties = async () => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties`,
+        const response = await apiClient({
+            url: `/api/parties`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load parties');
@@ -708,14 +703,9 @@ export const getParties = async () => {
 
 export const getPartiesByType = async (type) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties/type/${type}`,
+        const response = await apiClient({
+            url: `/api/parties/type/${type}`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load parties');
@@ -729,14 +719,9 @@ export const getPartiesByType = async (type) => {
 
 export const getPartyStats = async () => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties/summary/stats`,
+        const response = await apiClient({
+            url: `/api/parties/summary/stats`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load party stats');
@@ -750,14 +735,9 @@ export const getPartyStats = async () => {
 
 export const getParty = async (id) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties/${id}`,
+        const response = await apiClient({
+            url: `/api/parties/${id}`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load party');
@@ -771,14 +751,9 @@ export const getParty = async (id) => {
 
 export const createParty = async (partyData) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties`,
+        const response = await apiClient({
+            url: `/api/parties`,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: partyData,
         });
         if (response.status < 200 || response.status >= 300) {
@@ -793,14 +768,9 @@ export const createParty = async (partyData) => {
 
 export const updateParty = async (id, partyData) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties/${id}`,
+        const response = await apiClient({
+            url: `/api/parties/${id}`,
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: partyData,
         });
         if (response.status < 200 || response.status >= 300) {
@@ -815,14 +785,9 @@ export const updateParty = async (id, partyData) => {
 
 export const deleteParty = async (id) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/parties/${id}`,
+        const response = await apiClient({
+            url: `/api/parties/${id}`,
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to delete party');

@@ -25,7 +25,7 @@ const AddParties = {
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
                 if (confirm('Discard changes and go back?')) {
-                    window.location.hash = '/#/parties';
+                    window.location.hash = '/parties';
                 }
             });
         }
@@ -138,7 +138,7 @@ const AddParties = {
                     <div class="add-party-action-row">
                       <button id="save-party-btn" class="btn-primary text-white">Save Party</button>
                       <button id="save-draft-btn" class="btn-outline-primary text-primary">Save Draft</button>
-                      <button id="cancel-party-btn" class="btn-outline-danger text-danger">Cancel</button>
+                      <button id="cancel-party-btn" class="btn-red text-white">Cancel</button>
                     </div>
                   </article>
 
@@ -240,7 +240,7 @@ const handleSaveParty = async (isPublished = true) => {
         
         // Redirect after 2 seconds
         setTimeout(() => {
-            window.location.hash = '/#/parties';
+            window.location.hash = '/parties';
         }, 2000);
 
     } catch (error) {

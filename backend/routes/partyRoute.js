@@ -50,6 +50,12 @@ PartyRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res) =
     });
 }));
 
+// Get parties for export
+PartyRoute.get('/export/ledger', isAuth, isAdmin, expressAsync(async(req, res) => {
+    const parties = await Party.find({}).select('name email phone type status currentBalance').populate('createdBy', 'email');
+    res.send(parties);
+}));
+
 // Get single party
 PartyRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
     const party = await Party.findById(req.params.id).populate('createdBy', '_id email');
@@ -75,7 +81,9 @@ PartyRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
         taxId: req.body.taxId,
         paymentTerms: req.body.paymentTerms,
         creditLimit: req.body.creditLimit || 0,
+        currentBalance: req.body.currentBalance || 0,
         notes: req.body.notes,
+        status: req.body.status || 'active',
         createdBy: req.user._id
     });
 
@@ -133,12 +141,6 @@ PartyRoute.delete('/:id', isAuth, isAdmin, expressAsync(async(req, res) => {
     } else {
         res.status(404).send({ message: 'Party Not Found' });
     }
-}));
-
-// Get parties for export
-PartyRoute.get('/export/ledger', isAuth, isAdmin, expressAsync(async(req, res) => {
-    const parties = await Party.find({}).select('name email phone type status currentBalance').populate('createdBy', 'email');
-    res.send(parties);
 }));
 
 module.exports = PartyRoute;

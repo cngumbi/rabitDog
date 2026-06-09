@@ -35,6 +35,7 @@ import ManageBatches from './components/mediacal/manageBatches';
 //parties
 import Parties from './components/partner/parties';
 import AddParties from './components/partner/addParties';
+import Party from './components/partner/party';
 //utils
 import { getUserInfo } from './localStorage';
 //Sales
@@ -100,6 +101,7 @@ const routes = {
     //parties
     '/parties': Parties,
     '/add-party': AddParties,
+    '/party/:id': Party,
     //purchases
     '/purchases': Purchases,
     '/create-po': CreatePO,
@@ -153,6 +155,7 @@ const router = async () => {
         '/manage-batches',
         '/parties',
         '/add-party',
+        '/party/:id',
         '/purchases',
         '/create-po',
         '/transfers',

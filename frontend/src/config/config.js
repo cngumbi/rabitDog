@@ -1,2 +1,2 @@
-export const apiURL = document.location.href.startsWith('http://localhost') ? 'http://localhost:5000' : '';
-//export const apiURL = process.env.NODE_ENV === "production" ? "https://api.yourdomain.com" : "http://127.0.0.1:5000";
+export const apiURL = document.location.href.startsWith('http://localhost') ? 'http://localhost:4000' : '';
+//export const apiURL = process.env.NODE_ENV === "production" ? "https://api.yourdomain.com" : "http://127.0.0.1:4000";
