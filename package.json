@@ -6,7 +6,9 @@
   "scripts": {
     "build_1": " babel backend -d dist && cd frontend && npm run build",
     "build": "npm install && node -e \"const fs = require('fs'); const path = 'dist'; if (fs.existsSync(path)) fs.rmSync(path, {recursive: true, force: true});\" && babel backend -d dist && cd frontend && npm install && npm run build",
+    "build:prod": "cd frontend && npm run build:prod",
     "start": "nodemon --watch backend --exec babel-node backend/server.js",
+    "start:heap": "node --max-old-space-size=4096 backend/server.js",
     "serve": "node dist/server.js",
     "qstart": "npm install && cd frontend && npm install",
     "dev": "gulp dev",

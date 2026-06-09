@@ -7,7 +7,7 @@ const Expense = require('../models/expenseModel');
 const ExpenseRoute = express.Router();
 
 // Get all expenses
-ExpenseRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
+ExpenseRoute.get('/', isAuth, expressAsync(async(req, res) => {
     const expenses = await Expense.find({})
         .populate('vendor', 'name email')
         .populate('createdBy', '_id email')
@@ -16,9 +16,9 @@ ExpenseRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
 }));
 
 // Get expense summary stats
-ExpenseRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res) => {
+ExpenseRoute.get('/summary/stats', isAuth, expressAsync(async(req, res) => {
     const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    
+    const totalExpenses = await Expense.countDocuments({});
     const vendorInvoices = await Expense.countDocuments({ status: 'pending' });
     const approvals = await Expense.countDocuments({ approvalStatus: 'pending' });
     const pendingBills = await Expense.countDocuments({ paymentStatus: { $in: ['unpaid', 'partial'] } });
@@ -54,9 +54,40 @@ ExpenseRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res)
         }
     ]);
 
+    const paidExpenses = await Expense.countDocuments({ paymentStatus: 'paid' });
+    const reconciledExpenses = await Expense.countDocuments({ status: { $in: ['approved', 'paid'] } });
+    const expenseCategories = await Expense.distinct('category');
+
+    const approvalTimeStats = await Expense.aggregate([
+        {
+            $match: {
+                status: 'approved'
+            }
+        },
+        {
+            $project: {
+                approvalHours: {
+                    $divide: [
+                        { $subtract: ['$updatedAt', '$createdAt'] },
+                        1000 * 60 * 60
+                    ]
+                }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                averageApprovalHours: { $avg: '$approvalHours' }
+            }
+        }
+    ]);
+
     const thisMonthAmount = monthlySpend.length > 0 ? monthlySpend[0].total : 0;
     const lastMonthAmount = lastMonthSpend.length > 0 ? lastMonthSpend[0].total : 0;
     const trend = lastMonthAmount !== 0 ? Math.round(((thisMonthAmount - lastMonthAmount) / lastMonthAmount) * 100) : 0;
+    const averageApproval = approvalTimeStats.length > 0 ? Math.round(approvalTimeStats[0].averageApprovalHours) : 0;
+    const cashPayments = totalExpenses > 0 ? Math.round((paidExpenses / totalExpenses) * 100) : 0;
+    const reconciled = totalExpenses > 0 ? Math.round((reconciledExpenses / totalExpenses) * 100) : 0;
 
     const recentSpend = await Expense.find({ status: 'paid' })
         .sort({ paidDate: -1 })
@@ -70,7 +101,11 @@ ExpenseRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res)
         pendingBills,
         monthlySpend: thisMonthAmount,
         trend,
-        recentSpend
+        recentSpend,
+        expenseCategories: expenseCategories.length,
+        cashPayments,
+        averageApproval,
+        reconciled
     });
 }));
 
@@ -88,7 +123,7 @@ ExpenseRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
 }));
 
 // Create expense
-ExpenseRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
+ExpenseRoute.post('/', isAuth, expressAsync(async(req, res) => {
     const expense = new Expense({
         category: req.body.category,
         description: req.body.description,
@@ -199,7 +234,7 @@ ExpenseRoute.post('/:id/pay', isAuth, isAdmin, expressAsync(async(req, res) => {
 }));
 
 // Export ledger
-ExpenseRoute.get('/export/ledger', isAuth, isAdmin, expressAsync(async(req, res) => {
+ExpenseRoute.get('/export/ledger', isAuth, expressAsync(async(req, res) => {
     const expenses = await Expense.find({})
         .select('expenseNumber category amount vendor status paymentStatus createdAt')
         .populate('vendor', 'name');

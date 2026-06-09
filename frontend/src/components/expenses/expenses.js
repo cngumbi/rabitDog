@@ -21,20 +21,26 @@ const Expenses = {
             }
 
             // Build expense table rows
-            const expenseRows = expenses.slice(0, 10).map((expense) => {
-                const statusBadge = expense.status === 'paid' ? 'badge-green' : 
-                                   expense.status === 'approved' ? 'badge-primary' :
-                                   expense.status === 'pending' ? 'badge-orange' :
+            const expenseRows = (expenses || []).slice(0, 10).map((expense) => {
+                const status = (expense.status || 'draft').toString();
+                const category = (expense.category || 'other').toString();
+                const statusBadge = status === 'paid' ? 'badge-green' : 
+                                   status === 'approved' ? 'badge-primary' :
+                                   status === 'pending' ? 'badge-orange' :
                                    'badge-gray';
                 const vendorName = expense.vendorName || expense.vendor?.name || 'Direct Expense';
+                const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
+                const displayStatus = status.charAt(0).toUpperCase() + status.slice(1);
+                const displayAmount = Number(expense.amount) || 0;
+                const displayDate = expense.invoiceDate ? new Date(expense.invoiceDate).toLocaleDateString() : 'N/A';
                 
                 return `
                     <tr>
                         <td>${vendorName}</td>
-                        <td>${expense.category.charAt(0).toUpperCase() + expense.category.slice(1)}</td>
-                        <td>Ksh ${(expense.amount || 0).toLocaleString()}</td>
-                        <td>${expense.invoiceDate ? new Date(expense.invoiceDate).toLocaleDateString() : 'N/A'}</td>
-                        <td><span class="${statusBadge} text-white">${expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}</span></td>
+                        <td>${displayCategory}</td>
+                        <td>Ksh ${displayAmount.toLocaleString()}</td>
+                        <td>${displayDate}</td>
+                        <td><span class="${statusBadge} text-white">${displayStatus}</span></td>
                     </tr>
                 `;
             }).join('');
@@ -53,7 +59,7 @@ const Expenses = {
                             <p>Track vendor spend, reconcile payments, and spot budget pressure across operations and procurement.</p>
                             <div class="dashboard-hero-actions">
                               <a class="btn-primary text-white" href="/#/record-expense">Record Expense</a>
-                              <a class="btn-outline-primary text-primary" href="/#/expenses/export">Export ledger</a>
+                              <a class="btn-secondary text-secondary" href="/#/expenses/export">Export ledger</a>
                             </div>
                           </div>
                           <div class="dashboard-hero-meta">
