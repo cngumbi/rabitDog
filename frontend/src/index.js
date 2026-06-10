@@ -1,5 +1,3 @@
-//the main js file index.js
-//import router engine
 //==========import styles===============
 import './style/css/index.min.css';
 import favicon from './assets/favicon.ico';
@@ -52,7 +50,6 @@ import RecordExpenses from './components/expenses/recordExpenses';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
-
 //==================ROUTE CONFIG ============
 /*
     we define routes in two formats
@@ -68,7 +65,6 @@ faviconImg.href = favicon;
             }
         }
 */
-
 const routes = {
     '/': SignIn,
     '/user-current': SignIn,
@@ -112,9 +108,8 @@ const routes = {
     '/expenses': Expenses,
     '/record-expense': RecordExpenses,
 };
-
+//==================ROUTER FUNCTION===========
 const router = async () => {
-
     //Parse URL -> { resourece: 'chicken', verb: 'breeds', id: null}
     const request = ParseRequestUrl();
     //get user info from local storage
@@ -127,11 +122,6 @@ const router = async () => {
         '/forget',
         '/user-current',
     ];
-    //Public Pages
-    //const publicPages = [
-    //    '/forget',
-    //    '/verify-email',
-    //];
     //Protected Pages
     const protectedPages = [
         '/settings',
@@ -162,16 +152,11 @@ const router = async () => {
         '/new-transfer',
         '/expenses',
         '/record-expense',
-        
-
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';
     const currentPath = request.resource ? `/${request.resource}` : '/';
-    const lookupPath = request.resource
-        ? `/${request.resource}${request.id ? '/:id' : ''}${request.verb ? `/${request.verb}` : ''}`
-        : '/';
-
+    const lookupPath = request.resource ? `/${request.resource}${request.id ? '/:id' : ''}${request.verb ? `/${request.verb}` : ''}` : '/';
     const findRouteKey = (path) => {
         if (routes[path]) return path;
         const pathSegments = path.split('/').filter(Boolean);
@@ -183,9 +168,8 @@ const router = async () => {
             );
         });
     };
-
+    //find the matched route key for the current path, lookup path, or hash path
     const matchedRoute = findRouteKey(hashPath) || findRouteKey(lookupPath) || findRouteKey(currentPath) || currentPath;
-
     //redirect to dashboard if the user is trying to access an auth page while being logged in 
     if(userInfo.email && userInfo.verified && authPages.includes(currentPath)){
         document.location.hash = '/dashboard';
@@ -216,18 +200,11 @@ const router = async () => {
         document.location.hash = '/';
         return;
     }
-    //allow access to public pages without authentication
-    //if(publicPages.includes(currentPath)){
-    //    //do nothing and allow access
-    //}
     // Build lookup path for nested routes, e.g. /product/:id/edit
     const sessions = routes[matchedRoute] || routes[currentPath];
-
-    
-
+    // If no route matches, use Error404
     let Page = null;
     let childSessions = null;
-
     //=====================Sessions Matching====================
     if(sessions && sessions.component){
         //nested Sessions
@@ -244,14 +221,8 @@ const router = async () => {
     const header = document.getElementById('header-content');
     header.innerHTML = await Header.render();
     if (Header.vignette) await Header.vignette();
-
     //===================Render Main Content=====================
     //the main content
-    /* old style
-    const main = document.getElementById('main-content');
-    main.innerHTML = await sessions.render();
-    if(sessions.vignette()) await sessions.vignette();
-    */
    const main = document.getElementById('main-content');
    if(childSessions){
     //pass nested sessions + request into layout page
@@ -263,9 +234,6 @@ const router = async () => {
     main.innerHTML = await Page.render();
     if (Page.vignette) await Page.vignette();
    }
-
-
-
 };
 window.addEventListener('load', router);
 window.addEventListener('hashchange', router);
