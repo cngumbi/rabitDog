@@ -1,5 +1,3 @@
-//import { getCartItems } from "./localStorage";
-
 import { getUserInfo } from "./localStorage";
 
 
