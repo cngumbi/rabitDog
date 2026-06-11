@@ -58,11 +58,11 @@ export const isValidSku = (sku) => {
     return /^[A-Za-z0-9_-]+$/.test(sku);
 };
 //redirect function
-export const veer = ()=>{
-    //if(getCartItems().lenght !== 0){
-    //    document.location.hash = '/dashboard';
-    //}else{
-    //    document.location.hash = '/'
-    //}
-    //const user = getUserInfo();
-}
+//export const veer = ()=>{
+//    if(getCartItems().lenght !== 0){
+//        document.location.hash = '/dashboard';
+//    }else{
+//        document.location.hash = '/'
+//    }
+//    const user = getUserInfo();
+//}
