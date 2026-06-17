@@ -1,5 +1,5 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
-import { getPartyStats, getParties } from '../../connection/api';
+import { getPartyStats, getParties, updateParty } from '../../connection/api';
 
 const Parties = {
     vignette: ()=> {
@@ -196,11 +196,103 @@ const Parties = {
             });
         };
 
+        // Handle approve button clicks
+        const handleApproveSupplier = async (supplierId) => {
+            try {
+                const result = await updateParty(supplierId, { status: 'active' });
+                if (result.error) {
+                    alert('Failed to approve supplier: ' + result.error);
+                    return;
+                }
+                // Reload parties data
+                const parties = await getParties();
+                window.partiesData = parties;
+                updatePendingReviews();
+                filterAndSearch();
+            } catch (error) {
+                console.error('Error approving supplier:', error);
+                alert('Failed to approve supplier');
+            }
+        };
+
+        // Handle reject button clicks
+        const handleRejectSupplier = async (supplierId) => {
+            try {
+                const result = await updateParty(supplierId, { status: 'rejected' });
+                if (result.error) {
+                    alert('Failed to reject supplier: ' + result.error);
+                    return;
+                }
+                // Reload parties data
+                const parties = await getParties();
+                window.partiesData = parties;
+                updatePendingReviews();
+                filterAndSearch();
+            } catch (error) {
+                console.error('Error rejecting supplier:', error);
+                alert('Failed to reject supplier');
+            }
+        };
+
+        // Update pending reviews section
+        const updatePendingReviews = () => {
+            const pendingReviewsContainer = document.querySelector('#pending-reviews-list');
+            if (!pendingReviewsContainer) return;
+
+            const pendingSuppliers = (window.partiesData || []).filter(p => p.status === 'pending' && (p.type === 'supplier' || p.type === 'both'));
+            
+            if (pendingSuppliers.length === 0) {
+                pendingReviewsContainer.innerHTML = '<div class="no-pending-message">No pending supplier reviews</div>';
+                return;
+            }
+
+            const pendingHTML = pendingSuppliers.map(supplier => {
+                const initials = supplier.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                return `
+                    <div class="pending-supplier-card">
+                        <div class="pending-supplier-header">
+                            <div class="pending-supplier-avatar">${initials}</div>
+                            <div class="pending-supplier-info">
+                                <div class="pending-supplier-name">${supplier.name}</div>
+                                <div class="pending-supplier-business">${supplier.businessName || 'No business name'}</div>
+                            </div>
+                        </div>
+                        <div class="pending-supplier-details">
+                            <span class="detail-item"><strong>Phone:</strong> ${supplier.phone || '-'}</span>
+                            <span class="detail-item"><strong>Email:</strong> ${supplier.email || '-'}</span>
+                        </div>
+                        <div class="pending-supplier-actions">
+                            <button class="btn-approve" data-supplier-id="${supplier._id}">Approve</button>
+                            <button class="btn-reject" data-supplier-id="${supplier._id}">Reject</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            pendingReviewsContainer.innerHTML = pendingHTML;
+
+            // Attach event listeners to approve/reject buttons
+            pendingReviewsContainer.querySelectorAll('.btn-approve').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const supplierId = btn.dataset.supplierId;
+                    handleApproveSupplier(supplierId);
+                });
+            });
+
+            pendingReviewsContainer.querySelectorAll('.btn-reject').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const supplierId = btn.dataset.supplierId;
+                    handleRejectSupplier(supplierId);
+                });
+            });
+        };
+
         // Wait for parties table to be rendered
         setTimeout(() => {
             setupPagination();
             updateTable();
             updateChannelStats();
+            updatePendingReviews();
         }, 100);
     },
     render: async ()=>{
@@ -294,6 +386,9 @@ const Parties = {
             const partiesWithContact = parties.filter(p => p.phone || p.email).length;
             const contactPercentage = parties.length > 0 ? Math.round((partiesWithContact / parties.length) * 100) : 0;
 
+            // Get pending suppliers for review
+            const pendingSuppliers = parties.filter(p => p.status === 'pending' && (p.type === 'supplier' || p.type === 'both'));
+
             return `
                 <div class="wrap">
                     ${DashboardMenu.render({ selected: "parties" })}
@@ -355,6 +450,20 @@ const Parties = {
                             </div>
                           </article>
                         </section>
+
+                        ${pendingSuppliers.length > 0 ? `
+                        <section class="pending-reviews-section">
+                          <article class="panel">
+                            <div class="pending-reviews-header">
+                              <h2 class="pending-reviews-title">⏳ Pending Supplier Reviews</h2>
+                              <span class="pending-reviews-badge">${pendingSuppliers.length} awaiting approval</span>
+                            </div>
+                            <div class="pending-reviews-container" id="pending-reviews-list">
+                              <!-- Pending suppliers will be rendered here -->
+                            </div>
+                          </article>
+                        </section>
+                        ` : ''}
 
                         <section class="parties-layout">
                           <article class="panel parties-main-panel">

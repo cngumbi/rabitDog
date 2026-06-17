@@ -412,6 +412,173 @@
     }
 }
 
+// Pending reviews section
+.pending-reviews-section {
+    margin-bottom: 2rem;
+
+    .panel {
+        padding: 2rem;
+        background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+        border: 2px solid #ffd700;
+    }
+}
+
+.pending-reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid mix(black, white, 90%);
+}
+
+.pending-reviews-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+}
+
+.pending-reviews-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background-color: #ff6b6b;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.pending-reviews-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.pending-supplier-card {
+    background: white;
+    border: 1px solid mix(black, white, 85%);
+    border-left: 4px solid #ff6b6b;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+        transform: translateY(-2px);
+    }
+}
+
+.pending-supplier-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.pending-supplier-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.pending-supplier-info {
+    flex: 1;
+}
+
+.pending-supplier-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #000;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.pending-supplier-business {
+    font-size: 0.85rem;
+    color: mix(black, white, 50%);
+    line-height: 1.2;
+}
+
+.pending-supplier-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: mix(white, #ff6b6b, 97%);
+    border-radius: 6px;
+}
+
+.detail-item {
+    font-size: 0.85rem;
+    color: #333;
+
+    strong {
+        color: #000;
+        font-weight: 600;
+    }
+}
+
+.pending-supplier-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-approve,
+.btn-reject {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.btn-approve {
+    background-color: #4caf50;
+    color: white;
+
+    &:hover {
+        background-color: #45a049;
+    }
+}
+
+.btn-reject {
+    background-color: #f44336;
+    color: white;
+
+    &:hover {
+        background-color: #da190b;
+    }
+}
+
+.no-pending-message {
+    text-align: center;
+    padding: 2rem;
+    color: mix(black, white, 50%);
+    font-size: 0.95rem;
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
     .parties-directory-grid {
@@ -444,6 +611,20 @@
             padding: 0.75rem;
             font-size: 0.85rem;
         }
+    }
+
+    .pending-reviews-container {
+        grid-template-columns: 1fr;
+    }
+
+    .pending-reviews-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .pending-supplier-actions {
+        flex-direction: column;
     }
 }
 

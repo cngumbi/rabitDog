@@ -9762,6 +9762,202 @@ body.sidebar-open .sidebar {
           box-shadow: 0 2px 8px rgba(50, 109, 238, 0.3);
 }
 
+.pending-reviews-section {
+  margin-bottom: 2rem;
+}
+.pending-reviews-section .panel {
+  padding: 2rem;
+  background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+  border: 2px solid #ffd700;
+}
+
+.pending-reviews-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(25.5, 25.5, 25.5);
+}
+
+.pending-reviews-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+}
+
+.pending-reviews-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background-color: #ff6b6b;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pending-reviews-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.pending-supplier-card {
+  background: white;
+  border: 1px solid rgb(38.25, 38.25, 38.25);
+  border-left: 4px solid #ff6b6b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.pending-supplier-card:hover {
+  -webkit-box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+          box-shadow: 0 4px 12px rgba(255, 107, 107, 0.15);
+  -webkit-transform: translateY(-2px);
+          transform: translateY(-2px);
+}
+
+.pending-supplier-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.pending-supplier-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b6b, #ff8787);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: white;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.pending-supplier-info {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.pending-supplier-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.pending-supplier-business {
+  font-size: 0.85rem;
+  color: rgb(127.5, 127.5, 127.5);
+  line-height: 1.2;
+}
+
+.pending-supplier-details {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: rgb(255, 250.56, 250.56);
+  border-radius: 6px;
+}
+
+.detail-item {
+  font-size: 0.85rem;
+  color: #333;
+}
+.detail-item strong {
+  color: #000;
+  font-weight: 600;
+}
+
+.pending-supplier-actions {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-approve,
+.btn-reject {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.btn-approve:hover,
+.btn-reject:hover {
+  -webkit-transform: translateY(-2px);
+          transform: translateY(-2px);
+  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.btn-approve:active,
+.btn-reject:active {
+  -webkit-transform: translateY(0);
+          transform: translateY(0);
+}
+
+.btn-approve {
+  background-color: #4caf50;
+  color: white;
+}
+.btn-approve:hover {
+  background-color: #45a049;
+}
+
+.btn-reject {
+  background-color: #f44336;
+  color: white;
+}
+.btn-reject:hover {
+  background-color: #da190b;
+}
+
+.no-pending-message {
+  text-align: center;
+  padding: 2rem;
+  color: rgb(127.5, 127.5, 127.5);
+  font-size: 0.95rem;
+}
+
 @media (max-width: 768px) {
   .parties-directory-grid {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -9791,5 +9987,24 @@ body.sidebar-open .sidebar {
   .parties-table th, .parties-table td {
     padding: 0.75rem;
     font-size: 0.85rem;
+  }
+  .pending-reviews-container {
+    grid-template-columns: 1fr;
+  }
+  .pending-reviews-header {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    gap: 0.5rem;
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
+  }
+  .pending-supplier-actions {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
   }
 }
