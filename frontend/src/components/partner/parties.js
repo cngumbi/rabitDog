@@ -63,6 +63,9 @@ const Parties = {
             const typeValue = typeFilter?.value || 'all';
 
             filteredData = window.partiesData.filter(party => {
+                // Don't show suspended (rejected) parties in the main table
+                if (party.status === 'suspended') return false;
+
                 const matchesSearch = !searchTerm || 
                     party.name.toLowerCase().includes(searchTerm) ||
                     party.phone?.toLowerCase().includes(searchTerm) ||
@@ -218,7 +221,7 @@ const Parties = {
         // Handle reject button clicks
         const handleRejectSupplier = async (supplierId) => {
             try {
-                const result = await updateParty(supplierId, { status: 'rejected' });
+                const result = await updateParty(supplierId, { status: 'suspended' });
                 if (result.error) {
                     alert('Failed to reject supplier: ' + result.error);
                     return;
@@ -239,10 +242,10 @@ const Parties = {
             const pendingReviewsContainer = document.querySelector('#pending-reviews-list');
             if (!pendingReviewsContainer) return;
 
-            const pendingSuppliers = (window.partiesData || []).filter(p => p.status === 'pending' && (p.type === 'supplier' || p.type === 'both'));
+            const pendingSuppliers = (window.partiesData || []).filter(p => p.status === 'inactive' && (p.type === 'supplier' || p.type === 'both'));
             
             if (pendingSuppliers.length === 0) {
-                pendingReviewsContainer.innerHTML = '<div class="no-pending-message">No pending supplier reviews</div>';
+                pendingReviewsContainer.innerHTML = '<div class="no-pending-message">No pending supplier reviews at this time</div>';
                 return;
             }
 
@@ -316,8 +319,11 @@ const Parties = {
             // Store parties data in window for pagination
             window.partiesData = parties;
 
+            // Filter out suspended parties for display
+            const activeParties = parties.filter(p => p.status !== 'suspended');
+
             // Sort parties by creation date (most recent first) and get top 2
-            const sortedByDate = [...parties].sort((a, b) => {
+            const sortedByDate = [...activeParties].sort((a, b) => {
                 const dateA = new Date(a.createdAt || 0);
                 const dateB = new Date(b.createdAt || 0);
                 return dateB - dateA;
@@ -354,14 +360,14 @@ const Parties = {
 
             // Build pagination controls
             const itemsPerPage = 5;
-            const totalPages = Math.ceil(parties.length / itemsPerPage);
+            const totalPages = Math.ceil(activeParties.length / itemsPerPage);
             const pageButtons = Array.from({ length: totalPages }, (_, i) => {
                 const pageNum = i + 1;
                 return `<button class="pagination-page-btn ${pageNum === 1 ? 'active' : ''}" data-page="${pageNum}">${pageNum}</button>`;
             }).join('');
 
             // Build table rows for first page
-            const firstPageData = parties.slice(0, itemsPerPage);
+            const firstPageData = activeParties.slice(0, itemsPerPage);
             const tableRows = firstPageData.map(party => {
                 const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier';
                 const statusClass = party.status === 'active' ? 'badge-green' : party.status === 'inactive' ? 'badge-yellow' : 'badge-red';
@@ -379,15 +385,15 @@ const Parties = {
                 `;
             }).join('');
 
-            const buyersCount = parties.filter(p => p.type === 'buyer' || p.type === 'both').length;
-            const suppliersCount = parties.filter(p => p.type === 'supplier' || p.type === 'both').length;
+            const buyersCount = activeParties.filter(p => p.type === 'buyer' || p.type === 'both').length;
+            const suppliersCount = activeParties.filter(p => p.type === 'supplier' || p.type === 'both').length;
 
             // Calculate contacts reached percentage (parties with phone or email)
-            const partiesWithContact = parties.filter(p => p.phone || p.email).length;
-            const contactPercentage = parties.length > 0 ? Math.round((partiesWithContact / parties.length) * 100) : 0;
+            const partiesWithContact = activeParties.filter(p => p.phone || p.email).length;
+            const contactPercentage = activeParties.length > 0 ? Math.round((partiesWithContact / activeParties.length) * 100) : 0;
 
-            // Get pending suppliers for review
-            const pendingSuppliers = parties.filter(p => p.status === 'pending' && (p.type === 'supplier' || p.type === 'both'));
+            // Get pending suppliers for review (status is 'inactive' and type includes supplier)
+            const pendingSuppliers = parties.filter(p => p.status === 'inactive' && (p.type === 'supplier' || p.type === 'both'));
 
             return `
                 <div class="wrap">
@@ -421,7 +427,7 @@ const Parties = {
                             <div class="icon">👥</div>
                             <div>
                               <div class="metric-title">Total parties</div>
-                              <div class="metric-value">${parties.length}</div>
+                              <div class="metric-value">${activeParties.length}</div>
                               <div class="metric-desc metric-desc--info">Across buyers and suppliers</div>
                             </div>
                           </article>
@@ -429,7 +435,7 @@ const Parties = {
                             <div class="icon">⚡</div>
                             <div>
                               <div class="metric-title">Active parties</div>
-                              <div class="metric-value">${parties.filter(p => p.status === 'active').length}</div>
+                              <div class="metric-value">${activeParties.filter(p => p.status === 'active').length}</div>
                               <div class="metric-desc metric-desc--success">High-priority relationships</div>
                             </div>
                           </article>
@@ -445,7 +451,7 @@ const Parties = {
                             <div class="icon">📊</div>
                             <div>
                               <div class="metric-title">Profile Readiness</div>
-                              <div class="metric-value">${Math.round((parties.reduce((sum, p) => sum + (p.profileReadiness || 0), 0) / (parties.length || 1)) * 10) / 10}%</div>
+                              <div class="metric-value">${Math.round((activeParties.reduce((sum, p) => sum + (p.profileReadiness || 0), 0) / (activeParties.length || 1)) * 10) / 10}%</div>
                               <div class="metric-desc metric-desc--info">Average completion</div>
                             </div>
                           </article>
@@ -484,11 +490,11 @@ const Parties = {
                             <div class="party-summary-panel">
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Total parties</div>
-                                <div class="party-summary-value" data-stat="total-parties">${parties.length}</div>
+                                <div class="party-summary-value" data-stat="total-parties">${activeParties.length}</div>
                               </div>
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Active contracts</div>
-                                <div class="party-summary-value" data-stat="active-contracts">${parties.filter(p => p.status === 'active').length}</div>
+                                <div class="party-summary-value" data-stat="active-contracts">${activeParties.filter(p => p.status === 'active').length}</div>
                               </div>
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Outstanding balance</div>

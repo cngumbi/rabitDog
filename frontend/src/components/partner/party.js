@@ -313,7 +313,7 @@ const handleDeleteParty = async (partyId) => {
         showAlert(alertContainer, 'success', 'Party deleted successfully! Redirecting...');
         
         setTimeout(() => {
-            window.location.hash = '/#/parties';
+            window.location.hash = '/parties';
         }, 2000);
 
     } catch (error) {

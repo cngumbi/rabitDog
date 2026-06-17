@@ -95,6 +95,14 @@ const AddParties = {
                       </div>
                     </div>
 
+                    <div class="add-party-info-box">
+                      <span class="add-party-info-icon">ℹ️</span>
+                      <div>
+                        <div class="add-party-info-title">Supplier Approval Workflow</div>
+                        <p class="text-muted">Buyers are saved directly and become active immediately. Suppliers will appear in the <strong>Pending Supplier Reviews</strong> section on the Parties page for admin approval before they become active in the system.</p>
+                      </div>
+                    </div>
+
                     <div class="add-party-section-header mt-3">
                       <div>
                         <div class="add-party-section-title">Business details</div>
@@ -170,7 +178,7 @@ const AddParties = {
 
                     <div class="add-party-helper-card">
                       <div class="add-party-helper-title">Tip</div>
-                      <p class="text-muted">New parties appear in the directory immediately after saving, and their balance can be managed from the parties dashboard.</p>
+                      <p class="text-muted">Buyers are automatically activated and available immediately. Suppliers require admin approval and will appear in the pending reviews section until approved or rejected.</p>
                     </div>
                   </aside>
                 </section>
@@ -223,7 +231,11 @@ const handleSaveParty = async (isPublished = true) => {
             paymentTerms: partyPaymentTerms || undefined,
             notes: partyNotes || undefined,
             currentBalance: partyOpeningBalance ? parseFloat(partyOpeningBalance) : 0,
-            status: isPublished ? 'active' : 'inactive'
+            // Buyers are saved directly as active
+            // Suppliers and Buyer & Supplier require admin approval - set to inactive
+            status: (partyType === 'supplier' || partyType === 'both') ? 'inactive' : 'active',
+            // Mark if this is a supplier that needs explicit review
+            requiresApproval: partyType === 'supplier' || partyType === 'both'
         };
 
         const result = await createParty(partyData);
@@ -236,7 +248,14 @@ const handleSaveParty = async (isPublished = true) => {
         }
 
         // Success
-        showAlert(alertContainer, 'success', 'Party created successfully! Redirecting...');
+        const successMessage = (partyType === 'supplier' || partyType === 'both')
+            ? (isPublished 
+                ? 'Supplier added successfully! It will appear in pending reviews for approval.'
+                : 'Supplier draft saved successfully! An admin will review and approve it.')
+            : (isPublished
+                ? 'Buyer added successfully and is now active!'
+                : 'Buyer saved successfully and is now active!');
+        showAlert(alertContainer, 'success', successMessage);
         
         // Redirect after 2 seconds
         setTimeout(() => {
