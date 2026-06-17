@@ -799,6 +799,22 @@ export const deleteParty = async (id) => {
     }
 };
 
+export const getPartySummaryStats = async () => {
+    try {
+        const response = await apiClient({
+            url: `/api/parties/summary/stats`,
+            method: 'GET',
+        });
+        if (response.status < 200 || response.status >= 300) {
+            throw new Error(response.data.message || 'Failed to fetch party stats');
+        }
+        return response.data;
+    } catch (err) {
+        console.log(err);
+        return { error: err.response ? err.response.data.message : err.message };
+    }
+};
+
 // ============= PURCHASES =============
 export const getPurchases = async () => {
     try {

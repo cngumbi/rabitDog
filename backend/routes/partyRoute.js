@@ -6,6 +6,28 @@ const Party = require('../models/partyModel');
 
 const PartyRoute = express.Router();
 
+// Calculate profile readiness based on completed fields
+const calculateProfileReadiness = (partyData) => {
+    let completedFields = 0;
+    const totalFields = 8; // Total number of tracked fields
+    
+    // Required identity fields
+    if (partyData.name && partyData.name.trim()) completedFields++;
+    if (partyData.type) completedFields++;
+    if (partyData.phone && partyData.phone.trim()) completedFields++;
+    if (partyData.email && partyData.email.trim()) completedFields++;
+    
+    // Business profile fields
+    if (partyData.address && partyData.address.trim()) completedFields++;
+    if (partyData.paymentTerms) completedFields++;
+    
+    // Optional but valuable fields
+    if (partyData.notes && partyData.notes.trim()) completedFields++;
+    if (partyData.contactPerson && partyData.contactPerson.trim()) completedFields++;
+    
+    return Math.round((completedFields / totalFields) * 100);
+};
+
 // Get all parties
 PartyRoute.get('/', isAuth, isAdmin, expressAsync(async(req, res) => {
     const parties = await Party.find({}).populate('createdBy', '_id email');
@@ -84,6 +106,7 @@ PartyRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
         currentBalance: req.body.currentBalance || 0,
         notes: req.body.notes,
         status: req.body.status || 'active',
+        profileReadiness: calculateProfileReadiness(req.body),
         createdBy: req.user._id
     });
 
@@ -117,8 +140,10 @@ PartyRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res) => {
         party.creditLimit = req.body.creditLimit !== undefined ? req.body.creditLimit : party.creditLimit;
         party.currentBalance = req.body.currentBalance !== undefined ? req.body.currentBalance : party.currentBalance;
         party.status = req.body.status || party.status;
-        party.profileReadiness = req.body.profileReadiness !== undefined ? req.body.profileReadiness : party.profileReadiness;
         party.notes = req.body.notes || party.notes;
+        
+        // Recalculate profileReadiness based on updated data
+        party.profileReadiness = calculateProfileReadiness(party);
 
         const updatedParty = await party.save();
         await logActivity(req.user._id, 'PARTY_UPDATED', `Updated party ${updatedParty.name}`);

@@ -1,8 +1,91 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
-import { createParty } from '../../connection/api';
+import { createParty, getPartySummaryStats } from '../../connection/api';
+
+// Calculate profile readiness based on completed fields
+const calculateProfileReadiness = () => {
+    const partyName = document.querySelector('#partyName')?.value.trim() || '';
+    const partyType = document.querySelector('#partyType')?.value || '';
+    const partyPhone = document.querySelector('#partyPhone')?.value.trim() || '';
+    const partyEmail = document.querySelector('#partyEmail')?.value.trim() || '';
+    const partyAddress = document.querySelector('#partyAddress')?.value.trim() || '';
+    const partyPaymentTerms = document.querySelector('#partyPaymentTerms')?.value || '';
+    const partyNotes = document.querySelector('#partyNotes')?.value.trim() || '';
+
+    let completedFields = 0;
+    const totalFields = 8;
+    
+    if (partyName) completedFields++;
+    if (partyType) completedFields++;
+    if (partyPhone) completedFields++;
+    if (partyEmail) completedFields++;
+    if (partyAddress) completedFields++;
+    if (partyPaymentTerms) completedFields++;
+    if (partyNotes) completedFields++;
+    // 8th field is contact person (optional, counted if name exists)
+    if (partyName) completedFields++;
+
+    return Math.round((completedFields / totalFields) * 100);
+};
+
+// Update the submission checklist status
+const updateChecklistStatus = () => {
+    const partyName = document.querySelector('#partyName')?.value.trim() || '';
+    const partyType = document.querySelector('#partyType')?.value || '';
+    const partyPhone = document.querySelector('#partyPhone')?.value.trim() || '';
+    const partyEmail = document.querySelector('#partyEmail')?.value.trim() || '';
+    const partyAddress = document.querySelector('#partyAddress')?.value.trim() || '';
+    const partyPaymentTerms = document.querySelector('#partyPaymentTerms')?.value || '';
+    const partyNotes = document.querySelector('#partyNotes')?.value.trim() || '';
+
+    // Party identity: name, type, phone, email
+    const identityComplete = partyName && partyType && partyPhone && partyEmail;
+    
+    // Business profile: address and payment terms
+    const profileComplete = partyAddress && partyPaymentTerms;
+    
+    // Relationship notes: any notes
+    const notesComplete = partyNotes.length > 0;
+
+    // Update checklist items
+    updateChecklistItem(0, identityComplete);
+    updateChecklistItem(1, profileComplete);
+    updateChecklistItem(2, notesComplete);
+
+    // Update profile readiness display
+    updateProfileReadinessDisplay();
+};
+
+// Update individual checklist item
+const updateChecklistItem = (index, isComplete) => {
+    const items = document.querySelectorAll('.add-party-check-item');
+    if (items[index]) {
+        const dot = items[index].querySelector('.add-party-check-dot');
+        if (isComplete) {
+            dot.textContent = '✓';
+            dot.style.color = '#10b981';
+            items[index].style.opacity = '1';
+        } else {
+            dot.textContent = '○';
+            dot.style.color = '#d1d5db';
+            items[index].style.opacity = '0.6';
+        }
+    }
+};
+
+// Update profile readiness display
+const updateProfileReadinessDisplay = () => {
+    const readiness = calculateProfileReadiness();
+    const readinessValue = document.querySelector('[data-readiness-value]');
+    if (readinessValue) {
+        readinessValue.textContent = readiness + '%';
+    }
+};
 
 const AddParties = {
     vignette: async ()=> {
+        // Load stats
+        await loadStats();
+
         // Handle form submission
         const saveBtn = document.querySelector('#save-party-btn');
         const saveDraftBtn = document.querySelector('#save-draft-btn');
@@ -29,6 +112,28 @@ const AddParties = {
                 }
             });
         }
+
+        // Add listeners to form inputs for real-time checklist and readiness updates
+        const formInputs = [
+            '#partyName',
+            '#partyType',
+            '#partyPhone',
+            '#partyEmail',
+            '#partyAddress',
+            '#partyPaymentTerms',
+            '#partyNotes'
+        ];
+
+        formInputs.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.addEventListener('input', updateChecklistStatus);
+                element.addEventListener('change', updateChecklistStatus);
+            }
+        });
+
+        // Initial checklist update
+        updateChecklistStatus();
     },
     render: ()=>{
        return `
@@ -47,12 +152,12 @@ const AddParties = {
                   <div class="dashboard-hero-meta">
                     <div class="dashboard-mini-stat">
                       <span class="dashboard-mini-stat-label">New entries</span>
-                      <span class="dashboard-mini-stat-value">12</span>
+                      <span class="dashboard-mini-stat-value" data-new-entries-value>--</span>
                       <span class="dashboard-mini-stat-trend">This month</span>
                     </div>
                     <div class="dashboard-mini-stat">
                       <span class="dashboard-mini-stat-label">Profile readiness</span>
-                      <span class="dashboard-mini-stat-value">96%</span>
+                      <span class="dashboard-mini-stat-value" data-readiness-value>0%</span>
                       <span class="dashboard-mini-stat-trend">Complete fields</span>
                     </div>
                   </div>
@@ -153,22 +258,22 @@ const AddParties = {
                   <aside class="panel add-party-side-panel">
                     <div class="card-title">Submission checklist</div>
                     <div class="add-party-checklist">
-                      <div class="add-party-check-item">
-                        <span class="add-party-check-dot">✓</span>
+                      <div class="add-party-check-item" style="opacity: 0.6;">
+                        <span class="add-party-check-dot" style="color: #d1d5db;">○</span>
                         <div>
                           <div class="add-party-check-title">Party identity</div>
                           <div class="text-muted">Name, type, and contact details entered</div>
                         </div>
                       </div>
-                      <div class="add-party-check-item">
-                        <span class="add-party-check-dot">✓</span>
+                      <div class="add-party-check-item" style="opacity: 0.6;">
+                        <span class="add-party-check-dot" style="color: #d1d5db;">○</span>
                         <div>
                           <div class="add-party-check-title">Business profile</div>
                           <div class="text-muted">Address and preferred payment terms assigned</div>
                         </div>
                       </div>
-                      <div class="add-party-check-item">
-                        <span class="add-party-check-dot">✓</span>
+                      <div class="add-party-check-item" style="opacity: 0.6;">
+                        <span class="add-party-check-dot" style="color: #d1d5db;">○</span>
                         <div>
                           <div class="add-party-check-title">Relationship notes</div>
                           <div class="text-muted">Any contract or follow-up notes added</div>
@@ -186,6 +291,21 @@ const AddParties = {
             </div>
         </div>
         `
+    }
+};
+
+// Load statistics
+const loadStats = async () => {
+    try {
+        const stats = await getPartySummaryStats();
+        if (stats && !stats.error) {
+            const newEntriesDisplay = document.querySelector('[data-new-entries-value]');
+            if (newEntriesDisplay) {
+                newEntriesDisplay.textContent = stats.newThisMonth;
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load party stats:', error);
     }
 };
 

@@ -3,6 +3,28 @@ import ParseRequestUrl from '../../config/parseUrl';
 import { getParty, updateParty, deleteParty } from '../../connection/api';
 import { showLoading, hideLoading } from '../../utils';
 
+// Calculate profile readiness based on completed fields
+const calculateProfileReadiness = (partyData) => {
+    let completedFields = 0;
+    const totalFields = 8;
+    
+    // Required identity fields
+    if (partyData.name && partyData.name.trim()) completedFields++;
+    if (partyData.type) completedFields++;
+    if (partyData.phone && partyData.phone.trim()) completedFields++;
+    if (partyData.email && partyData.email.trim()) completedFields++;
+    
+    // Business profile fields
+    if (partyData.address && partyData.address.trim()) completedFields++;
+    if (partyData.paymentTerms && partyData.paymentTerms.trim()) completedFields++;
+    
+    // Optional but valuable fields
+    if (partyData.notes && partyData.notes.trim()) completedFields++;
+    if (partyData.contactPerson && partyData.contactPerson.trim()) completedFields++;
+    
+    return Math.round((completedFields / totalFields) * 100);
+};
+
 const Party = {
     vignette: async () => {
         const request = ParseRequestUrl();
@@ -12,7 +34,7 @@ const Party = {
         const editBtn = document.querySelector('#edit-party-btn');
         if (editBtn) {
             editBtn.addEventListener('click', () => {
-                toggleEditMode();
+                toggleEditMode(partyId);
             });
         }
 
@@ -28,7 +50,7 @@ const Party = {
         const cancelBtn = document.querySelector('#cancel-party-btn');
         if (cancelBtn) {
             cancelBtn.addEventListener('click', () => {
-                toggleEditMode();
+                toggleEditMode(partyId);
             });
         }
 
@@ -39,6 +61,15 @@ const Party = {
                 handleDeleteParty(partyId);
             });
         }
+
+        // Add listeners for profile readiness updates during edit
+        const formInputs = ['#partyEmail', '#partyPhone', '#partyAddress', '#partyContactPerson', '#partyPaymentTerms', '#partyNotes'];
+        formInputs.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.addEventListener('input', updateProfileReadinessDisplay);
+            }
+        });
     },
 
     render: async () => {
@@ -137,15 +168,19 @@ const Party = {
                                     <div class="party-detail-grid">
                                         <div>
                                             <label class="form-label">Email</label>
-                                            <input id="partyEmail" class="form-control" value="${party.email}" readonly>
+                                            <input id="partyEmail" class="form-control" value="${party.email}" readonly data-editable="true">
                                         </div>
                                         <div>
                                             <label class="form-label">Phone</label>
-                                            <input id="partyPhone" class="form-control" value="${party.phone}" readonly>
+                                            <input id="partyPhone" class="form-control" value="${party.phone}" readonly data-editable="true">
                                         </div>
                                         <div class="span-2">
                                             <label class="form-label">Address</label>
-                                            <input id="partyAddress" class="form-control" value="${party.address || ''}" readonly>
+                                            <input id="partyAddress" class="form-control" value="${party.address || ''}" readonly data-editable="true">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Contact Person</label>
+                                            <input id="partyContactPerson" class="form-control" value="${party.contactPerson || ''}" readonly data-editable="true">
                                         </div>
                                     </div>
                                 </div>
@@ -161,7 +196,7 @@ const Party = {
                                         </div>
                                         <div>
                                             <label class="form-label">Payment Terms</label>
-                                            <input id="partyPaymentTerms" class="form-control" value="${party.paymentTerms || 'Not specified'}" readonly>
+                                            <input id="partyPaymentTerms" class="form-control" value="${party.paymentTerms || 'Not specified'}" readonly data-editable="true">
                                         </div>
                                         <div>
                                             <label class="form-label">Credit Limit</label>
@@ -179,7 +214,7 @@ const Party = {
                                         <h3>Notes</h3>
                                     </div>
                                     <div>
-                                        <textarea id="partyNotes" class="form-control" rows="4" readonly>${party.notes || 'No notes'}</textarea>
+                                        <textarea id="partyNotes" class="form-control" rows="4" readonly data-editable="true">${party.notes || 'No notes'}</textarea>
                                     </div>
                                 </div>
 
@@ -210,9 +245,39 @@ const Party = {
                                     <div class="party-detail-stat-value">${new Date(party.updatedAt).toLocaleDateString()}</div>
                                 </div>
 
-                                <div class="party-detail-helper-card">
+                                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+                                    <div class="party-detail-helper-title" style="margin-bottom: 1rem;">Profile Readiness Factors</div>
+                                    <div style="font-size: 0.875rem; line-height: 1.6;">
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.email && party.email.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.email && party.email.trim() ? '#10b981' : '#6b7280'};">Email address</span>
+                                        </div>
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.phone && party.phone.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.phone && party.phone.trim() ? '#10b981' : '#6b7280'};">Phone number</span>
+                                        </div>
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.address && party.address.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.address && party.address.trim() ? '#10b981' : '#6b7280'};">Address</span>
+                                        </div>
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.contactPerson && party.contactPerson.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.contactPerson && party.contactPerson.trim() ? '#10b981' : '#6b7280'};">Contact person</span>
+                                        </div>
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.paymentTerms && party.paymentTerms.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.paymentTerms && party.paymentTerms.trim() ? '#10b981' : '#6b7280'};">Payment terms</span>
+                                        </div>
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <strong style="color: ${party.notes && party.notes.trim() ? '#10b981' : '#ef4444'};">✓</strong>
+                                            <span style="color: ${party.notes && party.notes.trim() ? '#10b981' : '#6b7280'};">Notes/Comments</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="party-detail-helper-card" style="margin-top: 1.5rem;">
                                     <div class="party-detail-helper-title">Tip</div>
-                                    <p class="text-muted">Edit party details, monitor balance changes, and track communication history from this dashboard.</p>
+                                    <p class="text-muted">Edit party details, monitor balance changes, and track communication history from this dashboard. Complete all fields to increase profile readiness.</p>
                                 </div>
                             </aside>
                         </section>
@@ -234,12 +299,12 @@ const Party = {
 };
 
 const toggleEditMode = () => {
-    const inputs = document.querySelectorAll('.party-detail-main-panel input, .party-detail-main-panel textarea');
+    const editableInputs = document.querySelectorAll('[data-editable="true"]');
     const editBtn = document.querySelector('#edit-party-btn');
     const editSection = document.querySelector('#edit-section');
     const deleteBtn = document.querySelector('#delete-party-btn');
 
-    inputs.forEach(input => {
+    editableInputs.forEach(input => {
         input.readOnly = !input.readOnly;
     });
 
@@ -253,6 +318,39 @@ const toggleEditMode = () => {
         editBtn.textContent = 'Edit';
         editBtn.disabled = false;
         deleteBtn.disabled = false;
+    }
+};
+
+const updateProfileReadinessDisplay = () => {
+    const partyData = {
+        name: document.querySelector('#partyEmail') ? 'exists' : '', // We'll check all fields
+        email: document.querySelector('#partyEmail')?.value.trim() || '',
+        phone: document.querySelector('#partyPhone')?.value.trim() || '',
+        address: document.querySelector('#partyAddress')?.value.trim() || '',
+        paymentTerms: document.querySelector('#partyPaymentTerms')?.value.trim() || '',
+        notes: document.querySelector('#partyNotes')?.value.trim() || '',
+        contactPerson: document.querySelector('#partyContactPerson')?.value.trim() || ''
+    };
+
+    // Recalculate readiness
+    const readiness = calculateProfileReadiness(partyData);
+    
+    // Update all profile readiness displays
+    const displays = document.querySelectorAll('[data-profile-readiness]');
+    displays.forEach(display => {
+        display.textContent = readiness + '%';
+    });
+
+    // Also update in the quick stats if it has a different selector
+    const quickStatValue = document.querySelector('.party-detail-stat:nth-child(2) .party-detail-stat-value');
+    if (quickStatValue) {
+        quickStatValue.textContent = readiness + '%';
+    }
+
+    // Update hero section readiness value
+    const heroReadiness = document.querySelector('.dashboard-hero-meta .dashboard-mini-stat:nth-child(4) .dashboard-mini-stat-value');
+    if (heroReadiness) {
+        heroReadiness.textContent = readiness + '%';
     }
 };
 
@@ -270,6 +368,7 @@ const handleSaveParty = async (partyId) => {
             email: document.querySelector('#partyEmail').value.trim(),
             phone: document.querySelector('#partyPhone').value.trim(),
             address: document.querySelector('#partyAddress').value.trim(),
+            contactPerson: document.querySelector('#partyContactPerson')?.value.trim() || undefined,
             paymentTerms: document.querySelector('#partyPaymentTerms').value.trim(),
             notes: document.querySelector('#partyNotes').value.trim()
         };
@@ -281,6 +380,34 @@ const handleSaveParty = async (partyId) => {
             saveBtn.disabled = false;
             saveBtn.textContent = originalText;
             return;
+        }
+
+        // Reload party to get updated profileReadiness from backend
+        showLoading();
+        const updatedParty = await getParty(partyId);
+        hideLoading();
+
+        if (!updatedParty.error && updatedParty && updatedParty.profileReadiness !== undefined) {
+            // Update the readiness display with new value from backend
+            const quickStatValue = document.querySelector('.party-detail-stat:nth-child(2) .party-detail-stat-value');
+            if (quickStatValue) {
+                quickStatValue.textContent = (updatedParty.profileReadiness || 0) + '%';
+            }
+
+            const heroReadiness = document.querySelector('.dashboard-hero-meta .dashboard-mini-stat:nth-child(4) .dashboard-mini-stat-value');
+            if (heroReadiness) {
+                heroReadiness.textContent = (updatedParty.profileReadiness || 0) + '%';
+            }
+
+            // Update the profile readiness factors display
+            const contactDetailsSection = document.querySelector('.party-detail-side-panel');
+            if (contactDetailsSection) {
+                const emailCheck = contactDetailsSection.querySelector('[data-check="email"]');
+                if (emailCheck) {
+                    emailCheck.style.color = updatedParty.email && updatedParty.email.trim() ? '#10b981' : '#ef4444';
+                    emailCheck.parentElement.style.color = updatedParty.email && updatedParty.email.trim() ? '#10b981' : '#6b7280';
+                }
+            }
         }
 
         showAlert(alertContainer, 'success', 'Party updated successfully!');

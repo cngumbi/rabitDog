@@ -21,11 +21,8 @@ const partySchema = new mongoose.Schema({
         required: true
     },
     address: {
-        street: String,
-        city: String,
-        state: String,
-        postalCode: String,
-        country: String
+        type: String,
+        default: ''
     },
     businessName: String,
     businessRegistration: String,
