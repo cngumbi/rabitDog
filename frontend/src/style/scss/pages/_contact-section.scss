@@ -1,0 +1,103 @@
+// Contact Section Styling
+
+.party-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.15);
+
+    .card-metric {
+        background: white;
+        padding: 1.2rem;
+        border-radius: 10px;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        min-height: 90px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        &:hover {
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+            display: block;
+            word-break: break-word;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+            max-height: 3.5rem;
+            overflow: hidden;
+        }
+
+        .metric-desc {
+            font-size: 0.8rem;
+            color: #9ca3af;
+            font-weight: 500;
+
+            &.metric-desc--info {
+                color: #6b7280;
+            }
+
+            &.metric-desc--success {
+                color: #059669;
+            }
+        }
+    }
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1rem;
+
+        .card-metric {
+            padding: 1rem;
+
+            .metric-value {
+                font-size: 1.2rem;
+            }
+
+            .metric-title {
+                font-size: 0.75rem;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+
+        .card-metric {
+            padding: 1rem;
+        }
+    }
+}
