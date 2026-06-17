@@ -9745,6 +9745,21 @@ body.sidebar-open .sidebar {
   border-radius: 20px;
   font-size: 0.875rem;
   color: #326dee;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.top-partner-channel:hover {
+  background-color: rgb(224.25, 233.1, 252.45);
+  -webkit-box-shadow: 0 2px 6px rgba(50, 109, 238, 0.15);
+          box-shadow: 0 2px 6px rgba(50, 109, 238, 0.15);
+}
+.top-partner-channel.active {
+  background-color: #326dee;
+  color: #1ac886;
+  border-color: #326dee;
+  -webkit-box-shadow: 0 2px 8px rgba(50, 109, 238, 0.3);
+          box-shadow: 0 2px 8px rgba(50, 109, 238, 0.3);
 }
 
 @media (max-width: 768px) {

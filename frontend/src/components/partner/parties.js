@@ -6,12 +6,14 @@ const Parties = {
         // Initialize pagination state
         let currentPage = 1;
         let filteredData = window.partiesData || [];
+        let selectedChannel = null;
         const itemsPerPage = 5;
 
         // Handle search
         const searchInput = document.querySelector('#parties-search-input');
         const typeFilter = document.querySelector('#parties-type-filter');
-        const exportBtn = document.querySelector('#export-csv-btn');
+        const searchBtn = document.querySelector('#search-btn');
+        const channelButtons = document.querySelectorAll('.top-partner-channel');
 
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -27,9 +29,34 @@ const Parties = {
             });
         }
 
-        if (exportBtn) {
-            exportBtn.addEventListener('click', handleExportCSV);
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => {
+                currentPage = 1;
+                filterAndSearch();
+            });
         }
+
+        // Handle channel button clicks
+        channelButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const channel = btn.textContent.trim().toLowerCase();
+                
+                // Toggle channel selection
+                if (selectedChannel === channel) {
+                    selectedChannel = null;
+                    btn.classList.remove('active');
+                } else {
+                    // Remove active class from all buttons
+                    channelButtons.forEach(b => b.classList.remove('active'));
+                    selectedChannel = channel;
+                    btn.classList.add('active');
+                }
+                
+                currentPage = 1;
+                filterAndSearch();
+                updateChannelStats();
+            });
+        });
 
         const filterAndSearch = () => {
             const searchTerm = searchInput?.value.toLowerCase() || '';
@@ -43,35 +70,49 @@ const Parties = {
 
                 const matchesType = typeValue === 'all' || party.type === typeValue;
 
-                return matchesSearch && matchesType;
+                // Filter by channel if selected
+                let matchesChannel = true;
+                if (selectedChannel) {
+                    const partyChannel = party.businessType?.toLowerCase() || 
+                                        (party.type === 'supplier' ? 'supplier' : 'retail');
+                    matchesChannel = partyChannel === selectedChannel;
+                }
+
+                return matchesSearch && matchesType && matchesChannel;
             });
 
             updateTable();
+            updateChannelStats();
         };
 
-        const handleExportCSV = () => {
-            if (!window.partiesData || window.partiesData.length === 0) return;
-
-            const headers = ['Party Name', 'Type', 'Phone', 'Email', 'Status', 'Balance'];
-            const rows = window.partiesData.map(party => [
-                party.name,
-                party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier',
-                party.phone || '-',
-                party.email || '-',
-                party.status.charAt(0).toUpperCase() + party.status.slice(1),
-                party.currentBalance
-            ]);
-
-            let csv = headers.join(',') + '\n';
-            csv += rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `parties-${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
+        // Update channel stats based on filtered data
+        const updateChannelStats = () => {
+            const totalPartiesElem = document.querySelector('[data-stat="total-parties"]');
+            const activeContractsElem = document.querySelector('[data-stat="active-contracts"]');
+            const outstandingBalanceElem = document.querySelector('[data-stat="outstanding-balance"]');
+            const contactsReachedElem = document.querySelector('[data-stat="contacts-reached"]');
+            
+            if (totalPartiesElem) {
+                totalPartiesElem.textContent = filteredData.length;
+            }
+            if (activeContractsElem) {
+                activeContractsElem.textContent = filteredData.filter(p => p.status === 'active').length;
+            }
+            if (outstandingBalanceElem) {
+                const totalBalance = filteredData.reduce((sum, p) => sum + (p.currentBalance || 0), 0);
+                outstandingBalanceElem.textContent = `Ksh ${totalBalance.toLocaleString()}`;
+            }
+            if (contactsReachedElem) {
+                // Calculate contacts reached percentage (parties with phone or email)
+                const totalParties = filteredData.length;
+                if (totalParties > 0) {
+                    const partiesWithContact = filteredData.filter(p => p.phone || p.email).length;
+                    const contactPercentage = Math.round((partiesWithContact / totalParties) * 100);
+                    contactsReachedElem.textContent = `${contactPercentage}%`;
+                } else {
+                    contactsReachedElem.textContent = '0%';
+                }
+            }
         };
 
         // Attach pagination event listeners
@@ -159,6 +200,7 @@ const Parties = {
         setTimeout(() => {
             setupPagination();
             updateTable();
+            updateChannelStats();
         }, 100);
     },
     render: async ()=>{
@@ -248,6 +290,10 @@ const Parties = {
             const buyersCount = parties.filter(p => p.type === 'buyer' || p.type === 'both').length;
             const suppliersCount = parties.filter(p => p.type === 'supplier' || p.type === 'both').length;
 
+            // Calculate contacts reached percentage (parties with phone or email)
+            const partiesWithContact = parties.filter(p => p.phone || p.email).length;
+            const contactPercentage = parties.length > 0 ? Math.round((partiesWithContact / parties.length) * 100) : 0;
+
             return `
                 <div class="wrap">
                     ${DashboardMenu.render({ selected: "parties" })}
@@ -321,27 +367,27 @@ const Parties = {
                           <aside class="panel parties-side-panel">
                             <div class="card-title">Top partner channels</div>
                             <div class="top-partner-channels">
-                              <span class="top-partner-channel">Retail</span>
-                              <span class="top-partner-channel">Wholesale</span>
-                              <span class="top-partner-channel">Supplier</span>
+                              <button class="top-partner-channel" style="cursor: pointer; border: none; background: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">Retail</button>
+                              <button class="top-partner-channel" style="cursor: pointer; border: none; background: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">Wholesale</button>
+                              <button class="top-partner-channel" style="cursor: pointer; border: none; background: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">Supplier</button>
                             </div>
 
                             <div class="party-summary-panel">
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Total parties</div>
-                                <div class="party-summary-value">${parties.length}</div>
+                                <div class="party-summary-value" data-stat="total-parties">${parties.length}</div>
                               </div>
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Active contracts</div>
-                                <div class="party-summary-value">${parties.filter(p => p.status === 'active').length}</div>
+                                <div class="party-summary-value" data-stat="active-contracts">${parties.filter(p => p.status === 'active').length}</div>
                               </div>
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Outstanding balance</div>
-                                <div class="party-summary-value">Ksh ${(stats.totalBalance || 0).toLocaleString()}</div>
+                                <div class="party-summary-value" data-stat="outstanding-balance">Ksh ${(stats.totalBalance || 0).toLocaleString()}</div>
                               </div>
                               <div class="party-summary-item">
                                 <div class="party-summary-label">Contacts reached</div>
-                                <div class="party-summary-value">${stats.contactRate || 89}%</div>
+                                <div class="party-summary-value" data-stat="contacts-reached">${contactPercentage}%</div>
                               </div>
                             </div>
                           </aside>
@@ -364,7 +410,7 @@ const Parties = {
                                   <option value="supplier">Supplier</option>
                                   <option value="both">Buyer & Supplier</option>
                                 </select>
-                                <button id="export-csv-btn" class="btn-primary text-white">Export CSV</button>
+                                <button id="search-btn" class="btn-primary text-white">Search</button>
                               </div>
                             </div>
                             <div class="table-responsive">
