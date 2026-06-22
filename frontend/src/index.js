@@ -50,13 +50,21 @@ import RecordExpenses from './components/expenses/recordExpenses';
 //livestock management
 import LivestockManagement from './components/livestock/LivestockManagement';
 import LivestockTypes from './components/livestock/livestockTypes';
+import AddType from './components/livestock/addType';
+import AddBatch from './components/livestock/addBatch';
 import AnimalRecords from './components/livestock/animalRecords';
+import AddAnimal from './components/livestock/addAnimal';
 import AnimalHealthRecords from './components/livestock/animalHealthRecords';
+import AddHealthRecord from './components/livestock/addHealthRecord';
 import FeedingRecords from './components/livestock/feedingRecords';
+import AddFeedingRecord from './components/livestock/addFeedingRecord';
+import AddProductionRecord from './components/livestock/addProductionRecord';
 import ProductionRecords from './components/livestock/productionRecords';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
-faviconImg.href = favicon;
+if (faviconImg) {
+  faviconImg.href = favicon;
+}
 //==================ROUTE CONFIG ============
 /*
     we define routes in two formats
@@ -117,10 +125,16 @@ const routes = {
     //livestock
     '/livestock': LivestockManagement,
     '/livestock/types': LivestockTypes,
+    '/livestock/types/add': AddType,
     '/livestock/animals': AnimalRecords,
+    '/livestock/animals/add': AddAnimal,
     '/livestock/health': AnimalHealthRecords,
+    '/livestock/health/add': AddHealthRecord,
     '/livestock/feeding': FeedingRecords,
+    '/livestock/feeding/add': AddFeedingRecord,
     '/livestock/production': ProductionRecords,
+    '/livestock/production/add': AddProductionRecord,
+    '/livestock/add': AddBatch,
 };
 //==================ROUTER FUNCTION===========
 const router = async () => {
@@ -168,10 +182,16 @@ const router = async () => {
         '/record-expense',
         '/livestock',
         '/livestock/types',
+        '/livestock/types/add',
         '/livestock/animals',
+        '/livestock/animals/add',
         '/livestock/health',
+        '/livestock/health/add',
         '/livestock/feeding',
+        '/livestock/feeding/add',
         '/livestock/production',
+        '/livestock/production/add',
+        '/livestock/add',
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';

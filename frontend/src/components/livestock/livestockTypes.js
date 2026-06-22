@@ -1,4 +1,4 @@
-import DashboardMenu from '../dashboard/dashboardMenu';
+import LivestockLayout from './LivestockLayout';
 import { livestockAPI } from '../../connection/livestockAPI';
 import { livestockUtils } from '../../utils/livestockUtils';
 
@@ -9,9 +9,7 @@ const LivestockTypes = {
     currentPage: 1,
     itemsPerPage: 10,
     filteredTypes: [],
-    searchTerm: '',
-    formData: {},
-    showForm: false
+    searchTerm: ''
   },
 
   async fetchTypes() {
@@ -22,32 +20,6 @@ const LivestockTypes = {
       this.data.filteredTypes = this.data.types;
     } catch (error) {
       console.error('Error fetching types:', error);
-      alert('Error: ' + livestockUtils.parseError(error));
-    } finally {
-      this.data.loading = false;
-    }
-  },
-
-  async createType() {
-    const { name, description, category } = this.data.formData;
-    if (!name || !category) {
-      alert('Please fill in required fields');
-      return;
-    }
-
-    try {
-      this.data.loading = true;
-      await livestockAPI.createType({
-        name,
-        description: description || '',
-        category: category || 'Poultry'
-      });
-      alert('Type created successfully');
-      this.data.formData = {};
-      this.data.showForm = false;
-      await this.fetchTypes();
-      this.updateView();
-    } catch (error) {
       alert('Error: ' + livestockUtils.parseError(error));
     } finally {
       this.data.loading = false;
@@ -80,44 +52,6 @@ const LivestockTypes = {
     this.data.currentPage = 1;
   },
 
-  renderForm() {
-    if (!this.data.showForm) return '';
-    
-    const { name, description, category } = this.data.formData;
-    return `
-      <div class="form-panel">
-        <h2>Add Livestock Type</h2>
-        <form onsubmit="event.preventDefault(); window.livestockTypesInstance.createType();">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-              <label class="form-label">Type Name *</label>
-              <input type="text" class="form-control" value="${name || ''}" onchange="window.livestockTypesInstance.data.formData.name = this.value;" placeholder="e.g., Broiler Chicken" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Category *</label>
-              <select class="form-select" onchange="window.livestockTypesInstance.data.formData.category = this.value;" required>
-                <option value="">Select Category</option>
-                <option value="Poultry" ${category === 'Poultry' ? 'selected' : ''}>Poultry</option>
-                <option value="Livestock" ${category === 'Livestock' ? 'selected' : ''}>Livestock</option>
-                <option value="Aquaculture" ${category === 'Aquaculture' ? 'selected' : ''}>Aquaculture</option>
-                <option value="Apiary" ${category === 'Apiary' ? 'selected' : ''}>Apiary</option>
-                <option value="Other" ${category === 'Other' ? 'selected' : ''}>Other</option>
-              </select>
-            </div>
-            <div class="form-group" style="grid-column: 1/-1;">
-              <label class="form-label">Description</label>
-              <textarea class="form-control" onchange="window.livestockTypesInstance.data.formData.description = this.value;" placeholder="Describe this livestock type">${description || ''}</textarea>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn-primary text-white">Create Type</button>
-            <button type="button" class="btn-secondary" onclick="window.livestockTypesInstance.data.showForm = false; window.livestockTypesInstance.updateView();">Cancel</button>
-          </div>
-        </form>
-      </div>
-    `;
-  },
-
   renderTable() {
     const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
     const endIdx = startIdx + this.data.itemsPerPage;
@@ -125,12 +59,12 @@ const LivestockTypes = {
     const totalPages = Math.ceil(this.data.filteredTypes.length / this.data.itemsPerPage);
 
     if (this.data.loading) {
-      return '<div class="loading-spinner" style="text-align: center; padding: 2rem;"><p>Loading types...</p></div>';
+      return '<div class="loading-spinner"><p>Loading types...</p></div>';
     }
 
     if (pageData.length === 0) {
       return `
-        <div class="empty-state" style="text-align: center; padding: 3rem;">
+        <div class="empty-state">
           <p>${this.data.types.length === 0 ? 'No types created yet' : 'No types match your search'}</p>
         </div>
       `;
@@ -153,16 +87,16 @@ const LivestockTypes = {
               <td>${type.category || 'N/A'}</td>
               <td>${type.description || 'N/A'}</td>
               <td>
-                <button onclick="window.livestockTypesInstance.deleteType('${type._id}');" class="action-link" style="color: #dc3545; background: none; border: none; cursor: pointer;">Delete</button>
+                <button onclick="window.livestockTypesInstance.deleteType('${type._id}');" class="action-link danger">Delete</button>
               </td>
             </tr>
           `).join('')}
         </tbody>
       </table>
       ${totalPages > 1 ? `
-        <div class="pagination" style="margin-top: 1.5rem;">
+        <div class="pagination">
           <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage - 1}; window.livestockTypesInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-          <span style="margin: 0 1rem; color: #666;">Page ${this.data.currentPage} of ${totalPages}</span>
+          <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
           <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage + 1}; window.livestockTypesInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
         </div>
       ` : ''}
@@ -170,40 +104,29 @@ const LivestockTypes = {
   },
 
   render() {
-    return `
-      <div class="wrap">
-        ${DashboardMenu.render({ selected: 'livestock' })}
-        <div class="main">
-          <section class="dashboard-hero">
-            <div class="dashboard-hero-copy">
-              <span class="dashboard-pill">Livestock Management</span>
-              <h1>Livestock Types</h1>
-              <p>Manage different livestock types in your system.</p>
-              <div class="dashboard-hero-actions">
-                <button onclick="window.livestockTypesInstance.data.showForm = true; window.livestockTypesInstance.updateView();" class="btn-primary text-white">+ Add Type</button>
-              </div>
+    return LivestockLayout.render({
+      activePath: '/livestock/types',
+      heroHtml: `
+        <section class="dashboard-hero">
+          <div class="dashboard-hero-copy">
+            <span class="dashboard-pill">Livestock Management</span>
+            <h1>Livestock Types</h1>
+            <p>Manage different livestock types in your system.</p>
+            <div class="dashboard-hero-actions">
+              <a href="/#/livestock/types/add" class="btn-primary text-white">+ Add Type</a>
             </div>
-            <div class="dashboard-hero-meta">
-              <div class="dashboard-mini-stat">
-                <span class="dashboard-mini-stat-label">Total Types</span>
-                <span class="dashboard-mini-stat-value">${this.data.types.length}</span>
-                <span class="dashboard-mini-stat-trend">All categories</span>
-              </div>
-            </div>
-          </section>
-
-          <div class="livestock-nav" style="padding: 0 2rem; margin-bottom: 1rem;">
-            <a href="/#/livestock">Batches</a>
-            <a href="/#/livestock/animals">Animals</a>
-            <a href="/#/livestock/types" class="active" style="background: rgba(102, 126, 234, 0.3);">Types</a>
-            <a href="/#/livestock/health">Health</a>
-            <a href="/#/livestock/feeding">Feeding</a>
-            <a href="/#/livestock/production">Production</a>
           </div>
-
-          ${this.renderForm()}
-
-          <div class="content-panel">
+          <div class="dashboard-hero-meta">
+            <div class="dashboard-mini-stat">
+              <span class="dashboard-mini-stat-label">Total Types</span>
+              <span class="dashboard-mini-stat-value">${this.data.types.length}</span>
+              <span class="dashboard-mini-stat-trend">All categories</span>
+            </div>
+          </div>
+        </section>
+      `,
+      contentHtml: `
+        <div class="content-panel">
             <div class="content-header">
               <h2>Livestock Types</h2>
               <span class="content-total">Total: ${this.data.filteredTypes.length}</span>
@@ -216,8 +139,8 @@ const LivestockTypes = {
             ${this.renderTable()}
           </div>
         </div>
-      </div>
-    `;
+      `
+    });
   },
 
   updateView() {

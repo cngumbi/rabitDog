@@ -1,4 +1,4 @@
-import DashboardMenu from '../dashboard/dashboardMenu';
+import LivestockLayout from './LivestockLayout';
 import { livestockAPI } from '../../connection/livestockAPI';
 import { livestockUtils } from '../../utils/livestockUtils';
 
@@ -14,6 +14,7 @@ const LivestockManagement = {
     searchTerm: '',
     filterStatus: 'all',
     formData: {},
+    showForm: false,
     stats: {
       totalBatches: 0,
       activeBatches: 0,
@@ -36,6 +37,9 @@ const LivestockManagement = {
       
       this.data.filteredBatches = this.data.batches;
       this.calculateStats();
+      if (!this.data.batches.length) {
+        this.data.showForm = true;
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -111,6 +115,7 @@ const LivestockManagement = {
       await livestockAPI.createBatch(payload);
       alert('Batch created successfully');
       this.data.formData = {};
+      this.data.showForm = false;
       await this.fetchData();
       this.updateView();
     } catch (error) {
@@ -140,7 +145,10 @@ const LivestockManagement = {
   },
 
   toggleCreateForm() {
-    this.data.formData = Object.keys(this.data.formData).length > 0 ? {} : this.data.formData;
+    this.data.showForm = !this.data.showForm;
+    if (!this.data.showForm) {
+      this.data.formData = {};
+    }
     this.updateView();
   },
 
@@ -148,13 +156,13 @@ const LivestockManagement = {
     const { totalBatches, activeBatches, totalAnimals, completedBatches } = this.data.stats;
 
     return `
-      <section class="dashboard-hero">
+      <section class="dashboard-hero card livestock-hero-card">
         <div class="dashboard-hero-copy">
           <span class="dashboard-pill">Livestock Management</span>
           <h1>Manage Your Livestock</h1>
           <p>Track batches, animals, health records, feeding, and production in one place.</p>
           <div class="dashboard-hero-actions">
-            <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">+ New Batch</button>
+            <a class="btn-primary text-white" href="/#/livestock/add">+ New Batch</a>
             <a class="btn-secondary text-white" href="/#/medicallogs">Health Records</a>
           </div>
         </div>
@@ -195,7 +203,7 @@ const LivestockManagement = {
       <div class="form-panel">
         <h2>Create New Batch</h2>
         <form onsubmit="event.preventDefault(); window.livestockInstance.createBatch();">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-grid">
             <div class="form-group">
               <label class="form-label">Batch Name *</label>
               <input type="text" class="form-control" value="${batchName || ''}" onchange="window.livestockInstance.data.formData.batchName = this.value;" placeholder="e.g., Batch A-01" required>
@@ -246,15 +254,32 @@ const LivestockManagement = {
     `;
   },
 
+  renderCreateSection() {
+    return `
+      <div class="content-panel batch-create-panel">
+        <div class="content-header">
+          <h2>Create New Batch</h2>
+          <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">${this.data.showForm ? 'Hide Form' : '+ New Batch'}</button>
+        </div>
+        ${this.data.showForm ? this.renderCreateForm() : `
+          <div class="empty-state">
+            <p>Start a new livestock batch to track production, feeding, and health records.</p>
+            <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">Create New Batch</button>
+          </div>
+        `}
+      </div>
+    `;
+  },
+
   renderFilterSection() {
     return `
       <div class="filter-section">
-        <div class="row" style="align-items: flex-end; gap: 1rem;">
-          <div style="flex: 1; min-width: 250px;">
+        <div class="filter-row">
+          <div class="filter-field">
             <label class="form-label">Search</label>
             <input type="text" class="form-control" id="search-input" placeholder="Search by batch name or code..." onkeyup="window.livestockInstance.handleSearch(this.value)">
           </div>
-          <div style="flex: 1; min-width: 200px;">
+          <div class="filter-field">
             <label class="form-label">Filter by Status</label>
             <select class="form-select" onchange="window.livestockInstance.handleStatusFilter(this.value);">
               <option value="all">All Batches</option>
@@ -264,7 +289,7 @@ const LivestockManagement = {
               <option value="Archived">Archived</option>
             </select>
           </div>
-          <div style="flex: 1; min-width: 200px;">
+          <div class="filter-field">
             <label class="form-label">Items per page</label>
             <select class="form-select" onchange="window.livestockInstance.data.itemsPerPage = parseInt(this.value); window.livestockInstance.data.currentPage = 1; window.livestockInstance.updateView();">
               <option value="5" ${this.data.itemsPerPage === 5 ? 'selected' : ''}>5</option>
@@ -285,14 +310,14 @@ const LivestockManagement = {
     const totalPages = Math.ceil(this.data.filteredBatches.length / this.data.itemsPerPage);
 
     if (this.data.loading) {
-      return `<div class="loading-spinner" style="text-align: center; padding: 2rem;"><p>Loading batches...</p></div>`;
+      return `<div class="loading-spinner"><p>Loading batches...</p></div>`;
     }
 
     if (pageData.length === 0) {
       return `
         <div class="empty-state">
           <p>${this.data.batches.length === 0 ? 'No batches created yet.' : 'No batches match your search.'}</p>
-          <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white" style="margin-top: 1rem;">Create First Batch</button>
+          <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">Create First Batch</button>
         </div>
       `;
     }
@@ -325,7 +350,7 @@ const LivestockManagement = {
               <td>${livestockUtils.formatDate(batch.startDate)}</td>
               <td>
                 <a href="#" class="action-link">View</a>
-                <button onclick="window.livestockInstance.deleteBatch('${batch._id}');" class="action-link" style="color: #dc3545;">Delete</button>
+                <button onclick="window.livestockInstance.deleteBatch('${batch._id}');" class="action-link danger">Delete</button>
               </td>
             </tr>
           `).join('')}
@@ -334,54 +359,86 @@ const LivestockManagement = {
 
       <div class="pagination">
         <button onclick="window.livestockInstance.changePage(${this.data.currentPage - 1});" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-        <div style="display: flex; gap: 0.25rem;">
+        <div class="pagination-pages">
           ${Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, this.data.currentPage - 2), Math.min(totalPages, this.data.currentPage + 1)).map(page => `
-            <button onclick="window.livestockInstance.changePage(${page});" class="btn-secondary" style="${page === this.data.currentPage ? 'background: #667eea; color: white;' : ''}">${page}</button>
+            <button onclick="window.livestockInstance.changePage(${page});" class="btn-secondary ${page === this.data.currentPage ? 'active' : ''}">${page}</button>
           `).join('')}
         </div>
         <button onclick="window.livestockInstance.changePage(${this.data.currentPage + 1});" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
-        <span style="margin-left: 1rem; color: #666;">Page ${this.data.currentPage} of ${totalPages}</span>
+        <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
       </div>
     `;
   },
 
   renderLivestockNav() {
+    const activePath = window.location.hash.slice(1).toLowerCase() || '/livestock';
+    const navItems = [
+      { href: '/livestock', label: 'Batches', icon: '🗃' },
+      { href: '/livestock/add', label: 'New Batch', icon: '➕' },
+      { href: '/livestock/animals', label: 'Animals', icon: '🐮' },
+      { href: '/livestock/types', label: 'Types', icon: '🏷' },
+      { href: '/livestock/health', label: 'Health', icon: '🩺' },
+      { href: '/livestock/feeding', label: 'Feeding', icon: '🥣' },
+      { href: '/livestock/production', label: 'Production', icon: '📈' }
+    ];
+
     return `
-      <div class="livestock-nav" style="padding: 0 2rem; margin-bottom: 1rem;">
-        <a href="/#/livestock" class="active" style="background: rgba(102, 126, 234, 0.3);">Batches</a>
-        <a href="/#/livestock/animals">Animals</a>
-        <a href="/#/livestock/types">Types</a>
-        <a href="/#/livestock/health">Health</a>
-        <a href="/#/livestock/feeding">Feeding</a>
-        <a href="/#/livestock/production">Production</a>
-      </div>
+      <nav class="livestock-nav pills" role="navigation" aria-label="Livestock navigation">
+        ${navItems.map(item => `
+          <a href="/#${item.href}" class="nav-item ${activePath === item.href ? 'active' : ''}">
+            <span class="nav-icon" aria-hidden="true">${item.icon}</span>
+            <span class="nav-label">${item.label}</span>
+          </a>
+        `).join('')}
+      </nav>
     `;
   },
 
   render() {
-    const showForm = Object.keys(this.data.formData).length > 0 || this.data.loading === false && !this.data.batches.length;
-    
-    return `
-      <div class="wrap">
-        ${DashboardMenu.render({ selected: 'livestock' })}
-        <div class="main">
-          ${this.renderHeroSection()}
-          ${this.renderLivestockNav()}
-          
-          ${showForm ? this.renderCreateForm() : ''}
-          
-          <div class="content-panel">
-            <div class="content-header">
-              <h2>Batches</h2>
-              <span class="content-total">Total: ${this.data.filteredBatches.length}</span>
-            </div>
-            
-            ${this.renderFilterSection()}
-            ${this.renderBatchesTable()}
-          </div>
+    const showForm = this.data.showForm || (!this.data.batches.length && !this.data.loading);
+
+    return LivestockLayout.render({
+      pageTitle: 'Manage Your Livestock',
+      description: 'Track batches, animals, health records, feeding, and production in one place.',
+      heroActions: `
+        <a class="btn-primary text-white" href="/#/livestock/add">+ New Batch</a>
+        <a class="btn-secondary text-white" href="/#/medicallogs">Health Records</a>
+      `,
+      heroMeta: `
+        <div class="dashboard-mini-stat">
+          <span class="dashboard-mini-stat-label">Total Batches</span>
+          <span class="dashboard-mini-stat-value">${this.data.stats.totalBatches}</span>
+          <span class="dashboard-mini-stat-trend">All livestock</span>
         </div>
-      </div>
-    `;
+        <div class="dashboard-mini-stat">
+          <span class="dashboard-mini-stat-label">Active Batches</span>
+          <span class="dashboard-mini-stat-value">${this.data.stats.activeBatches}</span>
+          <span class="dashboard-mini-stat-trend">Currently running</span>
+        </div>
+        <div class="dashboard-mini-stat">
+          <span class="dashboard-mini-stat-label">Total Animals</span>
+          <span class="dashboard-mini-stat-value">${this.data.stats.totalAnimals}</span>
+          <span class="dashboard-mini-stat-trend">In all batches</span>
+        </div>
+        <div class="dashboard-mini-stat">
+          <span class="dashboard-mini-stat-label">Completed</span>
+          <span class="dashboard-mini-stat-value">${this.data.stats.completedBatches}</span>
+          <span class="dashboard-mini-stat-trend">Finished batches</span>
+        </div>
+      `,
+      activePath: window.location.hash.slice(1).toLowerCase() || '/livestock',
+      contentHtml: `
+        ${this.renderCreateSection()}
+        <div class="content-panel">
+          <div class="content-header">
+            <h2>Batches</h2>
+            <span class="content-total">Total: ${this.data.filteredBatches.length}</span>
+          </div>
+          ${this.renderFilterSection()}
+          ${this.renderBatchesTable()}
+        </div>
+      `
+    });
   },
 
   updateView() {
