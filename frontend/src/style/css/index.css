@@ -10378,9 +10378,13 @@ body.sidebar-open .sidebar {
 /* Card style livestock nav (dashboard style stats) */
 .livestock-nav.cards {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-auto-rows: minmax(0, auto);
   gap: 1rem;
   margin-bottom: 1.5rem;
+  overflow-x: visible;
+  padding: 0;
 }
 
 .livestock-nav.cards .nav-card {
@@ -10403,6 +10407,9 @@ body.sidebar-open .sidebar {
   transition: -webkit-transform 0.12s ease, -webkit-box-shadow 0.12s ease;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
   transition: transform 0.12s ease, box-shadow 0.12s ease, -webkit-transform 0.12s ease, -webkit-box-shadow 0.12s ease;
+  min-width: 0;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
 .livestock-nav.cards .nav-card:hover {
@@ -10895,7 +10902,9 @@ body.sidebar-open .sidebar {
 }
 
 .livestock-wrap {
+  width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .livestock-nav {
