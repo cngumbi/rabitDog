@@ -201,6 +201,41 @@
   box-shadow: 0 6px 18px rgba(50,50,80,0.04);
 }
 
+/* Card style livestock nav (dashboard style stats) */
+.livestock-nav.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.livestock-nav.cards .nav-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #eef3fb;
+  box-shadow: 0 6px 18px rgba(20,20,40,0.04);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.livestock-nav.cards .nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,20,40,0.08); }
+
+.stat-card-left { flex: 0 0 56px; display:flex; align-items:center; justify-content:center; }
+.stat-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#fbfbff,#f3f6ff); color:#3a3f8f; }
+.stat-icon svg{ width:22px; height:22px; display:block; }
+
+.stat-card-body { flex:1; min-width:0; }
+.stat-label { font-size:0.95rem; color:#444; font-weight:600; margin-bottom:0.15rem; }
+.stat-value { font-size:1.35rem; font-weight:700; color:#111; margin-bottom:0.2rem; }
+.stat-sub { font-size:0.85rem; color:#777; }
+
+.livestock-nav.cards .nav-card.active { border-color:#dde8ff; background:linear-gradient(90deg,#fbfbff,#fff); }
+
 .content-header {
   display: flex;
   justify-content: space-between;

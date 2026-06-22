@@ -10375,6 +10375,114 @@ body.sidebar-open .sidebar {
           box-shadow: 0 6px 18px rgba(50, 50, 80, 0.04);
 }
 
+/* Card style livestock nav (dashboard style stats) */
+.livestock-nav.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.livestock-nav.cards .nav-card {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #eef3fb;
+  -webkit-box-shadow: 0 6px 18px rgba(20, 20, 40, 0.04);
+          box-shadow: 0 6px 18px rgba(20, 20, 40, 0.04);
+  -webkit-transition: -webkit-transform 0.12s ease, -webkit-box-shadow 0.12s ease;
+  transition: -webkit-transform 0.12s ease, -webkit-box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, -webkit-transform 0.12s ease, -webkit-box-shadow 0.12s ease;
+}
+
+.livestock-nav.cards .nav-card:hover {
+  -webkit-transform: translateY(-4px);
+          transform: translateY(-4px);
+  -webkit-box-shadow: 0 12px 28px rgba(20, 20, 40, 0.08);
+          box-shadow: 0 12px 28px rgba(20, 20, 40, 0.08);
+}
+
+.stat-card-left {
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 56px;
+          flex: 0 0 56px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fbfbff), to(#f3f6ff));
+  background: linear-gradient(180deg, #fbfbff, #f3f6ff);
+  color: #3a3f8f;
+}
+
+.stat-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.stat-card-body {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  min-width: 0;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: #444;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.stat-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.2rem;
+}
+
+.stat-sub {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.livestock-nav.cards .nav-card.active {
+  border-color: #dde8ff;
+  background: -webkit-gradient(linear, left top, right top, from(#fbfbff), to(#fff));
+  background: linear-gradient(90deg, #fbfbff, #fff);
+}
+
 .content-header {
   display: -webkit-box;
   display: -ms-flexbox;
