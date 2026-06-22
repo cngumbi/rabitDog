@@ -19,6 +19,20 @@ const PurchaseRoute = require("./routes/purchaseRoute");
 const TransferRoute = require("./routes/transferRoute");
 const ExpenseRoute = require("./routes/expenseRoute");
 
+// Accounting Routes
+const ChartOfAccountsRoute = require("./routes/chartOfAccountsRoute");
+const JournalEntryRoute = require("./routes/journalEntryRoute");
+const InvoiceRoute = require("./routes/invoiceRoute");
+const BillRoute = require("./routes/billRoute");
+const PaymentRoute = require("./routes/paymentRoute");
+const BudgetRoute = require("./routes/budgetRoute");
+const AssetRoute = require("./routes/assetRoute");
+const TaxRoute = require("./routes/taxRoute");
+const BankAccountRoute = require("./routes/bankAccountRoute");
+const PayrollRoute = require("./routes/payrollRoute");
+const CostCenterRoute = require("./routes/costCenterRoute");
+const FinancialReportsRoute = require("./routes/financialReportsRoute");
+
 const app = express();
 //middleware
 //for production
@@ -82,6 +96,20 @@ app.use('/api/parties', PartyRoute);
 app.use('/api/purchases', PurchaseRoute);
 app.use('/api/transfers', TransferRoute);
 app.use('/api/expenses', ExpenseRoute);
+
+// Accounting Routes
+app.use('/api/accounting/chart-of-accounts', ChartOfAccountsRoute);
+app.use('/api/accounting/journal-entries', JournalEntryRoute);
+app.use('/api/accounting/invoices', InvoiceRoute);
+app.use('/api/accounting/bills', BillRoute);
+app.use('/api/accounting/payments', PaymentRoute);
+app.use('/api/accounting/budgets', BudgetRoute);
+app.use('/api/accounting/assets', AssetRoute);
+app.use('/api/accounting/taxes', TaxRoute);
+app.use('/api/accounting/bank-accounts', BankAccountRoute);
+app.use('/api/accounting/payroll', PayrollRoute);
+app.use('/api/accounting/cost-centers', CostCenterRoute);
+app.use('/api/accounting/reports', FinancialReportsRoute);
 
 app.get('/api/paypal/clientId', (req, res)=>{
   res.send({ clientId: config.PAYPAL_CLIENT_ID });
