@@ -225,6 +225,8 @@
   overflow-x: hidden;
   padding: 0;
   box-sizing: border-box;
+  position: relative;
+  z-index: 10;
 }
 
 .livestock-nav.cards .nav-card {
