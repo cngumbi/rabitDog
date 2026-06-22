@@ -47,6 +47,13 @@ import NewTransfer from './components/transfers/createTransfer';
 //expenses
 import Expenses from './components/expenses/expenses';
 import RecordExpenses from './components/expenses/recordExpenses';
+//livestock management
+import LivestockManagement from './components/livestock/LivestockManagement';
+import LivestockTypes from './components/livestock/livestockTypes';
+import AnimalRecords from './components/livestock/animalRecords';
+import AnimalHealthRecords from './components/livestock/animalHealthRecords';
+import FeedingRecords from './components/livestock/feedingRecords';
+import ProductionRecords from './components/livestock/productionRecords';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 faviconImg.href = favicon;
@@ -107,6 +114,13 @@ const routes = {
     //expenses
     '/expenses': Expenses,
     '/record-expense': RecordExpenses,
+    //livestock
+    '/livestock': LivestockManagement,
+    '/livestock/types': LivestockTypes,
+    '/livestock/animals': AnimalRecords,
+    '/livestock/health': AnimalHealthRecords,
+    '/livestock/feeding': FeedingRecords,
+    '/livestock/production': ProductionRecords,
 };
 //==================ROUTER FUNCTION===========
 const router = async () => {
@@ -152,6 +166,12 @@ const router = async () => {
         '/new-transfer',
         '/expenses',
         '/record-expense',
+        '/livestock',
+        '/livestock/types',
+        '/livestock/animals',
+        '/livestock/health',
+        '/livestock/feeding',
+        '/livestock/production',
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';

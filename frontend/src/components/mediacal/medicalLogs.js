@@ -123,7 +123,8 @@ const MedicalLogs = {
                         <p>Track health checks, treatments, and veterinary follow-ups for each batch.</p>
                         <div class="dashboard-hero-actions">
                           <a class="btn-primary text-white" href="/#/listingmedical">Health Records</a>
-                          <a class="btn-secondary text-white" href="/#/manage-batches">Manage Batches</a>
+                          <a class="btn-secondary text-white" href="/#/livestock/health">Livestock Health</a>
+                          <a class="btn-secondary text-white" href="/#/livestock">Livestock Management</a>
                         </div>
                       </div>
                       <div class="dashboard-hero-meta" aria-label="Health snapshot">

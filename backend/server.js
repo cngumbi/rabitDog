@@ -33,6 +33,14 @@ const PayrollRoute = require("./routes/payrollRoute");
 const CostCenterRoute = require("./routes/costCenterRoute");
 const FinancialReportsRoute = require("./routes/financialReportsRoute");
 
+// Livestock Management Routes
+const LivestockTypeRoute = require("./routes/livestockTypeRoute");
+const LivestockBatchRoute = require("./routes/livestockBatchRoute");
+const LivestockRecordRoute = require("./routes/livestockRecordRoute");
+const LivestockHealthRoute = require("./routes/livestockHealthRoute");
+const LivestockFeedingRoute = require("./routes/livestockFeedingRoute");
+const LivestockProductionRoute = require("./routes/livestockProductionRoute");
+
 const app = express();
 //middleware
 //for production
@@ -110,6 +118,14 @@ app.use('/api/accounting/bank-accounts', BankAccountRoute);
 app.use('/api/accounting/payroll', PayrollRoute);
 app.use('/api/accounting/cost-centers', CostCenterRoute);
 app.use('/api/accounting/reports', FinancialReportsRoute);
+
+// Livestock Management Routes
+app.use('/api/livestock/types', LivestockTypeRoute);
+app.use('/api/livestock/batches', LivestockBatchRoute);
+app.use('/api/livestock/records', LivestockRecordRoute);
+app.use('/api/livestock/health', LivestockHealthRoute);
+app.use('/api/livestock/feeding', LivestockFeedingRoute);
+app.use('/api/livestock/production', LivestockProductionRoute);
 
 app.get('/api/paypal/clientId', (req, res)=>{
   res.send({ clientId: config.PAYPAL_CLIENT_ID });
