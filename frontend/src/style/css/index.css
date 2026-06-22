@@ -10138,12 +10138,18 @@ body.sidebar-open .sidebar {
   }
 }
 
-.wrap {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
+.livestock-wrap {
+  width: 100%;
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.livestock-wrap > .main {
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .dashboard-hero {
@@ -10168,6 +10174,11 @@ body.sidebar-open .sidebar {
   position: relative;
   overflow: hidden;
   min-height: 220px;
+  min-width: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .dashboard-hero.card {
   background: linear-gradient(135deg, #4a50d3 0%, #7a48d8 100%);
@@ -10196,6 +10207,7 @@ body.sidebar-open .sidebar {
       -ms-flex: 1;
           flex: 1;
   max-width: 600px;
+  min-width: 0;
 }
 @media (max-width: 1024px) {
   .dashboard-hero-copy {
@@ -10251,6 +10263,7 @@ body.sidebar-open .sidebar {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+  min-width: 0;
   -ms-flex-line-pack: start;
       align-content: flex-start;
 }
@@ -10383,8 +10396,10 @@ body.sidebar-open .sidebar {
   grid-auto-rows: minmax(0, auto);
   gap: 1rem;
   margin-bottom: 1.5rem;
-  overflow-x: visible;
+  overflow-x: hidden;
   padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .livestock-nav.cards .nav-card {
@@ -10410,6 +10425,13 @@ body.sidebar-open .sidebar {
   min-width: 0;
   -ms-flex-negative: 1;
       flex-shrink: 1;
+  word-wrap: break-word;
+}
+
+.livestock-nav.cards .nav-card, .livestock-nav.cards .stat-card-body {
+  min-width: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .livestock-nav.cards .nav-card:hover {
@@ -10417,6 +10439,10 @@ body.sidebar-open .sidebar {
           transform: translateY(-4px);
   -webkit-box-shadow: 0 12px 28px rgba(20, 20, 40, 0.08);
           box-shadow: 0 12px 28px rgba(20, 20, 40, 0.08);
+}
+
+.livestock-wrap, .livestock-wrap .main, .livestock-nav.cards, .dashboard-hero, .content-panel {
+  overflow-x: hidden;
 }
 
 .stat-card-left {
@@ -10905,6 +10931,16 @@ body.sidebar-open .sidebar {
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.livestock-wrap > .main {
+  min-width: 0;
+  width: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .livestock-nav {

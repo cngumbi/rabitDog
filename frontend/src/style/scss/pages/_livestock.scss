@@ -1,9 +1,16 @@
 // Livestock Management Styles
 
-.wrap {
-  display: flex;
+.livestock-wrap {
+  width: 100%;
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.livestock-wrap > .main {
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 // Dashboard Hero Section
@@ -22,6 +29,10 @@
   position: relative;
   overflow: hidden;
   min-height: 220px;
+  min-width: 0;
+  box-sizing: border-box;
+  min-width: 0;
+  box-sizing: border-box;
   
   &.card {
     background: linear-gradient(135deg, #4a50d3 0%, #7a48d8 100%);
@@ -42,6 +53,7 @@
 .dashboard-hero-copy {
   flex: 1;
   max-width: 600px;
+  min-width: 0;
 
   @media (max-width: 1024px) {
     max-width: 100%;
@@ -89,6 +101,7 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   flex: 1;
+  min-width: 0;
   align-content: flex-start;
 
   @media (max-width: 1024px) {
@@ -209,8 +222,9 @@
   grid-auto-rows: minmax(0, auto);
   gap: 1rem;
   margin-bottom: 1.5rem;
-  overflow-x: visible;
+  overflow-x: hidden;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .livestock-nav.cards .nav-card {
@@ -227,9 +241,19 @@
   transition: transform .12s ease, box-shadow .12s ease;
   min-width: 0;
   flex-shrink: 1;
+  word-wrap: break-word;
+}
+
+.livestock-nav.cards .nav-card, .livestock-nav.cards .stat-card-body {
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .livestock-nav.cards .nav-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,20,40,0.08); }
+
+.livestock-wrap, .livestock-wrap .main, .livestock-nav.cards, .dashboard-hero, .content-panel {
+  overflow-x: hidden;
+}
 
 .stat-card-left { flex: 0 0 56px; display:flex; align-items:center; justify-content:center; }
 .stat-icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#fbfbff,#f3f6ff); color:#3a3f8f; }
@@ -643,6 +667,14 @@
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.livestock-wrap > .main {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .livestock-nav {
