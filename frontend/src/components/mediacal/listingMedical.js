@@ -1,5 +1,6 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
 import { getHealthRecords } from '../../connection/api';
+import { livestockAPI } from '../../connection/livestockAPI';
 
 const ListMedicalLogs = {
     vignette: async () => {
@@ -8,6 +9,38 @@ const ListMedicalLogs = {
         const tableBody = document.getElementById('health-records-body');
         const searchButton = document.getElementById('health-search-button');
         const exportButton = document.getElementById('health-export-button');
+        let livestockBatches = [];
+
+        const resolveBatchDisplayName = (batchValue, record = {}) => {
+            if (!batchValue) return record.batchName || 'Unassigned';
+
+            if (typeof batchValue === 'object') {
+                return batchValue.batchName || batchValue.name || batchValue.label || record.batchName || 'Unassigned';
+            }
+
+            if (record.batchName) {
+                return record.batchName;
+            }
+
+            const batchId = String(batchValue);
+            const matchedBatch = livestockBatches.find((batch) => {
+                const candidateId = batch._id || '';
+                const candidateName = batch.batchName || batch.name || '';
+                return candidateId === batchId || candidateName === batchId;
+            });
+
+            return matchedBatch?.batchName || matchedBatch?.name || batchValue;
+        };
+
+        const populateBatchOptions = async () => {
+            try {
+                const response = await livestockAPI.getAllBatches();
+                livestockBatches = Array.isArray(response?.data) ? response.data : [];
+            } catch (error) {
+                console.error('Unable to load livestock batches for medical records', error);
+                livestockBatches = [];
+            }
+        };
 
         const formatDate = (iso) => {
             const date = new Date(iso);
@@ -38,7 +71,7 @@ const ListMedicalLogs = {
             }
             tableBody.innerHTML = records.map((record) => `
                 <tr>
-                  <td>${record.batch}</td>
+                  <td>${resolveBatchDisplayName(record.batch, record)}</td>
                   <td>${formatDate(record.date)}</td>
                   <td>${record.issue}</td>
                   <td><span class="${getBadgeClass(record.severity)} text-white">${record.severity}</span></td>
@@ -75,7 +108,7 @@ const ListMedicalLogs = {
                 const csv = [
                     ['Batch', 'Date', 'Issue', 'Severity', 'Action', 'Status', 'Notes'],
                     ...records.map((record) => [
-                        record.batch,
+                        resolveBatchDisplayName(record.batch, record),
                         formatDate(record.date),
                         record.issue,
                         record.severity,
@@ -95,6 +128,7 @@ const ListMedicalLogs = {
             });
         }
 
+        await populateBatchOptions();
         await loadRecords();
     },
     render: async () => {

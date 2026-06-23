@@ -53,7 +53,7 @@ HealthRecordRoute.get('/summary', isAuth, expressAsync(async (req, res) => {
 }));
 
 HealthRecordRoute.post('/', isAuth, expressAsync(async (req, res) => {
-    const { batch, date, severity, issue, action, notes } = req.body;
+    const { batch, batchName, date, severity, issue, action, notes } = req.body;
     if (!batch || !date || !issue) {
         return res.status(400).send({ message: 'Batch, date, and issue are required.' });
     }
@@ -72,6 +72,7 @@ HealthRecordRoute.post('/', isAuth, expressAsync(async (req, res) => {
     const healthRecord = new HealthRecord({
         user: req.user._id,
         batch: String(batch).trim(),
+        batchName: String(batchName || '').trim(),
         date: new Date(date),
         severity: severity || 'Normal',
         issue: normalizedIssue,
@@ -86,7 +87,7 @@ HealthRecordRoute.post('/', isAuth, expressAsync(async (req, res) => {
 }));
 
 HealthRecordRoute.put('/:id', isAuth, expressAsync(async (req, res) => {
-    const { batch, date, severity, issue, action, notes, status } = req.body;
+    const { batch, batchName, date, severity, issue, action, notes, status } = req.body;
     const record = await HealthRecord.findById(req.params.id);
 
     if (!record) {
@@ -98,6 +99,7 @@ HealthRecordRoute.put('/:id', isAuth, expressAsync(async (req, res) => {
     }
 
     if (batch) record.batch = String(batch).trim();
+    if (batchName !== undefined) record.batchName = String(batchName || '').trim();
     if (date) record.date = new Date(date);
     if (severity) record.severity = severity;
     if (issue) record.issue = String(issue).trim();

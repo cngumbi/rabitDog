@@ -1,5 +1,6 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
 import { getHealthRecords, updateHealthRecord, deleteHealthRecord } from '../../connection/api';
+import { livestockAPI } from '../../connection/livestockAPI';
 
 const EditHealthRecord = {
     vignette: async () => {
@@ -38,7 +39,16 @@ const EditHealthRecord = {
             return record;
         };
 
-        const populateForm = (record) => {
+        const loadBatches = async () => {
+            try {
+                const response = await livestockAPI.getAllBatches().catch(() => ({ data: [] }));
+                return response.data || [];
+            } catch (error) {
+                return [];
+            }
+        };
+
+        const populateForm = (record, batches = []) => {
             const batchSelect = document.getElementById('edit-batch');
             const dateInput = document.getElementById('edit-date');
             const severitySelect = document.getElementById('edit-severity');
@@ -47,7 +57,22 @@ const EditHealthRecord = {
             const notesTextarea = document.getElementById('edit-notes');
             const statusSelect = document.getElementById('edit-status');
 
-            if (batchSelect) batchSelect.value = record.batch || '';
+            if (batchSelect) {
+                const resolvedBatchValue = typeof record.batch === 'object' ? (record.batch._id || '') : (record.batch || '');
+                const resolvedBatchName = record.batchName || (typeof record.batch === 'object' ? (record.batch.batchName || record.batch.name || '') : '');
+
+                if (Array.isArray(batches) && batches.length) {
+                    batchSelect.innerHTML = batches.map((batch) => {
+                        const batchName = batch.batchName || batch.name || 'Unnamed batch';
+                        const batchValue = batch._id || batchName;
+                        const isSelected = String(resolvedBatchValue) === String(batchValue) || String(resolvedBatchName) === String(batchName);
+                        return `<option value="${batchValue}" ${isSelected ? 'selected' : ''}>${batchName}</option>`;
+                    }).join('');
+                } else {
+                    batchSelect.innerHTML = `<option value="${resolvedBatchValue || ''}" selected>${resolvedBatchName || resolvedBatchValue || 'Unassigned'}</option>`;
+                }
+            }
+
             if (dateInput) dateInput.value = formatDate(record.date);
             if (severitySelect) severitySelect.value = record.severity || 'Normal';
             if (issueInput) issueInput.value = record.issue || '';
@@ -56,16 +81,19 @@ const EditHealthRecord = {
             if (statusSelect) statusSelect.value = record.status || 'Open';
         };
 
-        const record = await loadRecord();
+        const [record, batches] = await Promise.all([loadRecord(), loadBatches()]);
         if (!record) return;
 
-        populateForm(record);
+        populateForm(record, batches);
 
         if (form) {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                const batchSelect = document.getElementById('edit-batch');
+                const selectedBatchOption = batchSelect?.selectedOptions?.[0];
                 const updatedData = {
-                    batch: document.getElementById('edit-batch')?.value,
+                    batch: batchSelect?.value || '',
+                    batchName: selectedBatchOption?.textContent?.trim() || '',
                     date: document.getElementById('edit-date')?.value,
                     severity: document.getElementById('edit-severity')?.value,
                     issue: document.getElementById('edit-issue')?.value,
@@ -130,7 +158,7 @@ const EditHealthRecord = {
                             <div id="edit-health-status" class="mb-2"></div>
 
                             <label class="form-label">Batch / House</label>
-                            <input id="edit-batch" class="form-control" type="text" name="batch" placeholder="e.g., Batch A-12" required>
+                            <select id="edit-batch" class="form-select" name="batch" required></select>
 
                             <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;">
                                 <div style="flex:1;min-width:140px;">

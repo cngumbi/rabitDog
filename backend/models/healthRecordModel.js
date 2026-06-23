@@ -11,6 +11,11 @@ const healthRecordSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    batchName: {
+        type: String,
+        default: '',
+        trim: true,
+    },
     date: {
         type: Date,
         required: true,

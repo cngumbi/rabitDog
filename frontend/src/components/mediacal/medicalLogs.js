@@ -1,5 +1,6 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
 import { getHealthSummary, getHealthRecords, createHealthRecord } from '../../connection/api';
+import { livestockAPI } from '../../connection/livestockAPI';
 
 const MedicalLogs = {
     vignette: async () => {
@@ -12,21 +13,43 @@ const MedicalLogs = {
         };
         const form = document.getElementById('healthEntryForm');
         const statusMessage = document.getElementById('health-form-status');
+        let livestockBatches = [];
 
-        const getBatchesFromStorage = () => {
-            const stored = localStorage.getItem('poultryBatches');
-            return stored ? JSON.parse(stored) : [
-                'Batch A-12',
-                'Batch B-06',
-                'House 3',
-                'House 4'
-            ];
+        const resolveBatchDisplayName = (batchValue) => {
+            if (!batchValue) return 'Unassigned';
+            const matchedBatch = livestockBatches.find((batch) => {
+                const batchId = batch._id || '';
+                const batchName = batch.batchName || batch.name || '';
+                return batchId === String(batchValue) || batchName === String(batchValue);
+            });
+            return matchedBatch?.batchName || matchedBatch?.name || batchValue;
         };
 
-        const populateBatchOptions = () => {
+        const populateBatchOptions = async () => {
             if (!batchSelect) return;
-            const batches = getBatchesFromStorage();
-            batchSelect.innerHTML = batches.map((batch) => `<option value="${batch}">${batch}</option>`).join('');
+
+            try {
+                const response = await livestockAPI.getAllBatches();
+                livestockBatches = Array.isArray(response?.data) ? response.data : [];
+            } catch (error) {
+                console.error('Unable to load livestock batches for medical logs', error);
+                livestockBatches = [];
+            }
+
+            if (!livestockBatches.length) {
+                batchSelect.innerHTML = '<option value="">No livestock batches available</option>';
+                return;
+            }
+
+            batchSelect.innerHTML = livestockBatches.map((batch) => {
+                const batchName = batch.batchName || batch.name || 'Unnamed batch';
+                const batchValue = batch._id || batchName;
+                return `<option value="${batchValue}">${batchName}</option>`;
+            }).join('');
+
+            if (!batchSelect.value) {
+                batchSelect.value = livestockBatches[0]._id || livestockBatches[0].batchName || livestockBatches[0].name || '';
+            }
         };
 
         const formatDate = (iso) => {
@@ -62,7 +85,7 @@ const MedicalLogs = {
                     ? records.map((record) => {
                         return `
                             <tr>
-                                <td>${record.batch}</td>
+                                <td>${resolveBatchDisplayName(record.batch)}</td>
                                 <td>${formatDate(record.date)}</td>
                                 <td>${record.issue}</td>
                                 <td>${getBadge(record.severity, 'severity')}</td>
@@ -80,8 +103,10 @@ const MedicalLogs = {
         if (form) {
             form.addEventListener('submit', async (event) => {
                 event.preventDefault();
+                const selectedBatchOption = batchSelect?.selectedOptions?.[0];
                 const record = {
-                    batch: document.getElementById('healthBatchSelect')?.value,
+                    batch: batchSelect?.value || '',
+                    batchName: selectedBatchOption?.textContent?.trim() || '',
                     date: document.getElementById('healthDate')?.value,
                     severity: document.getElementById('healthSeverity')?.value,
                     issue: document.getElementById('healthIssue')?.value,
@@ -101,12 +126,15 @@ const MedicalLogs = {
                     statusMessage.className = 'form-success';
                 }
                 form.reset();
+                if (batchSelect && livestockBatches.length) {
+                    batchSelect.value = livestockBatches[0]._id || livestockBatches[0].batchName || livestockBatches[0].name || '';
+                }
                 await refreshSummary();
                 await refreshHistory();
             });
         }
 
-        populateBatchOptions();
+        await populateBatchOptions();
         await refreshSummary();
         await refreshHistory();
     },
@@ -152,10 +180,7 @@ const MedicalLogs = {
                         <div id="health-form-status" class="mb-2"></div>
                         <label class="form-label">Batch / House</label>
                         <select class="form-select" name="batch" id="healthBatchSelect">
-                          <option value="Batch A-12">Batch A-12</option>
-                          <option value="Batch B-06">Batch B-06</option>
-                          <option value="House 3">House 3</option>
-                          <option value="House 4">House 4</option>
+                          <option value="">Loading livestock batches...</option>
                         </select>
 
                         <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;">

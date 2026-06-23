@@ -110,6 +110,30 @@ const FeedingRecords = {
     this.data.currentPage = 1;
   },
 
+  getBatchName(record) {
+    const batchRef = record.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      if (batchRef.batchName) {
+        return batchRef.batchName;
+      }
+      if (batchRef.name) {
+        return batchRef.name;
+      }
+      if (batchRef._id) {
+        const matchedBatch = this.data.batches.find((batch) => batch._id === batchRef._id);
+        return matchedBatch?.batchName || 'Unassigned';
+      }
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      const matchedBatch = this.data.batches.find((batch) => batch._id === String(batchRef));
+      return matchedBatch?.batchName || record.batchName || 'Unassigned';
+    }
+
+    return record.batchName || 'Unassigned';
+  },
+
   render() {
     const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
     const endIdx = startIdx + this.data.itemsPerPage;
@@ -232,7 +256,7 @@ const FeedingRecords = {
                 ${pageData.map(record => `
                   <tr>
                     <td>${livestockUtils.formatDate(record.feedingDate)}</td>
-                    <td>${this.data.batches.find(b => b._id === record.batch)?.batchName || 'N/A'}</td>
+                    <td>${this.getBatchName(record)}</td>
                     <td>${record.feedType}</td>
                     <td>${livestockUtils.formatNumber(record.quantityFed)}</td>
                     <td>${livestockUtils.formatCurrency(record.costPerKg)}</td>

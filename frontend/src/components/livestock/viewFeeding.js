@@ -49,6 +49,25 @@ const ViewFeeding = {
     }
   },
 
+  getBatchName(record) {
+    if (!record) {
+      return 'Unassigned';
+    }
+
+    const batchRef = record.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      return batchRef.batchName || batchRef.name || 'Unassigned';
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      const matchedBatch = this.data.batches.find((batch) => batch._id === String(batchRef));
+      return matchedBatch?.batchName || record.batchName || 'Unassigned';
+    }
+
+    return record.batchName || 'Unassigned';
+  },
+
   render() {
     const record = this.data.record;
     const contentHtml = this.data.loading
@@ -74,7 +93,7 @@ const ViewFeeding = {
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-top: 16px;">
               <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:14px;">
                 <div style="font-size:12px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">Batch</div>
-                <div style="font-weight:600;">${record.batch?.batchName || 'Unassigned'}</div>
+                <div style="font-weight:600;">${this.getBatchName(record)}</div>
               </div>
               <div style="background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; padding:14px;">
                 <div style="font-size:12px; text-transform:uppercase; color:#6b7280; margin-bottom:6px;">Date</div>
