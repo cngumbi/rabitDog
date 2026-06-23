@@ -102,6 +102,7 @@ PartyRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
         bankAccount: req.body.bankAccount,
         taxId: req.body.taxId,
         paymentTerms: req.body.paymentTerms,
+        wholesales: req.body.wholesales || false,
         creditLimit: req.body.creditLimit || 0,
         currentBalance: req.body.currentBalance || 0,
         notes: req.body.notes,
@@ -137,6 +138,7 @@ PartyRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res) => {
         party.bankAccount = req.body.bankAccount || party.bankAccount;
         party.taxId = req.body.taxId || party.taxId;
         party.paymentTerms = req.body.paymentTerms || party.paymentTerms;
+        party.wholesales = req.body.wholesales !== undefined ? req.body.wholesales : party.wholesales;
         party.creditLimit = req.body.creditLimit !== undefined ? req.body.creditLimit : party.creditLimit;
         party.currentBalance = req.body.currentBalance !== undefined ? req.body.currentBalance : party.currentBalance;
         party.status = req.body.status || party.status;

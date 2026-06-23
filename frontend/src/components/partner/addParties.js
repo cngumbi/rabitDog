@@ -234,6 +234,13 @@ const AddParties = {
                           <option value="30 days">30 days</option>
                         </select>
                       </div>
+                      <div>
+                        <label class="form-label">
+                          <input id="partyWholesales" type="checkbox" style="margin-right: 8px;">
+                          This party is a wholesaler
+                        </label>
+                        <div class="text-muted" style="font-size: 0.875rem; margin-top: 4px;">Check if this party engages in wholesale operations</div>
+                      </div>
                     </div>
 
                     <div class="add-party-section-header mt-3">
@@ -320,6 +327,7 @@ const handleSaveParty = async (isPublished = true) => {
     const partyAddress = document.querySelector('#partyAddress').value.trim();
     const partyOpeningBalance = document.querySelector('#partyOpeningBalance').value;
     const partyPaymentTerms = document.querySelector('#partyPaymentTerms').value;
+    const partyWholesales = document.querySelector('#partyWholesales').checked;
     const partyNotes = document.querySelector('#partyNotes').value.trim();
 
     // Validate required fields
@@ -349,6 +357,7 @@ const handleSaveParty = async (isPublished = true) => {
             email: partyEmail,
             address: partyAddress || undefined,
             paymentTerms: partyPaymentTerms || undefined,
+            wholesales: partyWholesales,
             notes: partyNotes || undefined,
             currentBalance: partyOpeningBalance ? parseFloat(partyOpeningBalance) : 0,
             // Buyers are saved directly as active

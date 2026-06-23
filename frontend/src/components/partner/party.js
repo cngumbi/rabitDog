@@ -206,6 +206,13 @@ const Party = {
                                             <label class="form-label">Current Balance</label>
                                             <input id="partyCurrentBalance" class="form-control" value="Ksh ${party.currentBalance.toLocaleString()}" readonly>
                                         </div>
+                                        <div>
+                                            <label class="form-label" style="display: flex; align-items: center;">
+                                                <input id="partyWholesales" type="checkbox" ${party.wholesales ? 'checked' : ''} readonly data-editable="true" style="margin-right: 8px; width: auto; cursor: pointer;">
+                                                Wholesaler
+                                            </label>
+                                            <div class="text-muted" style="font-size: 0.875rem; margin-top: 4px;">Indicates wholesale operations</div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -305,7 +312,11 @@ const toggleEditMode = () => {
     const deleteBtn = document.querySelector('#delete-party-btn');
 
     editableInputs.forEach(input => {
-        input.readOnly = !input.readOnly;
+        if (input.type === 'checkbox') {
+            input.disabled = !input.disabled;
+        } else {
+            input.readOnly = !input.readOnly;
+        }
     });
 
     if (editSection.style.display === 'none') {
@@ -370,6 +381,7 @@ const handleSaveParty = async (partyId) => {
             address: document.querySelector('#partyAddress').value.trim(),
             contactPerson: document.querySelector('#partyContactPerson')?.value.trim() || undefined,
             paymentTerms: document.querySelector('#partyPaymentTerms').value.trim(),
+            wholesales: document.querySelector('#partyWholesales').checked,
             notes: document.querySelector('#partyNotes').value.trim()
         };
 

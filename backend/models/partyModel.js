@@ -35,6 +35,10 @@ const partySchema = new mongoose.Schema({
     },
     taxId: String,
     paymentTerms: String,
+    wholesales: {
+        type: Boolean,
+        default: false
+    },
     creditLimit: {
         type: Number,
         default: 0
