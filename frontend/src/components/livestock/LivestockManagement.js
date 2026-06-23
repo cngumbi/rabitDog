@@ -68,24 +68,44 @@ const LivestockManagement = {
   },
 
   filterBatches() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.batches;
 
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(b =>
-        b.batchName?.toLowerCase().includes(term) ||
-        b.batchCode?.toLowerCase().includes(term) ||
-        b.livestockType?.name?.toLowerCase().includes(term)
-      );
+    if (searchTerm) {
+      filtered = filtered.filter((batch) => {
+        const searchableText = [
+          batch.batchName,
+          batch.batchCode,
+          batch.location,
+          batch.purpose,
+          batch.status,
+          batch.livestockType?.name,
+          batch.livestockType?.typeName
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
 
     if (this.data.filterStatus !== 'all') {
-      filtered = filtered.filter(b => b.status === this.data.filterStatus);
+      filtered = filtered.filter((batch) => batch.status === this.data.filterStatus);
     }
 
     this.data.filteredBatches = filtered;
     this.data.currentPage = 1;
-    this.updateView();
+    this.refreshResultsView();
+  },
+
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('livestock-batches-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderBatchesTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredBatches.length}`;
+    }
   },
 
   async deleteBatch(batchId) {
@@ -151,7 +171,7 @@ const LivestockManagement = {
     const totalPages = Math.ceil(this.data.filteredBatches.length / this.data.itemsPerPage);
     if (page >= 1 && page <= totalPages) {
       this.data.currentPage = page;
-      this.updateView();
+      this.refreshResultsView();
       window.scrollTo(0, 0);
     }
   },
@@ -373,16 +393,16 @@ const LivestockManagement = {
         <div class="filter-row">
           <div class="filter-field">
             <label class="form-label">Search</label>
-            <input type="text" class="form-control" id="search-input" data-role="search-input" placeholder="Search by batch name or code...">
+            <input type="text" class="form-control" id="search-input" data-role="search-input" value="${this.data.searchTerm || ''}" placeholder="Search by batch name or code...">
           </div>
           <div class="filter-field">
             <label class="form-label">Filter by Status</label>
             <select class="form-select" data-role="status-filter">
-              <option value="all">All Batches</option>
-              <option value="Active">Active</option>
-              <option value="Completed">Completed</option>
-              <option value="Suspended">Suspended</option>
-              <option value="Archived">Archived</option>
+              <option value="all" ${this.data.filterStatus === 'all' ? 'selected' : ''}>All Batches</option>
+              <option value="Active" ${this.data.filterStatus === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Completed" ${this.data.filterStatus === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Suspended" ${this.data.filterStatus === 'Suspended' ? 'selected' : ''}>Suspended</option>
+              <option value="Archived" ${this.data.filterStatus === 'Archived' ? 'selected' : ''}>Archived</option>
             </select>
           </div>
           <div class="filter-field">
@@ -533,10 +553,12 @@ const LivestockManagement = {
         <div class="content-panel">
           <div class="content-header">
             <h2>Batches</h2>
-            <span class="content-total">Total: ${this.data.filteredBatches.length}</span>
+            <span class="content-total" data-role="results-count">Total: ${this.data.filteredBatches.length}</span>
           </div>
           ${this.renderFilterSection()}
-          ${this.renderBatchesTable()}
+          <div id="livestock-batches-results">
+            ${this.renderBatchesTable()}
+          </div>
         </div>
       `
     });
