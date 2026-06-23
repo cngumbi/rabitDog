@@ -76,9 +76,14 @@ const Parties = {
                 // Filter by channel if selected
                 let matchesChannel = true;
                 if (selectedChannel) {
-                    const partyChannel = party.businessType?.toLowerCase() || 
-                                        (party.type === 'supplier' ? 'supplier' : 'retail');
-                    matchesChannel = partyChannel === selectedChannel;
+                    if (selectedChannel === 'wholesale') {
+                        // Wholesale channel is a boolean flag on the party
+                        matchesChannel = !!party.wholesales;
+                    } else {
+                        const partyChannel = party.businessType?.toLowerCase() || 
+                                            (party.type === 'supplier' ? 'supplier' : 'retail');
+                        matchesChannel = partyChannel === selectedChannel;
+                    }
                 }
 
                 return matchesSearch && matchesType && matchesChannel;
