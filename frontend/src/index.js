@@ -53,6 +53,7 @@ import LivestockManagement from './components/livestock/LivestockManagement';
 import LivestockTypes from './components/livestock/livestockTypes';
 import AddType from './components/livestock/addType';
 import AddBatch from './components/livestock/addBatch';
+import ViewBatch from './components/livestock/viewBatch';
 import AnimalRecords from './components/livestock/animalRecords';
 import AddAnimal from './components/livestock/addAnimal';
 import AnimalHealthRecords from './components/livestock/animalHealthRecords';
@@ -137,6 +138,7 @@ const routes = {
     '/livestock/production': ProductionRecords,
     '/livestock/production/add': AddProductionRecord,
     '/livestock/add': AddBatch,
+    '/livestock/batch/:id': ViewBatch,
 };
 //==================ROUTER FUNCTION===========
 const router = async () => {
@@ -195,6 +197,7 @@ const router = async () => {
         '/livestock/production',
         '/livestock/production/add',
         '/livestock/add',
+        '/livestock/batch/:id',
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';

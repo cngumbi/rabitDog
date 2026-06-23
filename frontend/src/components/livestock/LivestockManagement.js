@@ -438,7 +438,7 @@ const LivestockManagement = {
               <td><span class="badge badge-${batch.status.toLowerCase()}">${batch.status}</span></td>
               <td>${livestockUtils.formatDate(batch.startDate)}</td>
               <td>
-                <a href="#" class="action-link">View</a>
+                <a href="/#/livestock/batch/${batch._id}" class="action-link">View</a>
                 <button type="button" data-action="delete-batch" data-batch-id="${batch._id}" class="action-link danger">Delete</button>
               </td>
             </tr>
