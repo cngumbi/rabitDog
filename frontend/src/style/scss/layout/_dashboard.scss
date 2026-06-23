@@ -80,36 +80,46 @@
   flex-direction: column;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1rem;
-  padding: 1.1rem 1.15rem;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(35, 41, 70, 0.97), rgba(76, 86, 127, 0.9));
+  margin-bottom: 1.25rem;
+  padding: 1.25rem 1.25rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #111827 0%, #1f2937 45%, #334155 100%);
   color: #fff;
-  box-shadow: 0 6px 20px rgba(35, 41, 70, 0.12);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -60px auto;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.22), transparent 70%);
+    pointer-events: none;
+  }
   
   @include breakpoints.breakpoint('sm') {
     gap: 1.1rem;
-    margin-bottom: 1.2rem;
-    padding: 1.2rem 1.25rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(35, 41, 70, 0.14);
+    margin-bottom: 1.35rem;
+    padding: 1.35rem 1.4rem;
+    border-radius: 26px;
   }
   
   @include breakpoints.breakpoint('md') {
     gap: 1.2rem;
-    margin-bottom: 1.35rem;
-    padding: 1.25rem 1.4rem;
-    border-radius: 23px;
+    margin-bottom: 1.45rem;
+    padding: 1.45rem 1.6rem;
+    border-radius: 28px;
   }
   
   @include breakpoints.breakpoint('lg') {
     flex-direction: row;
     justify-content: space-between;
     gap: 1.25rem;
-    margin-bottom: 1.5rem;
-    padding: 1.35rem 1.5rem;
-    border-radius: 26px;
-    box-shadow: 0 12px 30px rgba(35, 41, 70, 0.16);
+    margin-bottom: 1.6rem;
+    padding: 1.6rem 1.75rem;
+    border-radius: 30px;
   }
 }
 .dashboard-hero-copy {
@@ -195,20 +205,26 @@
     }
   }
 }
+.dashboard-hero-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .dashboard-pill {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  padding: 0.35rem 0.7rem;
-  font-size: 0.67rem;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #fff;
+  backdrop-filter: blur(6px);
 }
 .dashboard-pill-accent {
-  background: rgba(34, 197, 94, 0.18);
-  color: #d1fae5;
+  background: rgba(34, 197, 94, 0.2);
+  color: #dcfce7;
 }
 .dashboard-hero-meta {
   display: grid;
@@ -236,20 +252,20 @@
   }
 }
 .dashboard-mini-stat {
-  border-radius: 14px;
-  padding: 0.8rem 0.85rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  padding: 0.85rem 0.9rem;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
   
   @include breakpoints.breakpoint('sm') {
-    border-radius: 16px;
-    padding: 0.9rem 0.95rem;
+    border-radius: 18px;
+    padding: 0.95rem 1rem;
   }
   
   @include breakpoints.breakpoint('lg') {
-    border-radius: 18px;
-    padding: 0.95rem 1rem;
+    border-radius: 20px;
+    padding: 1rem 1.05rem;
   }
 }
 .dashboard-mini-stat-label {
@@ -294,12 +310,16 @@
 }
 .dashboard-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
 .dashboard-kpi-grid .card-metric {
   min-width: 0;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.95));
 }
 .dashboard-enterprise-section {
   display: grid;
@@ -316,6 +336,45 @@
   padding: 1.25rem;
   min-width: 0;
 }
+.dashboard-panel-card,
+.dashboard-progress-card,
+.dashboard-home-card {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,250,252,0.98));
+}
+.dashboard-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.dashboard-card-heading h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+.dashboard-card-heading p {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.dashboard-status-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #ecfdf3;
+  color: #166534;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+.dashboard-focus-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+.dashboard-health-card {
+  background: linear-gradient(135deg, #fff7ed 0%, #fef2f2 100%);
+}
 .dashboard-chart-inner {
   width: 100%;
 }
@@ -331,14 +390,78 @@
   gap: 0.7rem;
   margin-top: 0.9rem;
 }
+.dashboard-progress-card {
+  margin-bottom: 1.5rem;
+}
+.dashboard-progress-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-top: 0.3rem;
+}
+.dashboard-progress-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  background: linear-gradient(90deg, rgba(248,250,252,0.95), rgba(241,245,249,0.9));
+  border: 1px solid rgba(226, 232, 240, 0.95);
+}
+.dashboard-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+.dashboard-progress-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.dashboard-progress-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-strong);
+}
+.dashboard-progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+.dashboard-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+.dashboard-progress-fill--batch {
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+}
+.dashboard-progress-fill--animal {
+  background: linear-gradient(90deg, #0f766e, #2dd4bf);
+}
+.dashboard-progress-fill--health {
+  background: linear-gradient(90deg, #dc2626, #fb923c);
+}
+.dashboard-progress-fill--production {
+  background: linear-gradient(90deg, #15803d, #4ade80);
+}
+.dashboard-progress-placeholder {
+  padding: 1rem 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 .dashboard-status-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 12px;
-  padding: 0.75rem 0.85rem;
-  border: 1px solid #e5e7ef;
-  background: #fff;
+  border-radius: 14px;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #e2e8f0;
+  background: rgba(255,255,255,0.94);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
 }
 .dashboard-status-label {
   display: flex;
