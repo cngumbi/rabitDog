@@ -52,19 +52,160 @@ const AnimalRecords = {
   },
 
   filterAnimals() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.animals;
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(a =>
-        a.identificationNumber?.toLowerCase().includes(term) ||
-        a.animalCode?.toLowerCase().includes(term)
-      );
+
+    if (searchTerm) {
+      filtered = filtered.filter((animal) => {
+        const batchName = this.getBatchName(animal);
+        const searchableText = [
+          animal.identificationNumber,
+          animal.animalCode,
+          animal.gender,
+          animal.status,
+          animal.health,
+          batchName,
+          animal.weight,
+          animal.age,
+          animal.livestockType?.name,
+          animal.livestockType?.typeName
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
+
     if (this.data.filterBatch !== 'all') {
-      filtered = filtered.filter(a => a.batch === this.data.filterBatch);
+      filtered = filtered.filter((animal) => this.getBatchId(animal) === this.data.filterBatch);
     }
+
     this.data.filteredAnimals = filtered;
     this.data.currentPage = 1;
+    this.refreshResultsView();
+  },
+
+  getBatchId(animal) {
+    const batchRef = animal.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      return batchRef._id || '';
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      return String(batchRef);
+    }
+
+    return '';
+  },
+
+  getBatchName(animal) {
+    const batchRef = animal.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      return batchRef.batchName || batchRef.name || 'Unassigned';
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      const matchedBatch = this.data.batches.find((batch) => batch._id === String(batchRef));
+      return matchedBatch?.batchName || animal.batchName || 'Unassigned';
+    }
+
+    return animal.batchName || 'Unassigned';
+  },
+
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('animal-records-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderResultsTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredAnimals.length}`;
+    }
+  },
+
+  renderResultsTable() {
+    const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
+    const endIdx = startIdx + this.data.itemsPerPage;
+    const pageData = this.data.filteredAnimals.slice(startIdx, endIdx);
+    const totalPages = Math.ceil(this.data.filteredAnimals.length / this.data.itemsPerPage);
+
+    if (this.data.loading) {
+      return '<div class="loading-spinner">Loading animals...</div>';
+    }
+
+    if (pageData.length === 0) {
+      return '<div class="empty-state">No animal records found</div>';
+    }
+
+    return `
+      <table class="batches-table">
+        <thead>
+          <tr>
+            <th>ID Code</th>
+            <th>ID Number</th>
+            <th>Batch</th>
+            <th>Gender</th>
+            <th>Weight (kg)</th>
+            <th>Health</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pageData.map(animal => `
+            <tr>
+              <td>${animal.animalCode || 'N/A'}</td>
+              <td><strong>${animal.identificationNumber}</strong></td>
+              <td>${this.getBatchName(animal)}</td>
+              <td>${animal.gender || 'N/A'}</td>
+              <td>${livestockUtils.formatNumber(animal.weight || 0)}</td>
+              <td><span class="badge badge-${animal.health?.toLowerCase()}">${animal.health || 'Healthy'}</span></td>
+              <td>${animal.status || 'Active'}</td>
+              <td>
+                <a href="/#/livestock/animal/${animal._id}" class="action-link">View</a>
+                <button onclick="window.animalRecordsInstance.deleteAnimal('${animal._id}');" class="action-link danger">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="window.animalRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.animalRecordsInstance.refreshResultsView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+          <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
+          <button onclick="window.animalRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.animalRecordsInstance.refreshResultsView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+        </div>
+      ` : ''}
+    `;
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      if (event.target.matches('[data-role="animal-search-input"]')) {
+        this.data.searchTerm = event.target.value;
+        this.filterAnimals();
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      if (event.target.matches('[data-role="animal-batch-filter"]')) {
+        this.data.filterBatch = event.target.value;
+        this.filterAnimals();
+      }
+    });
   },
 
   render() {
@@ -103,63 +244,26 @@ const AnimalRecords = {
         <div class="content-panel">
             <div class="content-header">
               <h2>Animals</h2>
-              <span class="content-total">Total: ${this.data.filteredAnimals.length}</span>
+              <span class="content-total" data-role="results-count">Total: ${this.data.filteredAnimals.length}</span>
             </div>
             
             <div class="filter-section">
               <div class="filter-row">
                 <div class="filter-field">
-                  <input type="text" class="form-control" placeholder="Search animals..." onkeyup="window.animalRecordsInstance.data.searchTerm = this.value; window.animalRecordsInstance.filterAnimals(); window.animalRecordsInstance.updateView();">
+                  <input type="text" class="form-control" value="${this.data.searchTerm || ''}" data-role="animal-search-input" placeholder="Search animals...">
                 </div>
                 <div class="filter-field">
-                  <select class="form-select" onchange="window.animalRecordsInstance.data.filterBatch = this.value; window.animalRecordsInstance.filterAnimals(); window.animalRecordsInstance.updateView();">
-                    <option value="all">All Batches</option>
-                    ${this.data.batches.map(b => `<option value="${b._id}">${b.batchName}</option>`).join('')}
+                  <select class="form-select" data-role="animal-batch-filter">
+                    <option value="all" ${this.data.filterBatch === 'all' ? 'selected' : ''}>All Batches</option>
+                    ${this.data.batches.map(b => `<option value="${b._id}" ${this.data.filterBatch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                   </select>
                 </div>
               </div>
             </div>
 
-            ${this.data.loading ? '<div class="loading-spinner">Loading animals...</div>' : (pageData.length === 0 ? '<div class="empty-state">No animal records found</div>' : `
-              <table class="batches-table">
-                <thead>
-                  <tr>
-                    <th>ID Code</th>
-                    <th>ID Number</th>
-                    <th>Batch</th>
-                    <th>Gender</th>
-                    <th>Weight (kg)</th>
-                    <th>Health</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${pageData.map(animal => `
-                    <tr>
-                      <td>${animal.animalCode || 'N/A'}</td>
-                      <td><strong>${animal.identificationNumber}</strong></td>
-                      <td>${this.data.batches.find(b => b._id === animal.batch)?.batchName || 'N/A'}</td>
-                      <td>${animal.gender || 'N/A'}</td>
-                      <td>${livestockUtils.formatNumber(animal.weight || 0)}</td>
-                      <td><span class="badge badge-${animal.health?.toLowerCase()}">${animal.health || 'Healthy'}</span></td>
-                      <td>${animal.status || 'Active'}</td>
-                      <td>
-                        <a href="/#/livestock/animal/${animal._id}" class="action-link">View</a>
-                        <button onclick="window.animalRecordsInstance.deleteAnimal('${animal._id}');" class="action-link danger">Delete</button>
-                      </td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-              ${totalPages > 1 ? `
-                <div class="pagination">
-                  <button onclick="window.animalRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.animalRecordsInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-                  <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
-                  <button onclick="window.animalRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.animalRecordsInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
-                </div>
-              ` : ''}
-            `)}
+            <div id="animal-records-results">
+              ${this.renderResultsTable()}
+            </div>
           </div>
         </div>
       </div>
@@ -179,6 +283,7 @@ const AnimalRecords = {
       const container = document.getElementById('main-content');
       if (container) {
         container.innerHTML = this.render();
+        this.attachEventListeners();
       }
     };
 
