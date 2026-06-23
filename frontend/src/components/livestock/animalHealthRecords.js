@@ -13,24 +13,30 @@ const AnimalHealthRecords = {
     searchTerm: '',
     filterSeverity: 'all',
     formData: {},
-    showForm: false
+    showForm: false,
+    errorMessage: ''
   },
 
   async fetchData() {
     this.data.loading = true;
+    this.data.errorMessage = '';
+    this.updateView();
+
     try {
-      const [healthRes, animalsRes] = await Promise.all([
-        livestockAPI.getAllHealthRecords().catch(() => ({ data: [] })),
-        livestockAPI.getAllRecords().catch(() => ({ data: [] }))
-      ]);
+      const healthRes = await livestockAPI.getAllHealthRecords().catch(() => ({ data: [] }));
       this.data.healthRecords = healthRes.data || [];
-      this.data.animals = animalsRes.data || [];
       this.data.filteredRecords = this.data.healthRecords;
+      this.data.loading = false;
+      this.updateView();
+
+      const animalsRes = await livestockAPI.getAllRecords().catch(() => ({ data: [] }));
+      this.data.animals = animalsRes.data || [];
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
       this.data.loading = false;
+      this.data.errorMessage = 'Unable to load health records right now.';
+      this.updateView();
     }
   },
 
@@ -76,6 +82,28 @@ const AnimalHealthRecords = {
         alert('Error: ' + livestockUtils.parseError(error));
       }
     }
+  },
+
+  getAnimalName(record) {
+    const animalRef = record.animal;
+
+    if (animalRef && typeof animalRef === 'object') {
+      if (animalRef.identificationNumber) {
+        return animalRef.identificationNumber;
+      }
+
+      if (animalRef._id) {
+        const matchedAnimal = this.data.animals.find((animal) => animal._id === animalRef._id);
+        return matchedAnimal?.identificationNumber || 'N/A';
+      }
+    }
+
+    if (typeof animalRef === 'string' || typeof animalRef === 'number') {
+      const matchedAnimal = this.data.animals.find((animal) => animal._id === String(animalRef));
+      return matchedAnimal?.identificationNumber || 'N/A';
+    }
+
+    return 'N/A';
   },
 
   filterRecords() {
@@ -153,6 +181,7 @@ const AnimalHealthRecords = {
             </div>
           </div>
 
+          ${this.data.errorMessage ? `<div class="empty-state">${this.data.errorMessage}</div>` : ''}
           ${this.data.loading ? '<div class="loading-spinner">Loading records...</div>' : (pageData.length === 0 ? '<div class="empty-state">No health records found</div>' : `
             <table class="batches-table">
               <thead>
@@ -170,12 +199,13 @@ const AnimalHealthRecords = {
                 ${pageData.map(record => `
                   <tr>
                     <td>${livestockUtils.formatDate(record.recordDate)}</td>
-                    <td>${this.data.animals.find(a => a._id === record.animal)?.identificationNumber || 'N/A'}</td>
+                    <td>${this.getAnimalName(record)}</td>
                     <td>${record.recordType}</td>
                     <td><span class="badge badge-${record.severity?.toLowerCase()}">${record.severity}</span></td>
                     <td>${record.description || 'N/A'}</td>
                     <td>${record.outcome || 'Pending'}</td>
                     <td>
+                      <a href="/#/livestock/health/${record._id}" class="action-link">View</a>
                       <button onclick="window.animalHealthInstance.deleteHealthRecord('${record._id}');" class="action-link danger">Delete</button>
                     </td>
                   </tr>

@@ -25,20 +25,25 @@ const ProductionRecords = {
 
   async fetchData() {
     this.data.loading = true;
+    this.data.errorMessage = '';
+    this.updateView();
+
     try {
-      const [productionRes, batchesRes] = await Promise.all([
-        livestockAPI.getAllProductionRecords().catch(() => ({ data: [] })),
-        livestockAPI.getAllBatches().catch(() => ({ data: [] }))
-      ]);
+      const productionRes = await livestockAPI.getAllProductionRecords().catch(() => ({ data: [] }));
       this.data.productionRecords = productionRes.data || [];
-      this.data.batches = batchesRes.data || [];
       this.data.filteredRecords = this.data.productionRecords;
       this.calculateStats();
+      this.data.loading = false;
+      this.updateView();
+
+      const batchesRes = await livestockAPI.getAllBatches().catch(() => ({ data: [] }));
+      this.data.batches = batchesRes.data || [];
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
       this.data.loading = false;
+      this.data.errorMessage = 'Unable to load production records right now.';
+      this.updateView();
     }
   },
 
@@ -109,6 +114,106 @@ const ProductionRecords = {
     this.data.currentPage = 1;
   },
 
+  getBatchName(record) {
+    const batchRef = record.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      if (batchRef.batchName) {
+        return batchRef.batchName;
+      }
+
+      if (batchRef._id) {
+        const matchedBatch = this.data.batches.find((batch) => batch._id === batchRef._id);
+        return matchedBatch?.batchName || 'N/A';
+      }
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      const matchedBatch = this.data.batches.find((batch) => batch._id === String(batchRef));
+      return matchedBatch?.batchName || record.batchName || 'N/A';
+    }
+
+    return record.batchName || 'N/A';
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-action]');
+      if (!trigger) {
+        return;
+      }
+
+      const action = trigger.dataset.action;
+      if (action === 'show-form') {
+        event.preventDefault();
+        this.data.showForm = true;
+        this.data.errorMessage = '';
+        this.updateView();
+      } else if (action === 'hide-form') {
+        event.preventDefault();
+        this.data.showForm = false;
+        this.data.formData = {};
+        this.updateView();
+      } else if (action === 'delete-record') {
+        const recordId = trigger.dataset.recordId;
+        if (recordId) {
+          this.deleteRecord(recordId);
+        }
+      }
+    });
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (field) {
+        this.data.formData[field] = event.target.value;
+        if (this.data.errorMessage) {
+          this.data.errorMessage = '';
+        }
+      }
+
+      if (event.target.matches('[data-filter="search"]')) {
+        this.data.searchTerm = event.target.value;
+        this.filterRecords();
+        this.updateView();
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (field) {
+        this.data.formData[field] = event.target.value;
+      }
+
+      if (event.target.matches('[data-filter="batch"]')) {
+        this.data.filterBatch = event.target.value;
+        this.filterRecords();
+        this.updateView();
+      } else if (event.target.matches('[data-filter="quality"]')) {
+        this.data.filterQuality = event.target.value;
+        this.filterRecords();
+        this.updateView();
+      }
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-production-form]')) {
+        event.preventDefault();
+        this.createRecord();
+      }
+    });
+  },
+
   render() {
     const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
     const endIdx = startIdx + this.data.itemsPerPage;
@@ -126,7 +231,7 @@ const ProductionRecords = {
             <h1>Production Records</h1>
             <p>Track production output, revenue, and profitability.</p>
             <div class="dashboard-hero-actions">
-              <a class="btn-primary text-white" href="/#/livestock/production/add">+ Add Record</a>
+              <button type="button" class="btn-primary text-white" data-action="show-form">+ Add Record</button>
               <a class="btn-secondary text-white" href="/#/livestock">View Batches</a>
             </div>
           </div>
@@ -152,22 +257,22 @@ const ProductionRecords = {
             <div class="content-header">
               <h2>Add Production Record</h2>
               <div>
-                <button class="btn-secondary" type="button" onclick="window.productionRecordsInstance.data.showForm = false; window.productionRecordsInstance.updateView();">Close</button>
+                <button class="btn-secondary" type="button" data-action="hide-form">Close</button>
               </div>
             </div>
             <div class="form-panel">
-              <form onsubmit="event.preventDefault(); window.productionRecordsInstance.createRecord();">
+              <form data-production-form="true">
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">Batch *</label>
-                    <select class="form-select" onchange="window.productionRecordsInstance.data.formData.batch = this.value;" required>
+                    <select class="form-select" data-field="batch" required>
                       <option value="">Select Batch</option>
                       ${this.data.batches.map(b => `<option value="${b._id}" ${batch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                     </select>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Production Type *</label>
-                    <select class="form-select" onchange="window.productionRecordsInstance.data.formData.productionType = this.value;" required>
+                    <select class="form-select" data-field="productionType" required>
                       <option value="">Select Type</option>
                       <option value="Eggs" ${productionType === 'Eggs' ? 'selected' : ''}>Eggs</option>
                       <option value="Meat" ${productionType === 'Meat' ? 'selected' : ''}>Meat</option>
@@ -179,11 +284,11 @@ const ProductionRecords = {
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quantity *</label>
-                    <input type="number" step="0.1" class="form-control" value="${quantity || ''}" onchange="window.productionRecordsInstance.data.formData.quantity = this.value;" placeholder="0.00" required>
+                    <input type="number" step="0.1" class="form-control" value="${quantity || ''}" data-field="quantity" placeholder="0.00" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Unit *</label>
-                    <select class="form-select" onchange="window.productionRecordsInstance.data.formData.unit = this.value;" required>
+                    <select class="form-select" data-field="unit" required>
                       <option value="">Select Unit</option>
                       <option value="Kg" ${this.data.formData.unit === 'Kg' ? 'selected' : ''}>Kg</option>
                       <option value="Liters" ${this.data.formData.unit === 'Liters' ? 'selected' : ''}>Liters</option>
@@ -193,11 +298,11 @@ const ProductionRecords = {
                   </div>
                   <div class="form-group">
                     <label class="form-label">Price per Unit *</label>
-                    <input type="number" step="0.01" class="form-control" value="${pricePerUnit || ''}" onchange="window.productionRecordsInstance.data.formData.pricePerUnit = this.value;" placeholder="0.00" required>
+                    <input type="number" step="0.01" class="form-control" value="${pricePerUnit || ''}" data-field="pricePerUnit" placeholder="0.00" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quality Grade</label>
-                    <select class="form-select" onchange="window.productionRecordsInstance.data.formData.qualityGrade = this.value;">
+                    <select class="form-select" data-field="qualityGrade">
                       <option value="Grade A" ${qualityGrade === 'Grade A' ? 'selected' : ''}>Grade A</option>
                       <option value="Grade B" ${qualityGrade === 'Grade B' ? 'selected' : ''}>Grade B</option>
                       <option value="Grade C" ${qualityGrade === 'Grade C' ? 'selected' : ''}>Grade C</option>
@@ -207,7 +312,7 @@ const ProductionRecords = {
                 </div>
                 <div class="form-actions">
                   <button type="submit" class="btn-primary text-white">Create Record</button>
-                  <button type="button" class="btn-secondary" onclick="window.productionRecordsInstance.data.showForm = false; window.productionRecordsInstance.updateView();">Cancel</button>
+                  <button type="button" class="btn-secondary" data-action="hide-form">Cancel</button>
                 </div>
               </form>
             </div>
@@ -220,7 +325,7 @@ const ProductionRecords = {
                 <p style="margin:0.25rem 0 0 0; color:#666; font-size:0.95rem;">Quickly log production output for a batch.</p>
               </div>
               <div>
-                <button class="btn-primary text-white" onclick="window.productionRecordsInstance.data.showForm = true; window.productionRecordsInstance.updateView();">+ Add Record</button>
+                <button class="btn-primary text-white" type="button" data-action="show-form">+ Add Record</button>
               </div>
             </div>
           </div>
@@ -235,16 +340,16 @@ const ProductionRecords = {
           <div class="filter-section">
             <div class="filter-row">
               <div class="filter-field">
-                <input type="text" class="form-control" placeholder="Search by type..." onkeyup="window.productionRecordsInstance.data.searchTerm = this.value; window.productionRecordsInstance.filterRecords(); window.productionRecordsInstance.updateView();">
+                <input type="text" class="form-control" placeholder="Search by type..." data-filter="search">
               </div>
               <div class="filter-field">
-                <select class="form-select" onchange="window.productionRecordsInstance.data.filterBatch = this.value; window.productionRecordsInstance.filterRecords(); window.productionRecordsInstance.updateView();">
+                <select class="form-select" data-filter="batch">
                   <option value="all">All Batches</option>
                   ${this.data.batches.map(b => `<option value="${b._id}">${b.batchName}</option>`).join('')}
                 </select>
               </div>
               <div class="filter-field">
-                <select class="form-select" onchange="window.productionRecordsInstance.data.filterQuality = this.value; window.productionRecordsInstance.filterRecords(); window.productionRecordsInstance.updateView();">
+                <select class="form-select" data-filter="quality">
                   <option value="all">All Grades</option>
                   <option value="Excellent">Excellent</option>
                   <option value="Good">Good</option>
@@ -273,13 +378,16 @@ const ProductionRecords = {
                 ${pageData.map(record => `
                   <tr>
                     <td>${livestockUtils.formatDate(record.productionDate)}</td>
-                    <td>${this.data.batches.find(b => b._id === record.batch)?.batchName || 'N/A'}</td>
+                    <td>${this.getBatchName(record)}</td>
                     <td>${record.productionType}</td>
                     <td>${livestockUtils.formatNumber(record.quantity)}</td>
                     <td>${record.unit}</td>
                     <td>${livestockUtils.formatCurrency(record.revenue || 0)}</td>
                     <td>${livestockUtils.formatCurrency((record.revenue || 0) - (record.expenses || 0))}</td>
-                    <td><button onclick="window.productionRecordsInstance.deleteRecord('${record._id}');" class="action-link danger">Delete</button></td>
+                    <td>
+                      <a href="/#/livestock/production/${record._id}" class="action-link">View</a>
+                      <button type="button" class="action-link danger" data-action="delete-record" data-record-id="${record._id}">Delete</button>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -297,9 +405,30 @@ const ProductionRecords = {
     });
   },
 
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
+    }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
   updateView() {
-    const container = document.getElementById('main-content');
-    if (container) container.innerHTML = this.render();
+    this.scheduleRender();
+    this.attachEventListeners();
   },
 
   vignette() { this.init(); },

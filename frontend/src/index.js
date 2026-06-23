@@ -59,11 +59,13 @@ import AddAnimal from './components/livestock/addAnimal';
 import ViewAnimal from './components/livestock/viewAnimal';
 import AnimalHealthRecords from './components/livestock/animalHealthRecords';
 import AddHealthRecord from './components/livestock/addHealthRecord';
+import ViewHealth from './components/livestock/viewHealth';
 import FeedingRecords from './components/livestock/feedingRecords';
 import AddFeedingRecord from './components/livestock/addFeedingRecord';
 import ViewFeeding from './components/livestock/viewFeeding';
 import AddProductionRecord from './components/livestock/addProductionRecord';
 import ProductionRecords from './components/livestock/productionRecords';
+import ViewProduction from './components/livestock/viewProduction';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 if (faviconImg) {
@@ -136,11 +138,13 @@ const routes = {
     '/livestock/animal/:id': ViewAnimal,
     '/livestock/health': AnimalHealthRecords,
     '/livestock/health/add': AddHealthRecord,
+    '/livestock/health/:id': ViewHealth,
     '/livestock/feeding': FeedingRecords,
     '/livestock/feeding/add': AddFeedingRecord,
     '/livestock/feeding/:id': ViewFeeding,
     '/livestock/production': ProductionRecords,
     '/livestock/production/add': AddProductionRecord,
+    '/livestock/production/:id': ViewProduction,
     '/livestock/add': AddBatch,
     '/livestock/batch/:id': ViewBatch,
 };
@@ -197,11 +201,13 @@ const router = async () => {
         '/livestock/animal/:id',
         '/livestock/health',
         '/livestock/health/add',
+        '/livestock/health/:id',
         '/livestock/feeding',
         '/livestock/feeding/add',
         '/livestock/feeding/:id',
         '/livestock/production',
         '/livestock/production/add',
+        '/livestock/production/:id',
         '/livestock/add',
         '/livestock/batch/:id',
     ];

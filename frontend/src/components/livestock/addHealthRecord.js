@@ -44,9 +44,52 @@ const AddHealthRecord = {
     return Object.keys(errors).length === 0;
   },
 
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+
+      this.data.formData[field] = event.target.value;
+      if (this.data.errors[field]) {
+        delete this.data.errors[field];
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+
+      this.data.formData[field] = event.target.value;
+      if (this.data.errors[field]) {
+        delete this.data.errors[field];
+      }
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-health-form]')) {
+        event.preventDefault();
+        this.submitForm();
+      }
+    });
+  },
+
   async submitForm() {
     if (!this.validateForm()) {
-      alert('Please fix the errors below');
       this.updateView();
       return;
     }
@@ -60,15 +103,14 @@ const AddHealthRecord = {
         recordType,
         animal,
         severity,
-        description: description || '',
-        treatment: treatment ? { medicineName: treatment } : undefined,
+        description: description ? description.trim() : '',
+        treatment: treatment ? { medicineName: treatment.trim() } : undefined,
         outcome: outcome || 'Ongoing',
         recordDate: new Date()
       };
 
       await livestockAPI.createHealthRecord(payload);
 
-      alert('✓ Health record created successfully!');
       this.data.formData = {
         recordType: '',
         animal: '',
@@ -80,12 +122,12 @@ const AddHealthRecord = {
       this.data.errors = {};
       this.updateView();
 
-      // Redirect after delay
       setTimeout(() => {
-        document.location.hash = '/#/livestock/health';
+        window.location.hash = '#/livestock/health';
       }, 500);
     } catch (error) {
-      alert('Error: ' + livestockUtils.parseError(error));
+      this.data.errors.submit = livestockUtils.parseError(error);
+      this.updateView();
     } finally {
       this.data.loading = false;
     }
@@ -118,7 +160,7 @@ const AddHealthRecord = {
       `,
       contentHtml: `
         <div class="content-panel">
-            <form id="health-record-form" onsubmit="event.preventDefault(); window.addHealthRecordInstance.submitForm();">
+            <form data-health-form="true">
               
               <!-- Section 1: Identification -->
               <div class="form-section">
@@ -130,7 +172,7 @@ const AddHealthRecord = {
                       <span class="form-hint">Type of health event</span>
                     </label>
                     <select class="form-control ${errors.recordType ? 'error' : ''}" 
-                            onchange="window.addHealthRecordInstance.data.formData.recordType = this.value; window.addHealthRecordInstance.data.errors = {}; window.addHealthRecordInstance.updateView();" 
+                            data-field="recordType"
                             required>
                       <option value="">-- Select Record Type --</option>
                       <option value="Illness" ${recordType === 'Illness' ? 'selected' : ''}>Illness / Disease</option>
@@ -148,7 +190,7 @@ const AddHealthRecord = {
                       <span class="form-hint">Which animal affected</span>
                     </label>
                     <select class="form-control ${errors.animal ? 'error' : ''}" 
-                            onchange="window.addHealthRecordInstance.data.formData.animal = this.value; window.addHealthRecordInstance.data.errors = {}; window.addHealthRecordInstance.updateView();" 
+                            data-field="animal"
                             required>
                       <option value="">-- Select Animal --</option>
                       ${this.data.animals.map(a => `<option value="${a._id}" ${animal === a._id ? 'selected' : ''}>${a.identificationNumber || a.animalCode}</option>`).join('')}
@@ -168,7 +210,7 @@ const AddHealthRecord = {
                       <span class="form-hint">How serious is the issue</span>
                     </label>
                     <select class="form-control ${errors.severity ? 'error' : ''}" 
-                            onchange="window.addHealthRecordInstance.data.formData.severity = this.value; window.addHealthRecordInstance.data.errors = {}; window.addHealthRecordInstance.updateView();" 
+                            data-field="severity"
                             required>
                       <option value="">-- Select Severity --</option>
                       <option value="Mild" ${severity === 'Mild' ? 'selected' : ''}>Mild (Minor issue, no urgency)</option>
@@ -185,7 +227,7 @@ const AddHealthRecord = {
                       <span class="form-hint">Status of the condition</span>
                     </label>
                     <select class="form-control" 
-                            onchange="window.addHealthRecordInstance.data.formData.outcome = this.value; window.addHealthRecordInstance.updateView();">
+                            data-field="outcome">
                       <option value="Ongoing" ${outcome === 'Ongoing' ? 'selected' : ''}>Ongoing (Still being monitored)</option>
                       <option value="Recovered" ${outcome === 'Recovered' ? 'selected' : ''}>Recovered (Animal healed)</option>
                       <option value="Deceased" ${outcome === 'Deceased' ? 'selected' : ''}>Deceased (Animal lost)</option>
@@ -205,7 +247,7 @@ const AddHealthRecord = {
                     </label>
                     <textarea class="form-control" 
                               rows="4"
-                              onchange="window.addHealthRecordInstance.data.formData.description = this.value; window.addHealthRecordInstance.updateView();" 
+                              data-field="description"
                               placeholder="Describe the health issue, symptoms, observations, etc.">${description || ''}</textarea>
                   </div>
 
@@ -216,8 +258,8 @@ const AddHealthRecord = {
                     </label>
                     <input type="text" 
                            class="form-control" 
+                           data-field="treatment"
                            value="${treatment || ''}" 
-                           onchange="window.addHealthRecordInstance.data.formData.treatment = this.value; window.addHealthRecordInstance.updateView();" 
                            placeholder="e.g., Amoxicillin 500mg, Vaccination XYZ">
                   </div>
                 </div>
@@ -242,6 +284,7 @@ const AddHealthRecord = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.attachEventListeners();
     }
   },
 
