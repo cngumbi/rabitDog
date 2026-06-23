@@ -32,12 +32,14 @@ const ProductionRecords = {
       const productionRes = await livestockAPI.getAllProductionRecords().catch(() => ({ data: [] }));
       this.data.productionRecords = productionRes.data || [];
       this.data.filteredRecords = this.data.productionRecords;
+      this.data.currentPage = 1;
       this.calculateStats();
       this.data.loading = false;
       this.updateView();
 
       const batchesRes = await livestockAPI.getAllBatches().catch(() => ({ data: [] }));
       this.data.batches = batchesRes.data || [];
+      this.filterRecords();
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -98,20 +100,59 @@ const ProductionRecords = {
     }
   },
 
+  getBatchId(record) {
+    const batchRef = record.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      return batchRef._id || '';
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      return String(batchRef);
+    }
+
+    return '';
+  },
+
+  getQualityValue(record) {
+    return record.qualityGrade || record.quality || 'Grade A';
+  },
+
   filterRecords() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.productionRecords;
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(r => r.productionType?.toLowerCase().includes(term));
+
+    if (searchTerm) {
+      filtered = filtered.filter((record) => {
+        const batchName = this.getBatchName(record);
+        const quality = this.getQualityValue(record);
+        const searchableText = [
+          record.productionType,
+          record.unit,
+          record.status,
+          quality,
+          batchName,
+          record.quantity,
+          record.revenue,
+          record.expenses,
+          livestockUtils.formatDate(record.productionDate)
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
+
     if (this.data.filterBatch !== 'all') {
-      filtered = filtered.filter(r => r.batch === this.data.filterBatch);
+      filtered = filtered.filter((record) => this.getBatchId(record) === this.data.filterBatch);
     }
+
     if (this.data.filterQuality !== 'all') {
-      filtered = filtered.filter(r => r.qualityGrade === this.data.filterQuality);
+      filtered = filtered.filter((record) => this.getQualityValue(record) === this.data.filterQuality);
     }
+
     this.data.filteredRecords = filtered;
     this.data.currentPage = 1;
+    this.refreshResultsView();
   },
 
   getBatchName(record) {
@@ -134,6 +175,74 @@ const ProductionRecords = {
     }
 
     return record.batchName || 'N/A';
+  },
+
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('production-records-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderRecordsTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredRecords.length}`;
+    }
+  },
+
+  renderRecordsTable() {
+    const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
+    const endIdx = startIdx + this.data.itemsPerPage;
+    const pageData = this.data.filteredRecords.slice(startIdx, endIdx);
+    const totalPages = Math.ceil(this.data.filteredRecords.length / this.data.itemsPerPage);
+
+    if (this.data.loading) {
+      return '<div class="loading-spinner">Loading records...</div>';
+    }
+
+    if (pageData.length === 0) {
+      return '<div class="empty-state">No production records found</div>';
+    }
+
+    return `
+      <table class="batches-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Batch</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+            <th>Revenue</th>
+            <th>Profit</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pageData.map(record => `
+            <tr>
+              <td>${livestockUtils.formatDate(record.productionDate)}</td>
+              <td>${this.getBatchName(record)}</td>
+              <td>${record.productionType}</td>
+              <td>${livestockUtils.formatNumber(record.quantity)}</td>
+              <td>${record.unit}</td>
+              <td>${livestockUtils.formatCurrency(record.revenue || 0)}</td>
+              <td>${livestockUtils.formatCurrency((record.revenue || 0) - (record.expenses || 0))}</td>
+              <td>
+                <a href="/#/livestock/production/${record._id}" class="action-link">View</a>
+                <button type="button" class="action-link danger" data-action="delete-record" data-record-id="${record._id}">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="window.productionRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.productionRecordsInstance.refreshResultsView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+          <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
+          <button onclick="window.productionRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.productionRecordsInstance.refreshResultsView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+        </div>
+      ` : ''}
+    `;
   },
 
   attachEventListeners() {
@@ -182,10 +291,9 @@ const ProductionRecords = {
         }
       }
 
-      if (event.target.matches('[data-filter="search"]')) {
+      if (event.target.matches('[data-role="production-search-input"]')) {
         this.data.searchTerm = event.target.value;
         this.filterRecords();
-        this.updateView();
       }
     });
 
@@ -195,14 +303,12 @@ const ProductionRecords = {
         this.data.formData[field] = event.target.value;
       }
 
-      if (event.target.matches('[data-filter="batch"]')) {
+      if (event.target.matches('[data-role="production-batch-filter"]')) {
         this.data.filterBatch = event.target.value;
         this.filterRecords();
-        this.updateView();
-      } else if (event.target.matches('[data-filter="quality"]')) {
+      } else if (event.target.matches('[data-role="production-quality-filter"]')) {
         this.data.filterQuality = event.target.value;
         this.filterRecords();
-        this.updateView();
       }
     });
 
@@ -215,11 +321,6 @@ const ProductionRecords = {
   },
 
   render() {
-    const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
-    const endIdx = startIdx + this.data.itemsPerPage;
-    const pageData = this.data.filteredRecords.slice(startIdx, endIdx);
-    const totalPages = Math.ceil(this.data.filteredRecords.length / this.data.itemsPerPage);
-
     const { batch, productionType, quantity, pricePerUnit, qualityGrade } = this.data.formData;
 
     return LivestockLayout.render({
@@ -334,72 +435,35 @@ const ProductionRecords = {
         <div class="content-panel">
           <div class="content-header">
             <h2>Production Records</h2>
-            <span class="content-total">Total: ${this.data.filteredRecords.length}</span>
+            <span class="content-total" data-role="results-count">Total: ${this.data.filteredRecords.length}</span>
           </div>
 
           <div class="filter-section">
             <div class="filter-row">
               <div class="filter-field">
-                <input type="text" class="form-control" placeholder="Search by type..." data-filter="search">
+                <input type="text" class="form-control" value="${this.data.searchTerm || ''}" data-role="production-search-input" placeholder="Search records...">
               </div>
               <div class="filter-field">
-                <select class="form-select" data-filter="batch">
-                  <option value="all">All Batches</option>
-                  ${this.data.batches.map(b => `<option value="${b._id}">${b.batchName}</option>`).join('')}
+                <select class="form-select" data-role="production-batch-filter">
+                  <option value="all" ${this.data.filterBatch === 'all' ? 'selected' : ''}>All Batches</option>
+                  ${this.data.batches.map(b => `<option value="${b._id}" ${this.data.filterBatch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                 </select>
               </div>
               <div class="filter-field">
-                <select class="form-select" data-filter="quality">
-                  <option value="all">All Grades</option>
-                  <option value="Excellent">Excellent</option>
-                  <option value="Good">Good</option>
-                  <option value="Average">Average</option>
-                  <option value="Poor">Poor</option>
+                <select class="form-select" data-role="production-quality-filter">
+                  <option value="all" ${this.data.filterQuality === 'all' ? 'selected' : ''}>All Grades</option>
+                  <option value="Excellent" ${this.data.filterQuality === 'Excellent' ? 'selected' : ''}>Excellent</option>
+                  <option value="Good" ${this.data.filterQuality === 'Good' ? 'selected' : ''}>Good</option>
+                  <option value="Average" ${this.data.filterQuality === 'Average' ? 'selected' : ''}>Average</option>
+                  <option value="Poor" ${this.data.filterQuality === 'Poor' ? 'selected' : ''}>Poor</option>
                 </select>
               </div>
             </div>
           </div>
 
-          ${this.data.loading ? '<div class="loading-spinner">Loading records...</div>' : (pageData.length === 0 ? '<div class="empty-state">No production records found</div>' : `
-            <table class="batches-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Batch</th>
-                  <th>Type</th>
-                  <th>Quantity</th>
-                  <th>Unit</th>
-                  <th>Revenue</th>
-                  <th>Profit</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${pageData.map(record => `
-                  <tr>
-                    <td>${livestockUtils.formatDate(record.productionDate)}</td>
-                    <td>${this.getBatchName(record)}</td>
-                    <td>${record.productionType}</td>
-                    <td>${livestockUtils.formatNumber(record.quantity)}</td>
-                    <td>${record.unit}</td>
-                    <td>${livestockUtils.formatCurrency(record.revenue || 0)}</td>
-                    <td>${livestockUtils.formatCurrency((record.revenue || 0) - (record.expenses || 0))}</td>
-                    <td>
-                      <a href="/#/livestock/production/${record._id}" class="action-link">View</a>
-                      <button type="button" class="action-link danger" data-action="delete-record" data-record-id="${record._id}">Delete</button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            ${totalPages > 1 ? `
-              <div class="pagination">
-                <button onclick="window.productionRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.productionRecordsInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-                <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
-                <button onclick="window.productionRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.productionRecordsInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
-              </div>
-            ` : ''}
-          `)}
+          <div id="production-records-results">
+            ${this.renderRecordsTable()}
+          </div>
         </div>
       `
     });
@@ -416,6 +480,7 @@ const ProductionRecords = {
       const container = document.getElementById('main-content');
       if (container) {
         container.innerHTML = this.render();
+        this.attachEventListeners();
       }
     };
 
@@ -428,7 +493,6 @@ const ProductionRecords = {
 
   updateView() {
     this.scheduleRender();
-    this.attachEventListeners();
   },
 
   vignette() { this.init(); },
