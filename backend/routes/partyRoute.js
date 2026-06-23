@@ -43,7 +43,7 @@ PartyRoute.get('/type/:type', isAuth, isAdmin, expressAsync(async(req, res) => {
 
 // Get party summary stats
 PartyRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res) => {
-    const buyers = await Party.countDocuments({ type: { $in: ['buyer', 'both'] }, status: 'active' });
+    const buyers = await Party.countDocuments({ type: { $in: ['buyer', 'both', 'wholesale'] }, status: 'active' });
     const suppliers = await Party.countDocuments({ type: { $in: ['supplier', 'both'] }, status: 'active' });
     const newThisMonth = await Party.countDocuments({
         createdAt: {

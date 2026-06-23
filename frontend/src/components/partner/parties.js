@@ -77,10 +77,10 @@ const Parties = {
                 let matchesChannel = true;
                 if (selectedChannel) {
                     if (selectedChannel === 'wholesale') {
-                        // Wholesale channel is a boolean flag on the party
-                        matchesChannel = !!party.wholesales;
+                        // Wholesale channel includes explicit wholesale type or wholesales flag
+                        matchesChannel = party.type === 'wholesale' || !!party.wholesales;
                     } else {
-                        const partyChannel = party.businessType?.toLowerCase() || 
+                        const partyChannel = party.businessType?.toLowerCase() ||
                                             (party.type === 'supplier' ? 'supplier' : 'retail');
                         matchesChannel = partyChannel === selectedChannel;
                     }
@@ -168,7 +168,7 @@ const Parties = {
 
             // Update table rows
             tableBody.innerHTML = pageData.map(party => {
-                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier';
+                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : party.type === 'wholesale' ? 'Wholesale Buyer' : 'Buyer & Supplier';
                 const statusClass = party.status === 'active' ? 'badge-success' : party.status === 'inactive' ? 'badge-warning' : 'badge-danger';
                 
                 return `
@@ -338,7 +338,7 @@ const Parties = {
             // Build recent party cards HTML
             const recentPartyCards = recentParties.map((party, index) => {
                 const initials = party.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier';
+                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : party.type === 'wholesale' ? 'Wholesale Buyer' : 'Buyer & Supplier';
                 const statusClass = party.status === 'active' ? 'badge-green' : party.status === 'inactive' ? 'badge-yellow' : 'badge-red';
                 const cardClass = index === 0 ? 'party-card party-card-primary' : 'party-card';
                 
@@ -374,7 +374,7 @@ const Parties = {
             // Build table rows for first page
             const firstPageData = activeParties.slice(0, itemsPerPage);
             const tableRows = firstPageData.map(party => {
-                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier';
+                const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : party.type === 'wholesale' ? 'Wholesale Buyer' : 'Buyer & Supplier';
                 const statusClass = party.status === 'active' ? 'badge-green' : party.status === 'inactive' ? 'badge-yellow' : 'badge-red';
                 
                 return `
@@ -390,7 +390,7 @@ const Parties = {
                 `;
             }).join('');
 
-            const buyersCount = activeParties.filter(p => p.type === 'buyer' || p.type === 'both').length;
+            const buyersCount = activeParties.filter(p => p.type === 'buyer' || p.type === 'wholesale' || p.type === 'both').length;
             const suppliersCount = activeParties.filter(p => p.type === 'supplier' || p.type === 'both').length;
 
             // Calculate contacts reached percentage (parties with phone or email)
@@ -527,6 +527,7 @@ const Parties = {
                                 <select id="parties-type-filter" class="parties-type-filter">
                                   <option value="all">All Types</option>
                                   <option value="buyer">Buyer</option>
+                                  <option value="wholesale">Wholesale Buyer</option>
                                   <option value="supplier">Supplier</option>
                                   <option value="both">Buyer & Supplier</option>
                                 </select>

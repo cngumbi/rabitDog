@@ -186,6 +186,7 @@ const AddParties = {
                         <select id="partyType" class="form-select" required>
                           <option value="">Select type</option>
                           <option value="buyer">Buyer</option>
+                          <option value="wholesale">Wholesale Buyer</option>
                           <option value="supplier">Supplier</option>
                           <option value="both">Buyer & Supplier</option>
                         </select>

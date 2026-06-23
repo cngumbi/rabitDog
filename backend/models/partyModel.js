@@ -8,7 +8,7 @@ const partySchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['buyer', 'supplier', 'both'],
+        enum: ['buyer', 'supplier', 'both', 'wholesale'],
         required: true
     },
     email: {

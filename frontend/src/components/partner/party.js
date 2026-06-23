@@ -93,7 +93,7 @@ const Party = {
                 `;
             }
 
-            const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : 'Buyer & Supplier';
+            const roleLabel = party.type === 'buyer' ? 'Buyer' : party.type === 'supplier' ? 'Supplier' : party.type === 'wholesale' ? 'Wholesale Buyer' : 'Buyer & Supplier';
             const statusClass = party.status === 'active' ? 'badge-green' : party.status === 'inactive' ? 'badge-yellow' : 'badge-red';
             const initials = party.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
