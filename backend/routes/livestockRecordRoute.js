@@ -8,9 +8,9 @@ const LivestockBatch = require('../models/livestockBatchModel');
 const LivestockRecordRoute = express.Router();
 
 // GET all animals
-LivestockRecordRoute.get('/', expressAsync(async (req, res) => {
+LivestockRecordRoute.get('/', isAuth, expressAsync(async (req, res) => {
   const { batch, status, health } = req.query;
-  const filter = { owner: req.user?._id };
+  const filter = { owner: req.user._id };
   
   if (batch) filter.batch = batch;
   if (status) filter.status = status;
@@ -25,7 +25,7 @@ LivestockRecordRoute.get('/', expressAsync(async (req, res) => {
 }));
 
 // GET animal by ID
-LivestockRecordRoute.get('/:id', expressAsync(async (req, res) => {
+LivestockRecordRoute.get('/:id', isAuth, expressAsync(async (req, res) => {
   const record = await LivestockRecord.findById(req.params.id)
     .populate('batch')
     .populate('livestockType')

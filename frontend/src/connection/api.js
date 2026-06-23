@@ -26,9 +26,7 @@ const refreshToken = async () => {
         setUserInfo(response.data);
         return response.data;
     } catch(err){
-        // On refresh failure, ensure client signs out and return null
         try { await clearUser(); } catch(e) { /* best-effort */ }
-        // Redirect to a refresh-failure page so UX can explain next steps
         document.location.hash = '/refresh-failed';
         return null;
     }
@@ -54,12 +52,17 @@ apiClient.interceptors.response.use(
             !originalRequest.url.endsWith('/refresh-token')
         ){
             originalRequest._retry = true;
+            const { token } = getUserInfo();
+            if(!token){
+                try { await clearUser(); } catch(e) { /* best-effort */ }
+                document.location.hash = '/';
+                return Promise.reject(new Error('Unauthorized - please sign in'));
+            }
             const data = await refreshToken();
             if(data && data.token){
                 originalRequest.headers.Authorization = `Bearer ${data.token}`;
                 return apiClient(originalRequest);
             }
-            // If refresh failed, ensure we surface the failure to caller
             return Promise.reject(new Error('Session expired - refresh failed'));
         }
         return Promise.reject(error);

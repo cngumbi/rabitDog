@@ -14,6 +14,8 @@ const LivestockTypes = {
 
   async fetchTypes() {
     this.data.loading = true;
+    this.updateView();
+
     try {
       const response = await livestockAPI.getAllTypes();
       this.data.types = response.data || [];
@@ -23,6 +25,7 @@ const LivestockTypes = {
       alert('Error: ' + livestockUtils.parseError(error));
     } finally {
       this.data.loading = false;
+      this.updateView();
     }
   },
 

@@ -52,6 +52,12 @@ livestockClient.interceptors.response.use(
             !originalRequest.url.endsWith('/refresh-token')
         ){
             originalRequest._retry = true;
+            const { token } = getUserInfo();
+            if(!token){
+                try { await clearUser(); } catch(e) {}
+                document.location.hash = '/';
+                return Promise.reject(new Error('Unauthorized - please sign in'));
+            }
             const data = await refreshToken();
             if(data && data.token){
                 originalRequest.headers.Authorization = `Bearer ${data.token}`;

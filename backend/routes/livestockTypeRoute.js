@@ -30,6 +30,17 @@ LivestockTypeRoute.get('/:id', expressAsync(async (req, res) => {
 // CREATE new livestock type
 LivestockTypeRoute.post('/', isAuth, expressAsync(async (req, res) => {
   try {
+    console.log('Creating livestock type with body:', req.body);
+    console.log('User ID:', req.user?._id);
+
+    if (!req.user) {
+      return res.status(401).send({ message: 'User not authenticated' });
+    }
+
+    if (!req.body.name || !req.body.category) {
+      return res.status(400).send({ message: 'Name and category are required' });
+    }
+
     const type = new LivestockType({
       name: req.body.name,
       description: req.body.description,
@@ -43,12 +54,32 @@ LivestockTypeRoute.post('/', isAuth, expressAsync(async (req, res) => {
       humidityRange: req.body.humidityRange,
       owner: req.user._id
     });
-    
+
+    console.log('Saving type:', type);
     const createdType = await type.save();
+    console.log('Type saved successfully:', createdType);
+
     await logActivity(req.user._id, 'LIVESTOCK_TYPE_CREATED', `Created livestock type: ${createdType.name}`);
     res.status(201).send(createdType);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    console.error('Error creating livestock type:', error);
+    
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      const value = error.keyValue[field];
+      return res.status(400).send({ 
+        message: `A livestock type with this ${field} (${value}) already exists in this category. Please use a different name.`
+      });
+    }
+
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).send({ message: 'Validation error: ' + messages.join(', ') });
+    }
+
+    res.status(400).send({ message: error.message || 'Error creating livestock type' });
   }
 }));
 

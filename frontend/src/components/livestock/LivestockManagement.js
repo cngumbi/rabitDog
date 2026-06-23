@@ -15,6 +15,7 @@ const LivestockManagement = {
     filterStatus: 'all',
     formData: {},
     showForm: false,
+    errorMessage: '',
     stats: {
       totalBatches: 0,
       activeBatches: 0,
@@ -25,6 +26,8 @@ const LivestockManagement = {
 
   async fetchData() {
     this.data.loading = true;
+    this.data.errorMessage = '';
+    this.updateView();
     try {
       // Parallel fetch for better performance
       const [typesRes, batchesRes] = await Promise.all([
@@ -42,8 +45,10 @@ const LivestockManagement = {
       }
     } catch (error) {
       console.error('Error fetching data:', error);
+      this.data.errorMessage = 'Unable to load livestock batches right now. Please refresh or try again shortly.';
     } finally {
       this.data.loading = false;
+      this.updateView();
     }
   },
 
@@ -144,12 +149,96 @@ const LivestockManagement = {
     }
   },
 
-  toggleCreateForm() {
-    this.data.showForm = !this.data.showForm;
+  toggleCreateForm(forceOpen = null) {
+    const shouldOpen = forceOpen !== null ? forceOpen : !this.data.showForm;
+    this.data.showForm = shouldOpen;
     if (!this.data.showForm) {
       this.data.formData = {};
     }
     this.updateView();
+  },
+
+  attachEventListeners() {
+    if (this._eventListenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._eventListenersAttached = true;
+
+    container.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) {
+        return;
+      }
+
+      const { action, batchId, page, open } = button.dataset;
+
+      switch (action) {
+        case 'toggle-create-form':
+          this.toggleCreateForm(open === 'true');
+          break;
+        case 'reset-create-form':
+          this.data.formData = {};
+          this.toggleCreateForm(false);
+          break;
+        case 'delete-batch':
+          if (batchId) {
+            this.deleteBatch(batchId);
+          }
+          break;
+        case 'change-page':
+          if (page) {
+            this.changePage(parseInt(page, 10));
+          }
+          break;
+        default:
+          break;
+      }
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-create-batch-form]')) {
+        event.preventDefault();
+        this.createBatch();
+      }
+    });
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+
+      this.data.formData[field] = event.target.value;
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (field) {
+        this.data.formData[field] = event.target.value;
+      }
+
+      if (event.target.matches('[data-role="status-filter"]')) {
+        this.handleStatusFilter(event.target.value);
+      }
+
+      if (event.target.matches('[data-role="items-per-page"]')) {
+        this.data.itemsPerPage = parseInt(event.target.value, 10);
+        this.data.currentPage = 1;
+        this.updateView();
+      }
+    });
+
+    container.addEventListener('keyup', (event) => {
+      if (event.target.matches('[data-role="search-input"]')) {
+        this.handleSearch(event.target.value);
+      }
+    });
   },
 
   renderHeroSection() {
@@ -202,42 +291,42 @@ const LivestockManagement = {
     return `
       <div class="form-panel">
         <h2>Create New Batch</h2>
-        <form onsubmit="event.preventDefault(); window.livestockInstance.createBatch();">
+        <form data-create-batch-form="true">
           <div class="form-grid">
             <div class="form-group">
               <label class="form-label">Batch Name *</label>
-              <input type="text" class="form-control" value="${batchName || ''}" onchange="window.livestockInstance.data.formData.batchName = this.value;" placeholder="e.g., Batch A-01" required>
+              <input type="text" class="form-control" data-field="batchName" value="${batchName || ''}" placeholder="e.g., Batch A-01" required>
             </div>
             <div class="form-group">
               <label class="form-label">Livestock Type *</label>
-              <select class="form-select" onchange="window.livestockInstance.data.formData.livestockTypeId = this.value;" required>
+              <select class="form-select" data-field="livestockTypeId" required>
                 <option value="">Select Type</option>
                 ${this.data.livestockTypes.map(type => `<option value="${type._id}" ${livestockTypeId === type._id ? 'selected' : ''}>${type.name}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label class="form-label">Initial Quantity *</label>
-              <input type="number" class="form-control" value="${quantity || ''}" onchange="window.livestockInstance.data.formData.quantity = this.value;" placeholder="100" required>
+              <input type="number" class="form-control" data-field="quantity" value="${quantity || ''}" placeholder="100" required>
             </div>
             <div class="form-group">
               <label class="form-label">Unit Cost *</label>
-              <input type="number" class="form-control" step="0.01" value="${unitCost || ''}" onchange="window.livestockInstance.data.formData.unitCost = this.value;" placeholder="500" required>
+              <input type="number" class="form-control" step="0.01" data-field="unitCost" value="${unitCost || ''}" placeholder="500" required>
             </div>
             <div class="form-group">
               <label class="form-label">Start Date *</label>
-              <input type="date" class="form-control" value="${startDate || ''}" onchange="window.livestockInstance.data.formData.startDate = this.value;" required>
+              <input type="date" class="form-control" data-field="startDate" value="${startDate || ''}" required>
             </div>
             <div class="form-group">
               <label class="form-label">Expected End Date</label>
-              <input type="date" class="form-control" value="${expectedEndDate || ''}" onchange="window.livestockInstance.data.formData.expectedEndDate = this.value;">
+              <input type="date" class="form-control" data-field="expectedEndDate" value="${expectedEndDate || ''}">
             </div>
             <div class="form-group">
               <label class="form-label">Location</label>
-              <input type="text" class="form-control" value="${location || ''}" onchange="window.livestockInstance.data.formData.location = this.value;" placeholder="e.g., House 1">
+              <input type="text" class="form-control" data-field="location" value="${location || ''}" placeholder="e.g., House 1">
             </div>
             <div class="form-group">
               <label class="form-label">Purpose</label>
-              <select class="form-select" onchange="window.livestockInstance.data.formData.purpose = this.value;">
+              <select class="form-select" data-field="purpose">
                 <option value="">Select Purpose</option>
                 <option value="Production" ${purpose === 'Production' ? 'selected' : ''}>Production</option>
                 <option value="Breeding" ${purpose === 'Breeding' ? 'selected' : ''}>Breeding</option>
@@ -247,7 +336,7 @@ const LivestockManagement = {
           </div>
           <div class="form-actions">
             <button type="submit" class="btn-primary text-white">Create Batch</button>
-            <button type="button" class="btn-secondary" onclick="window.livestockInstance.data.formData = {}; window.livestockInstance.toggleCreateForm();">Cancel</button>
+            <button type="button" class="btn-secondary" data-action="reset-create-form">Cancel</button>
           </div>
         </form>
       </div>
@@ -259,12 +348,12 @@ const LivestockManagement = {
       <div class="content-panel batch-create-panel">
         <div class="content-header">
           <h2>Create New Batch</h2>
-          <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">${this.data.showForm ? 'Hide Form' : '+ New Batch'}</button>
+          <button type="button" data-action="toggle-create-form" data-open="${this.data.showForm ? 'false' : 'true'}" class="btn-primary text-white">${this.data.showForm ? 'Hide Form' : '+ New Batch'}</button>
         </div>
         ${this.data.showForm ? this.renderCreateForm() : `
           <div class="empty-state">
             <p>Start a new livestock batch to track production, feeding, and health records.</p>
-            <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">Create New Batch</button>
+            <button type="button" data-action="toggle-create-form" data-open="true" class="btn-primary text-white">Create New Batch</button>
           </div>
         `}
       </div>
@@ -277,11 +366,11 @@ const LivestockManagement = {
         <div class="filter-row">
           <div class="filter-field">
             <label class="form-label">Search</label>
-            <input type="text" class="form-control" id="search-input" placeholder="Search by batch name or code..." onkeyup="window.livestockInstance.handleSearch(this.value)">
+            <input type="text" class="form-control" id="search-input" data-role="search-input" placeholder="Search by batch name or code...">
           </div>
           <div class="filter-field">
             <label class="form-label">Filter by Status</label>
-            <select class="form-select" onchange="window.livestockInstance.handleStatusFilter(this.value);">
+            <select class="form-select" data-role="status-filter">
               <option value="all">All Batches</option>
               <option value="Active">Active</option>
               <option value="Completed">Completed</option>
@@ -291,7 +380,7 @@ const LivestockManagement = {
           </div>
           <div class="filter-field">
             <label class="form-label">Items per page</label>
-            <select class="form-select" onchange="window.livestockInstance.data.itemsPerPage = parseInt(this.value); window.livestockInstance.data.currentPage = 1; window.livestockInstance.updateView();">
+            <select class="form-select" data-role="items-per-page">
               <option value="5" ${this.data.itemsPerPage === 5 ? 'selected' : ''}>5</option>
               <option value="10" ${this.data.itemsPerPage === 10 ? 'selected' : ''}>10</option>
               <option value="20" ${this.data.itemsPerPage === 20 ? 'selected' : ''}>20</option>
@@ -317,7 +406,7 @@ const LivestockManagement = {
       return `
         <div class="empty-state">
           <p>${this.data.batches.length === 0 ? 'No batches created yet.' : 'No batches match your search.'}</p>
-          <button onclick="window.livestockInstance.toggleCreateForm();" class="btn-primary text-white">Create First Batch</button>
+          <button type="button" data-action="toggle-create-form" data-open="true" class="btn-primary text-white">Create First Batch</button>
         </div>
       `;
     }
@@ -350,7 +439,7 @@ const LivestockManagement = {
               <td>${livestockUtils.formatDate(batch.startDate)}</td>
               <td>
                 <a href="#" class="action-link">View</a>
-                <button onclick="window.livestockInstance.deleteBatch('${batch._id}');" class="action-link danger">Delete</button>
+                <button type="button" data-action="delete-batch" data-batch-id="${batch._id}" class="action-link danger">Delete</button>
               </td>
             </tr>
           `).join('')}
@@ -358,13 +447,13 @@ const LivestockManagement = {
       </table>
 
       <div class="pagination">
-        <button onclick="window.livestockInstance.changePage(${this.data.currentPage - 1});" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+        <button type="button" data-action="change-page" data-page="${this.data.currentPage - 1}" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
         <div class="pagination-pages">
           ${Array.from({ length: totalPages }, (_, i) => i + 1).slice(Math.max(0, this.data.currentPage - 2), Math.min(totalPages, this.data.currentPage + 1)).map(page => `
-            <button onclick="window.livestockInstance.changePage(${page});" class="btn-secondary ${page === this.data.currentPage ? 'active' : ''}">${page}</button>
+            <button type="button" data-action="change-page" data-page="${page}" class="btn-secondary ${page === this.data.currentPage ? 'active' : ''}">${page}</button>
           `).join('')}
         </div>
-        <button onclick="window.livestockInstance.changePage(${this.data.currentPage + 1});" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+        <button type="button" data-action="change-page" data-page="${this.data.currentPage + 1}" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
         <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
       </div>
     `;
@@ -429,6 +518,11 @@ const LivestockManagement = {
       activePath: window.location.hash.slice(1).toLowerCase() || '/livestock',
       contentHtml: `
         ${this.renderCreateSection()}
+        ${this.data.errorMessage ? `
+          <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+            ✗ ${this.data.errorMessage}
+          </div>
+        ` : ''}
         <div class="content-panel">
           <div class="content-header">
             <h2>Batches</h2>
@@ -445,6 +539,7 @@ const LivestockManagement = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.attachEventListeners();
     }
   },
 

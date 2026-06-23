@@ -32,6 +32,7 @@ const FeedingRecords = {
       this.data.batches = batchesRes.data || [];
       this.data.filteredRecords = this.data.feedingRecords;
       this.calculateStats();
+      this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

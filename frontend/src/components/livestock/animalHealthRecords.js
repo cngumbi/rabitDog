@@ -16,6 +16,24 @@ const AnimalHealthRecords = {
     showForm: false
   },
 
+  async fetchData() {
+    this.data.loading = true;
+    try {
+      const [healthRes, animalsRes] = await Promise.all([
+        livestockAPI.getAllHealthRecords().catch(() => ({ data: [] })),
+        livestockAPI.getAllRecords().catch(() => ({ data: [] }))
+      ]);
+      this.data.healthRecords = healthRes.data || [];
+      this.data.animals = animalsRes.data || [];
+      this.data.filteredRecords = this.data.healthRecords;
+      this.updateView();
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      this.data.loading = false;
+    }
+  },
+
   async createHealthRecord() {
     const { recordType, animal, severity, description, treatment, outcome } = this.data.formData;
     if (!recordType || !animal || !severity) {

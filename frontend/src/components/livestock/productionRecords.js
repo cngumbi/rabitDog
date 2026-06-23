@@ -34,6 +34,7 @@ const ProductionRecords = {
       this.data.batches = batchesRes.data || [];
       this.data.filteredRecords = this.data.productionRecords;
       this.calculateStats();
+      this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

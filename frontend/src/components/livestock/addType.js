@@ -37,18 +37,24 @@ const AddType = {
       this.data.loading = true;
       this.data.errorMessage = '';
 
-      await livestockAPI.createType({
+      console.log('Submitting form with data:', { name, description, category });
+      
+      const response = await livestockAPI.createType({
         name: name.trim(),
         description: description?.trim() || '',
         category: category || 'Poultry'
       });
 
+      console.log('Type created successfully:', response.data);
       this.data.success = true;
       setTimeout(() => {
         window.location.hash = '#/livestock/types';
       }, 1000);
     } catch (error) {
-      this.data.errorMessage = 'Error creating type: ' + livestockUtils.parseError(error);
+      console.error('Error creating type:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Unknown error';
+      this.data.errorMessage = 'Error creating type: ' + errorMsg;
+      console.log('Final error message:', this.data.errorMessage);
       this.updateView();
     } finally {
       this.data.loading = false;
@@ -84,7 +90,7 @@ const AddType = {
             ` : ''}
 
             <div class="form-panel">
-              <form onsubmit="event.preventDefault(); window.addTypeInstance.submitForm();">
+              <form id="add-type-form">
                 <div class="form-section">
                   <h3 class="form-section-title">Basic Information</h3>
                   
@@ -92,10 +98,10 @@ const AddType = {
                     <label class="form-label">Type Name *</label>
                     <p class="form-hint">Enter a descriptive name for this livestock type (e.g., Broiler Chicken, Dairy Cow)</p>
                     <input 
+                      id="type-name"
                       type="text" 
                       class="form-control ${this.data.errors.name ? 'error' : ''}" 
                       value="${name || ''}" 
-                      onchange="window.addTypeInstance.data.formData.name = this.value;" 
                       placeholder="e.g., Broiler Chicken"
                       required
                     >
@@ -106,8 +112,8 @@ const AddType = {
                     <label class="form-label">Category *</label>
                     <p class="form-hint">Select the main category this livestock type belongs to</p>
                     <select 
+                      id="type-category"
                       class="form-select ${this.data.errors.category ? 'error' : ''}" 
-                      onchange="window.addTypeInstance.data.formData.category = this.value;"
                       required
                     >
                       <option value="">Select Category</option>
@@ -128,8 +134,8 @@ const AddType = {
                     <label class="form-label">Description</label>
                     <p class="form-hint">Provide details about this type, characteristics, or special notes</p>
                     <textarea 
+                      id="type-description"
                       class="form-control" 
-                      onchange="window.addTypeInstance.data.formData.description = this.value;" 
                       placeholder="Describe this livestock type (e.g., Average weight, lifespan, special characteristics)"
                       rows="4"
                     >${description || ''}</textarea>
@@ -159,11 +165,45 @@ const AddType = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.attachEventListeners();
+    }
+  },
+
+  attachEventListeners() {
+    const form = document.getElementById('add-type-form');
+    const nameInput = document.getElementById('type-name');
+    const categorySelect = document.getElementById('type-category');
+    const descriptionInput = document.getElementById('type-description');
+
+    if (nameInput) {
+      nameInput.addEventListener('input', (event) => {
+        this.data.formData.name = event.target.value;
+      });
+    }
+
+    if (categorySelect) {
+      categorySelect.addEventListener('change', (event) => {
+        this.data.formData.category = event.target.value;
+      });
+    }
+
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', (event) => {
+        this.data.formData.description = event.target.value;
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await this.submitForm();
+      });
     }
   },
 
   vignette() {
     this.init();
+    this.attachEventListeners();
   },
 
   init() {

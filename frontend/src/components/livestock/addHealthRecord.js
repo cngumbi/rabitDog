@@ -21,6 +21,7 @@ const AddHealthRecord = {
     try {
       const response = await livestockAPI.getAllRecords();
       this.data.animals = response.data || [];
+      this.updateView();
     } catch (error) {
       console.error('Error fetching animals:', error);
     }
@@ -33,6 +34,11 @@ const AddHealthRecord = {
     if (!recordType) errors.recordType = 'Record type is required';
     if (!animal) errors.animal = 'Please select an animal';
     if (!severity) errors.severity = 'Severity level is required';
+
+    // description is required by backend model
+    if (!this.data.formData.description || this.data.formData.description.trim() === '') {
+      errors.description = 'Description is required';
+    }
 
     this.data.errors = errors;
     return Object.keys(errors).length === 0;

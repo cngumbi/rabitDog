@@ -16,6 +16,7 @@ const AddAnimal = {
     try {
       const response = await livestockAPI.getAllBatches().catch(e => ({ data: [] }));
       this.data.batches = response.data || [];
+      this.updateView();
     } catch (error) {
       console.error('Error fetching batches:', error);
       this.data.batches = [];
@@ -51,9 +52,14 @@ const AddAnimal = {
       this.data.loading = true;
       this.data.errorMessage = '';
 
+      // derive livestockType from selected batch to satisfy backend model requirements
+      const selectedBatch = this.data.batches.find(b => b._id === batch) || {};
+      const livestockType = selectedBatch.livestockType && (selectedBatch.livestockType._id || selectedBatch.livestockType) || undefined;
+
       await livestockAPI.createRecord({
         identificationNumber: identificationNumber.trim(),
         batch,
+        livestockType,
         gender,
         weight: weight ? parseFloat(weight) : 0,
         health: health || 'Healthy',

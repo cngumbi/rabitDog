@@ -7,15 +7,15 @@ const LivestockHealthRecord = require('../models/livestockHealthRecordModel');
 const LivestockHealthRoute = express.Router();
 
 // GET all health records
-LivestockHealthRoute.get('/', expressAsync(async (req, res) => {
+LivestockHealthRoute.get('/', isAuth, expressAsync(async (req, res) => {
   const { batch, recordType, severity } = req.query;
-  const filter = { owner: req.user?._id };
+  const filter = { owner: req.user._id };
   
   if (batch) filter.batch = batch;
   if (recordType) filter.recordType = recordType;
   if (severity) filter.severity = severity;
   
-  const records = await LivestockHealthRoute.find(filter)
+  const records = await LivestockHealthRecord.find(filter)
     .populate('batch', 'batchName')
     .populate('animal')
     .populate('recordedBy', 'name')
@@ -25,7 +25,7 @@ LivestockHealthRoute.get('/', expressAsync(async (req, res) => {
 }));
 
 // GET health record by ID
-LivestockHealthRoute.get('/:id', expressAsync(async (req, res) => {
+LivestockHealthRoute.get('/:id', isAuth, expressAsync(async (req, res) => {
   const record = await LivestockHealthRecord.findById(req.params.id)
     .populate('batch')
     .populate('animal')

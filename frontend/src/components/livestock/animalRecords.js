@@ -24,6 +24,7 @@ const AnimalRecords = {
       this.data.animals = animalsRes.data || [];
       this.data.batches = batchesRes.data || [];
       this.data.filteredAnimals = this.data.animals;
+      this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {

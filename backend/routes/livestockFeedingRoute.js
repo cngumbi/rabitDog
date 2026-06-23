@@ -7,9 +7,9 @@ const LivestockFeedingRecord = require('../models/livestockFeedingRecordModel');
 const LivestockFeedingRoute = express.Router();
 
 // GET all feeding records
-LivestockFeedingRoute.get('/', expressAsync(async (req, res) => {
+LivestockFeedingRoute.get('/', isAuth, expressAsync(async (req, res) => {
   const { batch, feedType, startDate, endDate } = req.query;
-  const filter = { owner: req.user?._id };
+  const filter = { owner: req.user._id };
   
   if (batch) filter.batch = batch;
   if (feedType) filter.feedType = feedType;
@@ -30,7 +30,7 @@ LivestockFeedingRoute.get('/', expressAsync(async (req, res) => {
 }));
 
 // GET feeding record by ID
-LivestockFeedingRoute.get('/:id', expressAsync(async (req, res) => {
+LivestockFeedingRoute.get('/:id', isAuth, expressAsync(async (req, res) => {
   const record = await LivestockFeedingRecord.findById(req.params.id)
     .populate('batch')
     .populate('supplier')

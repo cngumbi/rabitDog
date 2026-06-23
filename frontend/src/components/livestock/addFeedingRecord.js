@@ -15,6 +15,7 @@ const AddFeedingRecord = {
     try {
       const res = await livestockAPI.getAllBatches().catch(() => ({ data: [] }));
       this.data.batches = res.data || [];
+      this.updateView();
     } catch (error) {
       console.error('Error fetching batches', error);
       this.data.batches = [];

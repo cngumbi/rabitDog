@@ -16,6 +16,7 @@ const AddBatch = {
     try {
       const response = await livestockAPI.getAllTypes().catch(() => ({ data: [] }));
       this.data.livestockTypes = response.data || [];
+      this.updateView();
     } catch (error) {
       console.error('Error fetching livestock types:', error);
       this.data.livestockTypes = [];
@@ -24,7 +25,7 @@ const AddBatch = {
 
   validateForm() {
     this.data.errors = {};
-    const { batchName, livestockTypeId, quantity, unitCost, startDate } = this.data.formData;
+    const { batchName, livestockTypeId, quantity, unitCost, startDate, location } = this.data.formData;
 
     if (!batchName || batchName.trim() === '') {
       this.data.errors.batchName = 'Batch name is required';
@@ -40,6 +41,9 @@ const AddBatch = {
     }
     if (!startDate) {
       this.data.errors.startDate = 'Start date is required';
+    }
+    if (!location || location.trim() === '') {
+      this.data.errors.location = 'Location is required';
     }
 
     return Object.keys(this.data.errors).length === 0;
@@ -112,16 +116,16 @@ const AddBatch = {
           ` : ''}
 
           <div class="form-panel">
-            <form onsubmit="event.preventDefault(); window.addBatchInstance.submitForm();">
+            <form id="add-batch-form">
               <div class="form-grid">
                 <div class="form-group">
                   <label class="form-label">Batch Name *</label>
-                  <input type="text" class="form-control ${this.data.errors.batchName ? 'error' : ''}" value="${batchName || ''}" onchange="window.addBatchInstance.data.formData.batchName = this.value;" placeholder="e.g., Batch A-01" required>
+                  <input id="batch-name" type="text" class="form-control ${this.data.errors.batchName ? 'error' : ''}" value="${batchName || ''}" placeholder="e.g., Batch A-01" required>
                   ${this.data.errors.batchName ? `<div class="form-error">${this.data.errors.batchName}</div>` : ''}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Livestock Type *</label>
-                  <select class="form-select ${this.data.errors.livestockTypeId ? 'error' : ''}" onchange="window.addBatchInstance.data.formData.livestockTypeId = this.value;" required>
+                  <select id="batch-livestock-type" class="form-select ${this.data.errors.livestockTypeId ? 'error' : ''}" required>
                     <option value="">Select Type</option>
                     ${this.data.livestockTypes.map(type => `<option value="${type._id}" ${livestockTypeId === type._id ? 'selected' : ''}>${type.name}</option>`).join('')}
                   </select>
@@ -129,30 +133,31 @@ const AddBatch = {
                 </div>
                 <div class="form-group">
                   <label class="form-label">Initial Quantity *</label>
-                  <input type="number" class="form-control ${this.data.errors.quantity ? 'error' : ''}" value="${quantity || ''}" onchange="window.addBatchInstance.data.formData.quantity = this.value;" placeholder="100" required>
+                  <input id="batch-quantity" type="number" class="form-control ${this.data.errors.quantity ? 'error' : ''}" value="${quantity || ''}" placeholder="100" required>
                   ${this.data.errors.quantity ? `<div class="form-error">${this.data.errors.quantity}</div>` : ''}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Unit Cost *</label>
-                  <input type="number" step="0.01" class="form-control ${this.data.errors.unitCost ? 'error' : ''}" value="${unitCost || ''}" onchange="window.addBatchInstance.data.formData.unitCost = this.value;" placeholder="500" required>
+                  <input id="batch-unit-cost" type="number" step="0.01" class="form-control ${this.data.errors.unitCost ? 'error' : ''}" value="${unitCost || ''}" placeholder="500" required>
                   ${this.data.errors.unitCost ? `<div class="form-error">${this.data.errors.unitCost}</div>` : ''}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Start Date *</label>
-                  <input type="date" class="form-control ${this.data.errors.startDate ? 'error' : ''}" value="${startDate || ''}" onchange="window.addBatchInstance.data.formData.startDate = this.value;" required>
+                  <input id="batch-start-date" type="date" class="form-control ${this.data.errors.startDate ? 'error' : ''}" value="${startDate || ''}" required>
                   ${this.data.errors.startDate ? `<div class="form-error">${this.data.errors.startDate}</div>` : ''}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Expected End Date</label>
-                  <input type="date" class="form-control" value="${expectedEndDate || ''}" onchange="window.addBatchInstance.data.formData.expectedEndDate = this.value;">
+                  <input id="batch-end-date" type="date" class="form-control" value="${expectedEndDate || ''}">
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Location</label>
-                  <input type="text" class="form-control" value="${location || ''}" onchange="window.addBatchInstance.data.formData.location = this.value;" placeholder="e.g., House 1">
+                  <label class="form-label">Location *</label>
+                  <input id="batch-location" type="text" class="form-control ${this.data.errors.location ? 'error' : ''}" value="${location || ''}" placeholder="e.g., House 1" required>
+                  ${this.data.errors.location ? `<div class="form-error">${this.data.errors.location}</div>` : ''}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Purpose</label>
-                  <select class="form-select" onchange="window.addBatchInstance.data.formData.purpose = this.value;">
+                  <select id="batch-purpose" class="form-select">
                     <option value="">Select Purpose</option>
                     <option value="Production" ${purpose === 'Production' ? 'selected' : ''}>Production</option>
                     <option value="Breeding" ${purpose === 'Breeding' ? 'selected' : ''}>Breeding</option>
@@ -179,11 +184,80 @@ const AddBatch = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.attachEventListeners();
+    }
+  },
+
+  attachEventListeners() {
+    const form = document.getElementById('add-batch-form');
+    const batchNameInput = document.getElementById('batch-name');
+    const livestockTypeSelect = document.getElementById('batch-livestock-type');
+    const quantityInput = document.getElementById('batch-quantity');
+    const unitCostInput = document.getElementById('batch-unit-cost');
+    const startDateInput = document.getElementById('batch-start-date');
+    const endDateInput = document.getElementById('batch-end-date');
+    const locationInput = document.getElementById('batch-location');
+    const purposeSelect = document.getElementById('batch-purpose');
+
+    if (batchNameInput) {
+      batchNameInput.addEventListener('input', (event) => {
+        this.data.formData.batchName = event.target.value;
+      });
+    }
+
+    if (livestockTypeSelect) {
+      livestockTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.livestockTypeId = event.target.value;
+      });
+    }
+
+    if (quantityInput) {
+      quantityInput.addEventListener('input', (event) => {
+        this.data.formData.quantity = event.target.value;
+      });
+    }
+
+    if (unitCostInput) {
+      unitCostInput.addEventListener('input', (event) => {
+        this.data.formData.unitCost = event.target.value;
+      });
+    }
+
+    if (startDateInput) {
+      startDateInput.addEventListener('input', (event) => {
+        this.data.formData.startDate = event.target.value;
+      });
+    }
+
+    if (endDateInput) {
+      endDateInput.addEventListener('input', (event) => {
+        this.data.formData.expectedEndDate = event.target.value;
+      });
+    }
+
+    if (locationInput) {
+      locationInput.addEventListener('input', (event) => {
+        this.data.formData.location = event.target.value;
+      });
+    }
+
+    if (purposeSelect) {
+      purposeSelect.addEventListener('change', (event) => {
+        this.data.formData.purpose = event.target.value;
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await this.submitForm();
+      });
     }
   },
 
   vignette() {
     this.init();
+    this.attachEventListeners();
   },
 
   async init() {
