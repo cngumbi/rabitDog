@@ -180,12 +180,30 @@ const AddBatch = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
-      this.attachEventListeners();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   attachEventListeners() {

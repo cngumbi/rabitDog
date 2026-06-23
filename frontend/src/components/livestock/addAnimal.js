@@ -20,6 +20,7 @@ const AddAnimal = {
     } catch (error) {
       console.error('Error fetching batches:', error);
       this.data.batches = [];
+      this.updateView();
     }
   },
 
@@ -52,9 +53,8 @@ const AddAnimal = {
       this.data.loading = true;
       this.data.errorMessage = '';
 
-      // derive livestockType from selected batch to satisfy backend model requirements
       const selectedBatch = this.data.batches.find(b => b._id === batch) || {};
-      const livestockType = selectedBatch.livestockType && (selectedBatch.livestockType._id || selectedBatch.livestockType) || undefined;
+      const livestockType = selectedBatch.livestockType && (selectedBatch.livestockType._id || selectedBatch.livestockType) || '';
 
       await livestockAPI.createRecord({
         identificationNumber: identificationNumber.trim(),
@@ -76,6 +76,48 @@ const AddAnimal = {
     } finally {
       this.data.loading = false;
     }
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+      if (this.data.errors[field]) {
+        delete this.data.errors[field];
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+      if (this.data.errors[field]) {
+        delete this.data.errors[field];
+      }
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-animal-form]')) {
+        event.preventDefault();
+        this.submitForm();
+      }
+    });
   },
 
   render() {
@@ -106,7 +148,7 @@ const AddAnimal = {
         ` : ''}
 
         <div class="form-panel">
-          <form onsubmit="event.preventDefault(); window.addAnimalInstance.submitForm();">
+          <form data-animal-form="true">
             <div class="form-section">
               <h3 class="form-section-title">Identification</h3>
               
@@ -116,8 +158,8 @@ const AddAnimal = {
                 <input 
                   type="text" 
                   class="form-control ${this.data.errors.identificationNumber ? 'error' : ''}" 
+                  data-field="identificationNumber"
                   value="${identificationNumber || ''}" 
-                  onchange="window.addAnimalInstance.data.formData.identificationNumber = this.value;" 
                   placeholder="e.g., ANM-001"
                   required
                 >
@@ -129,7 +171,7 @@ const AddAnimal = {
                 <p class="form-hint">Select which batch this animal belongs to</p>
                 <select 
                   class="form-select ${this.data.errors.batch ? 'error' : ''}" 
-                  onchange="window.addAnimalInstance.data.formData.batch = this.value;"
+                  data-field="batch"
                   required
                 >
                   <option value="">Select Batch</option>
@@ -147,7 +189,7 @@ const AddAnimal = {
                 <p class="form-hint">Specify the gender of this animal</p>
                 <select 
                   class="form-select ${this.data.errors.gender ? 'error' : ''}" 
-                  onchange="window.addAnimalInstance.data.formData.gender = this.value;"
+                  data-field="gender"
                   required
                 >
                   <option value="">Select Gender</option>
@@ -164,8 +206,8 @@ const AddAnimal = {
                   type="number" 
                   step="0.1" 
                   class="form-control" 
+                  data-field="weight"
                   value="${weight || ''}" 
-                  onchange="window.addAnimalInstance.data.formData.weight = this.value;" 
                   placeholder="0.00"
                 >
               </div>
@@ -179,7 +221,7 @@ const AddAnimal = {
                 <p class="form-hint">Initial health status of this animal</p>
                 <select 
                   class="form-select" 
-                  onchange="window.addAnimalInstance.data.formData.health = this.value;"
+                  data-field="health"
                 >
                   <option value="Healthy" ${health === 'Healthy' ? 'selected' : ''}>Healthy</option>
                   <option value="Sick" ${health === 'Sick' ? 'selected' : ''}>Sick</option>
@@ -204,11 +246,30 @@ const AddAnimal = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {
@@ -222,6 +283,7 @@ const AddAnimal = {
     this.data.loading = false;
     this.data.success = false;
     this.data.errorMessage = '';
+    this.updateView();
     this.fetchBatches();
   }
 };

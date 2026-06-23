@@ -42,14 +42,25 @@ const ViewBatch = {
     };
   },
 
+  async fetchTypes() {
+    try {
+      const typesResponse = await livestockAPI.getAllTypes().catch(() => ({ data: [] }));
+      this.data.livestockTypes = typesResponse.data || [];
+      this.updateView();
+    } catch (error) {
+      console.error('Error fetching livestock types:', error);
+    }
+  },
+
   async fetchBatch() {
     const batchId = this.getBatchId();
     if (!batchId) {
       this.data.loading = false;
-      this.data.errorMessage = 'Batch not found.';
+      this.data.errorMessage = '';
       this.data.formMode = 'create';
       this.data.formData = this.buildFormData();
       this.updateView();
+      this.fetchTypes();
       return;
     }
 
@@ -58,14 +69,10 @@ const ViewBatch = {
     this.updateView();
 
     try {
-      const [batchResponse, typesResponse] = await Promise.all([
-        livestockAPI.getBatch(batchId),
-        livestockAPI.getAllTypes().catch(() => ({ data: [] }))
-      ]);
+      const batchResponse = await livestockAPI.getBatch(batchId);
       const payload = batchResponse.data || {};
       this.data.batch = payload.batch || null;
       this.data.records = payload.records || [];
-      this.data.livestockTypes = typesResponse.data || [];
       this.data.formData = this.buildFormData(this.data.batch);
       this.data.formMode = this.data.batch ? 'edit' : 'create';
     } catch (error) {
@@ -73,13 +80,13 @@ const ViewBatch = {
       this.data.errorMessage = 'Unable to load this batch right now.';
       this.data.batch = null;
       this.data.records = [];
-      this.data.livestockTypes = [];
       this.data.formData = this.buildFormData();
       this.data.formMode = 'create';
-    } finally {
-      this.data.loading = false;
-      this.updateView();
     }
+
+    this.data.loading = false;
+    this.updateView();
+    this.fetchTypes();
   },
 
   attachEventListeners() {
@@ -403,12 +410,30 @@ const ViewBatch = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
-      this.attachEventListeners();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   init() {

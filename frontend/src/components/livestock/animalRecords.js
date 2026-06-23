@@ -16,19 +16,25 @@ const AnimalRecords = {
 
   async fetchData() {
     this.data.loading = true;
+    this.data.errorMessage = '';
+    this.updateView();
+
     try {
-      const [animalsRes, batchesRes] = await Promise.all([
-        livestockAPI.getAllRecords().catch(e => ({ data: [] })),
-        livestockAPI.getAllBatches().catch(e => ({ data: [] }))
-      ]);
+      const animalsRes = await livestockAPI.getAllRecords().catch(e => ({ data: [] }));
       this.data.animals = animalsRes.data || [];
-      this.data.batches = batchesRes.data || [];
       this.data.filteredAnimals = this.data.animals;
+      this.data.currentPage = 1;
+      this.data.loading = false;
+      this.updateView();
+
+      const batchesRes = await livestockAPI.getAllBatches().catch(e => ({ data: [] }));
+      this.data.batches = batchesRes.data || [];
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
       this.data.loading = false;
+      this.data.errorMessage = 'Unable to load animal records right now.';
+      this.updateView();
     }
   },
 
@@ -161,11 +167,29 @@ const AnimalRecords = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {

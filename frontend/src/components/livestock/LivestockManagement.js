@@ -28,27 +28,34 @@ const LivestockManagement = {
     this.data.loading = true;
     this.data.errorMessage = '';
     this.updateView();
-    try {
-      // Parallel fetch for better performance
-      const [typesRes, batchesRes] = await Promise.all([
-        livestockAPI.getAllTypes().catch(e => ({ data: [] })),
-        livestockAPI.getAllBatches().catch(e => ({ data: [] }))
-      ]);
 
-      this.data.livestockTypes = typesRes.data || [];
+    try {
+      const batchesRes = await livestockAPI.getAllBatches().catch(e => ({ data: [] }));
       this.data.batches = batchesRes.data || [];
-      
       this.data.filteredBatches = this.data.batches;
       this.calculateStats();
       if (!this.data.batches.length) {
         this.data.showForm = true;
       }
+
+      this.data.loading = false;
+      this.updateView();
+      this.loadTypes();
     } catch (error) {
       console.error('Error fetching data:', error);
       this.data.errorMessage = 'Unable to load livestock batches right now. Please refresh or try again shortly.';
-    } finally {
       this.data.loading = false;
       this.updateView();
+    }
+  },
+
+  async loadTypes() {
+    try {
+      const typesRes = await livestockAPI.getAllTypes().catch(e => ({ data: [] }));
+      this.data.livestockTypes = typesRes.data || [];
+      this.updateView();
+    } catch (error) {
+      console.error('Error fetching livestock types:', error);
     }
   },
 
@@ -535,12 +542,30 @@ const LivestockManagement = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
-      this.attachEventListeners();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {
