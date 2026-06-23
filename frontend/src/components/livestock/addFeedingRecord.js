@@ -57,6 +57,7 @@ const AddFeedingRecord = {
         wastage: 0
       });
       this.data.success = true;
+      this.data.formData = {};
       this.updateView();
       setTimeout(() => { window.location.hash = '#/livestock/feeding'; }, 800);
     } catch (error) {
@@ -65,6 +66,45 @@ const AddFeedingRecord = {
     } finally {
       this.data.loading = false;
     }
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+      if (this.data.errorMessage) {
+        this.data.errorMessage = '';
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-feeding-form]')) {
+        event.preventDefault();
+        this.submit();
+      }
+    });
   },
 
   render() {
@@ -86,34 +126,34 @@ const AddFeedingRecord = {
             ${this.data.errorMessage ? `<div style="background-color:#f8d7da;color:#721c24;padding:12px;border-radius:6px;margin-bottom:12px;">✗ ${this.data.errorMessage}</div>` : ''}
 
             <div class="form-panel">
-              <form onsubmit="event.preventDefault(); window.addFeedingRecordInstance.submit();">
+              <form data-feeding-form="true">
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">Batch *</label>
-                    <select class="form-select" onchange="window.addFeedingRecordInstance.data.formData.batch = this.value;" required>
+                    <select class="form-select" data-field="batch" required>
                       <option value="">Select Batch</option>
                       ${this.data.batches.map(b => `<option value="${b._id}" ${batch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                     </select>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Feed Type *</label>
-                    <input type="text" class="form-control" value="${feedType || ''}" onchange="window.addFeedingRecordInstance.data.formData.feedType = this.value;" placeholder="e.g., Poultry Pellets" required>
+                    <input type="text" class="form-control" data-field="feedType" value="${feedType || ''}" placeholder="e.g., Poultry Pellets" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quantity Fed (kg) *</label>
-                    <input type="number" step="0.1" class="form-control" value="${quantityFed || ''}" onchange="window.addFeedingRecordInstance.data.formData.quantityFed = this.value;" placeholder="0.00" required>
+                    <input type="number" step="0.1" class="form-control" data-field="quantityFed" value="${quantityFed || ''}" placeholder="0.00" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quantity Allocated (kg) *</label>
-                    <input type="number" step="0.1" class="form-control" value="${quantityAllocated || ''}" onchange="window.addFeedingRecordInstance.data.formData.quantityAllocated = this.value;" placeholder="0.00" required>
+                    <input type="number" step="0.1" class="form-control" data-field="quantityAllocated" value="${quantityAllocated || ''}" placeholder="0.00" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Cost per kg *</label>
-                    <input type="number" step="0.01" class="form-control" value="${costPerKg || ''}" onchange="window.addFeedingRecordInstance.data.formData.costPerKg = this.value;" placeholder="0.00" required>
+                    <input type="number" step="0.01" class="form-control" data-field="costPerKg" value="${costPerKg || ''}" placeholder="0.00" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Feed Quality</label>
-                    <select class="form-select" onchange="window.addFeedingRecordInstance.data.formData.feedQuality = this.value;">
+                    <select class="form-select" data-field="feedQuality">
                       <option value="Excellent" ${feedQuality === 'Excellent' ? 'selected' : ''}>Excellent</option>
                       <option value="Good" ${feedQuality === 'Good' ? 'selected' : ''}>Good</option>
                       <option value="Fair" ${feedQuality === 'Fair' ? 'selected' : ''}>Fair</option>
@@ -136,7 +176,10 @@ const AddFeedingRecord = {
 
   updateView() {
     const container = document.getElementById('main-content');
-    if (container) container.innerHTML = this.render();
+    if (container) {
+      container.innerHTML = this.render();
+      this.attachEventListeners();
+    }
   },
 
   vignette() { this.init(); },

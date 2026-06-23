@@ -145,6 +145,7 @@ const AnimalRecords = {
                       <td><span class="badge badge-${animal.health?.toLowerCase()}">${animal.health || 'Healthy'}</span></td>
                       <td>${animal.status || 'Active'}</td>
                       <td>
+                        <a href="/#/livestock/animal/${animal._id}" class="action-link">View</a>
                         <button onclick="window.animalRecordsInstance.deleteAnimal('${animal._id}');" class="action-link danger">Delete</button>
                       </td>
                     </tr>

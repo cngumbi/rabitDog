@@ -56,6 +56,7 @@ const AddProductionRecord = {
         status: 'Produced'
       });
       this.data.success = true;
+      this.data.formData = {};
       this.updateView();
       setTimeout(() => { window.location.hash = '#/livestock/production'; }, 800);
     } catch (error) {
@@ -64,6 +65,45 @@ const AddProductionRecord = {
     } finally {
       this.data.loading = false;
     }
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+      if (this.data.errorMessage) {
+        this.data.errorMessage = '';
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      const field = event.target.dataset.field;
+      if (!field) {
+        return;
+      }
+      this.data.formData[field] = event.target.value;
+    });
+
+    container.addEventListener('submit', (event) => {
+      if (event.target.matches('form[data-production-form]')) {
+        event.preventDefault();
+        this.submit();
+      }
+    });
   },
 
   render() {
@@ -85,18 +125,18 @@ const AddProductionRecord = {
             ${this.data.errorMessage ? `<div style="background-color:#f8d7da;color:#721c24;padding:12px;border-radius:6px;margin-bottom:12px;">✗ ${this.data.errorMessage}</div>` : ''}
 
             <div class="form-panel">
-              <form onsubmit="event.preventDefault(); window.addProductionRecordInstance.submit();">
+              <form data-production-form="true">
                 <div class="form-grid">
                   <div class="form-group">
                     <label class="form-label">Batch *</label>
-                    <select class="form-select" onchange="window.addProductionRecordInstance.data.formData.batch = this.value;" required>
+                    <select class="form-select" data-field="batch" required>
                       <option value="">Select Batch</option>
                       ${this.data.batches.map(b => `<option value="${b._id}" ${batch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                     </select>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Production Type *</label>
-                    <select class="form-select" onchange="window.addProductionRecordInstance.data.formData.productionType = this.value;" required>
+                    <select class="form-select" data-field="productionType" required>
                       <option value="">Select Type</option>
                       <option value="Eggs" ${productionType === 'Eggs' ? 'selected' : ''}>Eggs</option>
                       <option value="Meat" ${productionType === 'Meat' ? 'selected' : ''}>Meat</option>
@@ -108,11 +148,11 @@ const AddProductionRecord = {
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quantity *</label>
-                    <input type="number" step="0.1" class="form-control" value="${quantity || ''}" onchange="window.addProductionRecordInstance.data.formData.quantity = this.value;" required>
+                    <input type="number" step="0.1" class="form-control" data-field="quantity" value="${quantity || ''}" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Unit *</label>
-                    <select class="form-select" onchange="window.addProductionRecordInstance.data.formData.unit = this.value;" required>
+                    <select class="form-select" data-field="unit" required>
                       <option value="">Select Unit</option>
                       <option value="Kg" ${unit === 'Kg' ? 'selected' : ''}>Kg</option>
                       <option value="Liters" ${unit === 'Liters' ? 'selected' : ''}>Liters</option>
@@ -122,11 +162,11 @@ const AddProductionRecord = {
                   </div>
                   <div class="form-group">
                     <label class="form-label">Price per Unit *</label>
-                    <input type="number" step="0.01" class="form-control" value="${pricePerUnit || ''}" onchange="window.addProductionRecordInstance.data.formData.pricePerUnit = this.value;" required>
+                    <input type="number" step="0.01" class="form-control" data-field="pricePerUnit" value="${pricePerUnit || ''}" required>
                   </div>
                   <div class="form-group">
                     <label class="form-label">Quality Grade</label>
-                    <select class="form-select" onchange="window.addProductionRecordInstance.data.formData.qualityGrade = this.value;">
+                    <select class="form-select" data-field="qualityGrade">
                       <option value="Grade A" ${qualityGrade === 'Grade A' ? 'selected' : ''}>Grade A</option>
                       <option value="Grade B" ${qualityGrade === 'Grade B' ? 'selected' : ''}>Grade B</option>
                       <option value="Grade C" ${qualityGrade === 'Grade C' ? 'selected' : ''}>Grade C</option>
@@ -149,7 +189,10 @@ const AddProductionRecord = {
 
   updateView() {
     const container = document.getElementById('main-content');
-    if (container) container.innerHTML = this.render();
+    if (container) {
+      container.innerHTML = this.render();
+      this.attachEventListeners();
+    }
   },
 
   vignette() { this.init(); },

@@ -23,20 +23,25 @@ const FeedingRecords = {
 
   async fetchData() {
     this.data.loading = true;
+    this.data.errorMessage = '';
+    this.updateView();
+
     try {
-      const [feedingRes, batchesRes] = await Promise.all([
-        livestockAPI.getAllFeedingRecords().catch(e => ({ data: [] })),
-        livestockAPI.getAllBatches().catch(e => ({ data: [] }))
-      ]);
+      const feedingRes = await livestockAPI.getAllFeedingRecords().catch(e => ({ data: [] }));
       this.data.feedingRecords = feedingRes.data || [];
-      this.data.batches = batchesRes.data || [];
       this.data.filteredRecords = this.data.feedingRecords;
       this.calculateStats();
+      this.data.loading = false;
+      this.updateView();
+
+      const batchesRes = await livestockAPI.getAllBatches().catch(e => ({ data: [] }));
+      this.data.batches = batchesRes.data || [];
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
       this.data.loading = false;
+      this.data.errorMessage = 'Unable to load feeding records right now.';
+      this.updateView();
     }
   },
 
@@ -234,6 +239,7 @@ const FeedingRecords = {
                     <td><strong>${livestockUtils.formatCurrency(record.totalCost)}</strong></td>
                     <td><span class="badge badge-quality">${record.feedQuality || 'Good'}</span></td>
                     <td>
+                      <a href="/#/livestock/feeding/${record._id}" class="action-link">View</a>
                       <button onclick="window.feedingRecordsInstance.deleteRecord('${record._id}');" class="action-link danger">Delete</button>
                     </td>
                   </tr>
@@ -253,11 +259,29 @@ const FeedingRecords = {
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {

@@ -56,10 +56,12 @@ import AddBatch from './components/livestock/addBatch';
 import ViewBatch from './components/livestock/viewBatch';
 import AnimalRecords from './components/livestock/animalRecords';
 import AddAnimal from './components/livestock/addAnimal';
+import ViewAnimal from './components/livestock/viewAnimal';
 import AnimalHealthRecords from './components/livestock/animalHealthRecords';
 import AddHealthRecord from './components/livestock/addHealthRecord';
 import FeedingRecords from './components/livestock/feedingRecords';
 import AddFeedingRecord from './components/livestock/addFeedingRecord';
+import ViewFeeding from './components/livestock/viewFeeding';
 import AddProductionRecord from './components/livestock/addProductionRecord';
 import ProductionRecords from './components/livestock/productionRecords';
 //setting the favicon of the site
@@ -131,10 +133,12 @@ const routes = {
     '/livestock/types/add': AddType,
     '/livestock/animals': AnimalRecords,
     '/livestock/animals/add': AddAnimal,
+    '/livestock/animal/:id': ViewAnimal,
     '/livestock/health': AnimalHealthRecords,
     '/livestock/health/add': AddHealthRecord,
     '/livestock/feeding': FeedingRecords,
     '/livestock/feeding/add': AddFeedingRecord,
+    '/livestock/feeding/:id': ViewFeeding,
     '/livestock/production': ProductionRecords,
     '/livestock/production/add': AddProductionRecord,
     '/livestock/add': AddBatch,
@@ -190,10 +194,12 @@ const router = async () => {
         '/livestock/types/add',
         '/livestock/animals',
         '/livestock/animals/add',
+        '/livestock/animal/:id',
         '/livestock/health',
         '/livestock/health/add',
         '/livestock/feeding',
         '/livestock/feeding/add',
+        '/livestock/feeding/:id',
         '/livestock/production',
         '/livestock/production/add',
         '/livestock/add',
