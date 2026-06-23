@@ -1,5 +1,5 @@
 import DashboardMenu from '../dashboard/dashboardMenu';
-import { createTransfer, getProducts, getParties } from '../../connection/api';
+import { createTransfer, getParties } from '../../connection/api';
 
 const NewTransfer = {
     vignette: ()=> {
@@ -46,12 +46,7 @@ const NewTransfer = {
     },
     render: async ()=>{
         try {
-            const products = await getProducts({ searchKeyword: "" });
             const parties = await getParties();
-
-            const productsOptions = !products.error && products.length > 0
-                ? products.map(p => `<option value="${p._id}" data-name="${p.productName || ''}">${p.productName || 'Unknown'}</option>`).join('')
-                : '<option value="">No products available</option>';
 
             const partiesOptions = !parties.error && parties.length > 0
                 ? parties.map(p => `<option value="${p._id}">${p.name}</option>`).join('')
@@ -130,10 +125,7 @@ const NewTransfer = {
                     <div class="new-transfer-form-grid">
                       <div>
                         <label class="form-label">Item</label>
-                        <select id="lineItemProduct" class="form-select" required>
-                          <option value="">Select product</option>
-                          ${productsOptions}
-                        </select>
+                        <input id="lineItemName" class="form-control" type="text" placeholder="Enter item name" required>
                       </div>
                       <div>
                         <label class="form-label">Quantity</label>
@@ -172,6 +164,7 @@ const NewTransfer = {
                         </tbody>
                       </table>
                     </div>
+
 
                     <div class="new-transfer-section-header mt-3">
                       <div>
@@ -259,16 +252,15 @@ const NewTransfer = {
 let lineItems = [];
 
 const addLineItem = () => {
-    const productSelect = document.querySelector('#lineItemProduct');
+    const itemNameInput = document.querySelector('#lineItemName');
     const quantityInput = document.querySelector('#lineItemQuantity');
     const alertContainer = document.querySelector('#alert-container');
 
-    const productId = productSelect.value;
-    const productName = productSelect.selectedOptions[0]?.text || '';
+    const itemName = itemNameInput.value.trim();
     const quantity = parseInt(quantityInput.value) || 0;
 
-    if (!productId) {
-        showAlert(alertContainer, 'error', 'Please select a product before adding an item.');
+    if (!itemName) {
+        showAlert(alertContainer, 'error', 'Please enter an item name before adding an item.');
         return;
     }
     if (quantity <= 0) {
@@ -276,27 +268,27 @@ const addLineItem = () => {
         return;
     }
 
-    // Check if product already exists
-    const existingItem = lineItems.find(item => item.product === productId);
+    // Check if item already exists
+    const existingItem = lineItems.find(item => item.name.toLowerCase() === itemName.toLowerCase());
     if (existingItem) {
-        showAlert(alertContainer, 'error', 'This product is already in the transfer. Edit the quantity in the preview table.');
+        showAlert(alertContainer, 'error', 'This item is already in the transfer. Edit the quantity in the preview table.');
         return;
     }
 
     lineItems.push({
-        product: productId,
-        name: productName,
+        name: itemName,
         quantity: quantity
     });
 
     // Reset inputs
-    productSelect.value = '';
+    itemNameInput.value = '';
     quantityInput.value = '1';
 
     renderLineItems();
     updateSummary();
-    showAlert(alertContainer, 'success', `${productName} added successfully!`);
+    showAlert(alertContainer, 'success', `${itemName} added successfully!`);
 };
+
 
 const renderLineItems = () => {
     const lineItemsBody = document.querySelector('#line-items-body');
@@ -374,6 +366,8 @@ const updateSummary = () => {
 const handleCreateTransfer = async (isCreate) => {
     const fromLocation = getLocationValue('transferFromLocation', 'transferFromLocationCustom');
     const toLocation = getLocationValue('transferToLocation', 'transferToLocationCustom');
+    const fromParty = document.querySelector('#transferFromLocation')?.value || undefined;
+    const toParty = document.querySelector('#transferToLocation')?.value || undefined;
     const shipmentDate = document.querySelector('#transferShipmentDate')?.value;
     const expectedReceiptDate = document.querySelector('#transferExpectedReceiptDate')?.value;
     const notes = document.querySelector('#transferNotes')?.value;
@@ -408,9 +402,11 @@ const handleCreateTransfer = async (isCreate) => {
     const transferData = {
         fromLocation: fromLocation.trim(),
         toLocation: toLocation.trim(),
+        fromParty: fromParty || undefined,
+        toParty: toParty || undefined,
         items: lineItems,
-        shipmentDate: shipmentDate ? new Date(shipmentDate) : undefined,
-        expectedReceiptDate: expectedReceiptDate ? new Date(expectedReceiptDate) : undefined,
+        shipmentDate,
+        expectedReceiptDate,
         notes,
         status: isCreate ? 'pending' : 'draft'
     };
@@ -426,7 +422,11 @@ const handleCreateTransfer = async (isCreate) => {
 
         showAlert(alertContainer, 'success', isCreate ? 'Transfer created successfully!' : 'Draft saved successfully!');
         setTimeout(() => {
-            window.location.hash = '/transfers';
+            if (isCreate && result.transfer && result.transfer._id) {
+                window.location.hash = `/track-transfer/${result.transfer._id}`;
+            } else {
+                window.location.hash = '/transfers';
+            }
         }, 1500);
     } catch (error) {
         showAlert(alertContainer, 'error', `Error: ${error.message}`);

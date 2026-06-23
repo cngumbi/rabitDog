@@ -1787,7 +1787,7 @@ img {
 
 .party-card-role {
   color: var(--muted);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   margin-top: 0.15rem;
 }
 
@@ -1803,8 +1803,76 @@ img {
           justify-content: space-between;
   gap: 0.75rem;
   color: var(--muted);
-  font-size: 0.74rem;
-  margin: 0.9rem 0 0.75rem;
+  font-size: 0.84rem;
+  margin: 0.8rem 0 0.75rem;
+}
+
+.party-card-compact {
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid #d1d5db;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+  box-shadow: 0 14px 32px rgba(50, 64, 84, 0.08);
+}
+
+.party-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.party-card-header-strong {
+  border-bottom: 1px solid #e5e7ef;
+  padding-bottom: 0.85rem;
+}
+
+.party-card-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.party-card-subtitle {
+  color: #475569;
+  font-size: 0.82rem;
+}
+
+.party-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.party-card-field {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.85rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.party-card-field-label {
+  color: #64748b;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.party-card-field-value {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.party-card-field.span-full {
+  grid-column: 1 / -1;
+}
+
+.party-card-field-value a {
+  color: #2563eb;
+  text-decoration: none;
 }
 
 .party-card-footer {
@@ -2878,6 +2946,65 @@ img {
 .new-transfer-helper-title {
   font-weight: 800;
   margin-bottom: 0.35rem;
+}
+
+..transfer-items-list {
+  border-radius: 18px;
+  border: 1px solid #d6e4f2;
+  background: #f7fbff;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+.transfer-items-header,
+.transfer-item-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  align-items: center;
+}
+
+.transfer-items-header {
+  background: #e8f1ff;
+  color: #16325c;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-weight: 700;
+}
+
+.transfer-header-received {
+  justify-self: end;
+}
+
+.transfer-item-row {
+  border-top: 1px solid #e0e7f0;
+  background: #ffffff;
+}
+
+.transfer-item-row:nth-child(odd) {
+  background: #f8fbff;
+}
+
+.transfer-item-name {
+  color: #111827;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.transfer-item-quantity,
+.transfer-item-received {
+  color: #475569;
+  text-align: right;
+  font-size: 0.92rem;
+}
+
+.transfer-items-empty {
+  padding: 1.25rem 1rem;
+  color: #6b7280;
+  text-align: center;
+  background: #ffffff;
 }
 
 .new-transfer-check-list {

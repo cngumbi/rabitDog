@@ -42,6 +42,9 @@ const StackTransfers = {
                         <div class="stock-transfer-meta">
                             <div class="stock-transfer-status ${statusBadge} text-white">${transfer.status.charAt(0).toUpperCase() + transfer.status.slice(1)}</div>
                             <div class="stock-transfer-time">${transfer.createdAt ? new Date(transfer.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</div>
+                            <div class="d-flex gap-2 flex-column mt-2">
+                              <a class="btn-outline-primary text-black" href="/#/track-transfer/${transfer._id}">Track</a>
+                            </div>
                         </div>
                     </div>
                 `;

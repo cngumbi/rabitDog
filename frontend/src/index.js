@@ -44,6 +44,7 @@ import AddPurchases from './components/purchases/addPurchases';
 //transfers
 import StackTransfers from './components/transfers/transfers';
 import NewTransfer from './components/transfers/createTransfer';
+import TrackTransfer from './components/transfers/trackTransfer';
 //expenses
 import Expenses from './components/expenses/expenses';
 import RecordExpenses from './components/expenses/recordExpenses';
@@ -119,6 +120,7 @@ const routes = {
     //transfers
     '/transfers': StackTransfers,
     '/new-transfer': NewTransfer,
+    '/track-transfer/:id': TrackTransfer,
     //expenses
     '/expenses': Expenses,
     '/record-expense': RecordExpenses,
@@ -178,6 +180,7 @@ const router = async () => {
         '/create-po',
         '/transfers',
         '/new-transfer',
+        '/track-transfer/:id',
         '/expenses',
         '/record-expense',
         '/livestock',

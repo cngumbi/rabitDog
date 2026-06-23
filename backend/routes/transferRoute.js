@@ -75,7 +75,9 @@ TransferRoute.get('/summary/stats', isAuth, isAdmin, expressAsync(async(req, res
 TransferRoute.get('/:id', isAuth, expressAsync(async(req, res) => {
     const transfer = await Transfer.findById(req.params.id)
         .populate('createdBy', '_id email')
-        .populate('confirmedBy', '_id email');
+        .populate('confirmedBy', '_id email')
+        .populate('fromParty', 'name phone address contactPerson email')
+        .populate('toParty', 'name phone address contactPerson email');
     if (transfer) {
         res.send(transfer);
     } else {
@@ -88,6 +90,8 @@ TransferRoute.post('/', isAuth, isAdmin, expressAsync(async(req, res) => {
     const transfer = new Transfer({
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
+        fromParty: req.body.fromParty,
+        toParty: req.body.toParty,
         items: req.body.items || [],
         status: req.body.status || 'pending',
         shipmentDate: req.body.shipmentDate,
@@ -114,6 +118,8 @@ TransferRoute.put('/:id', isAuth, isAdmin, expressAsync(async(req, res) => {
     if (transfer) {
         transfer.fromLocation = req.body.fromLocation || transfer.fromLocation;
         transfer.toLocation = req.body.toLocation || transfer.toLocation;
+        transfer.fromParty = req.body.fromParty !== undefined ? req.body.fromParty : transfer.fromParty;
+        transfer.toParty = req.body.toParty !== undefined ? req.body.toParty : transfer.toParty;
         transfer.items = req.body.items || transfer.items;
         transfer.status = req.body.status || transfer.status;
         transfer.readyToDispatch = req.body.readyToDispatch !== undefined ? req.body.readyToDispatch : transfer.readyToDispatch;

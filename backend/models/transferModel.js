@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const transferItemSchema = new mongoose.Schema({
     product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true
+        ref: 'Product'
     },
     name: String,
     quantity: {
@@ -23,16 +22,23 @@ const transferSchema = new mongoose.Schema({
     transferNumber: {
         type: String,
         unique: true,
-        index: true,
-        required: true
+        index: true
     },
     fromLocation: {
         type: String,
         required: true
     },
+    fromParty: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Party'
+    },
     toLocation: {
         type: String,
         required: true
+    },
+    toParty: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Party'
     },
     items: [transferItemSchema],
     status: {
@@ -75,13 +81,30 @@ const transferSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Pre-save middleware to generate Transfer Number
+const counterSchema = new mongoose.Schema({
+    _id: {
+        type: String,
+        required: true
+    },
+    seq: {
+        type: Number,
+        default: 0
+    }
+});
+
+const Counter = mongoose.model('Counter', counterSchema);
+
+// Pre-save middleware to generate Transfer Number sequentially
 transferSchema.pre('save', async function(next) {
     try {
         if (!this.transferNumber) {
-            const count = await mongoose.model('Transfer').countDocuments();
-            const timestamp = Date.now().toString().slice(-6);
-            this.transferNumber = `TR-${timestamp}-${count + 1}`;
+            const counter = await Counter.findOneAndUpdate(
+                { _id: 'transferNumber' },
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true }
+            );
+            const sequence = counter.seq.toString().padStart(6, '0');
+            this.transferNumber = `TR-${sequence}`;
         }
         // Calculate units moved
         if (this.items && this.items.length > 0) {

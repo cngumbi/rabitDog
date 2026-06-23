@@ -989,14 +989,9 @@ export const receivePurchase = async (id) => {
 // ============= TRANSFERS =============
 export const getTransfers = async () => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers`,
+        const response = await apiClient({
+            url: `/api/transfers`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load transfers');
@@ -1010,14 +1005,9 @@ export const getTransfers = async () => {
 
 export const getTransferStats = async () => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/summary/stats`,
+        const response = await apiClient({
+            url: `/api/transfers/summary/stats`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load transfer stats');
@@ -1031,14 +1021,9 @@ export const getTransferStats = async () => {
 
 export const getTransferLog = async () => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/export/log`,
+        const response = await apiClient({
+            url: `/api/transfers/export/log`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to export transfer log');
@@ -1052,14 +1037,9 @@ export const getTransferLog = async () => {
 
 export const getTransfer = async (id) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/${id}`,
+        const response = await apiClient({
+            url: `/api/transfers/${id}`,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to load transfer');
@@ -1073,14 +1053,9 @@ export const getTransfer = async (id) => {
 
 export const createTransfer = async (transferData) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers`,
+        const response = await apiClient({
+            url: `/api/transfers`,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: transferData,
         });
         if (response.status < 200 || response.status >= 300) {
@@ -1095,14 +1070,9 @@ export const createTransfer = async (transferData) => {
 
 export const updateTransfer = async (id, transferData) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/${id}`,
+        const response = await apiClient({
+            url: `/api/transfers/${id}`,
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: transferData,
         });
         if (response.status < 200 || response.status >= 300) {
@@ -1117,14 +1087,9 @@ export const updateTransfer = async (id, transferData) => {
 
 export const dispatchTransfer = async (id) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/${id}/dispatch`,
+        const response = await apiClient({
+            url: `/api/transfers/${id}/dispatch`,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
         });
         if (response.status < 200 || response.status >= 300) {
             throw new Error(response.data.message || 'Failed to dispatch transfer');
@@ -1138,14 +1103,9 @@ export const dispatchTransfer = async (id) => {
 
 export const receiveTransfer = async (id, items) => {
     try {
-        const { token } = getUserInfo();
-        const response = await axios({
-            url: `${apiURL}/api/transfers/${id}/receive`,
+        const response = await apiClient({
+            url: `/api/transfers/${id}/receive`,
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
             data: { items },
         });
         if (response.status < 200 || response.status >= 300) {
