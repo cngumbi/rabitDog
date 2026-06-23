@@ -20,6 +20,8 @@ const LivestockTypes = {
       const response = await livestockAPI.getAllTypes();
       this.data.types = response.data || [];
       this.data.filteredTypes = this.data.types;
+      this.data.currentPage = 1;
+      this.filterTypes();
     } catch (error) {
       console.error('Error fetching types:', error);
       alert('Error: ' + livestockUtils.parseError(error));
@@ -43,16 +45,36 @@ const LivestockTypes = {
   },
 
   filterTypes() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.types;
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(t =>
-        t.name?.toLowerCase().includes(term) ||
-        t.description?.toLowerCase().includes(term)
-      );
+
+    if (searchTerm) {
+      filtered = filtered.filter((type) => {
+        const searchableText = [
+          type.name,
+          type.category,
+          type.description
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
+
     this.data.filteredTypes = filtered;
     this.data.currentPage = 1;
+    this.refreshResultsView();
+  },
+
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('livestock-types-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredTypes.length}`;
+    }
   },
 
   renderTable() {
@@ -98,12 +120,32 @@ const LivestockTypes = {
       </table>
       ${totalPages > 1 ? `
         <div class="pagination">
-          <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage - 1}; window.livestockTypesInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+          <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage - 1}; window.livestockTypesInstance.refreshResultsView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
           <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
-          <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage + 1}; window.livestockTypesInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+          <button onclick="window.livestockTypesInstance.data.currentPage = ${this.data.currentPage + 1}; window.livestockTypesInstance.refreshResultsView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
         </div>
       ` : ''}
     `;
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      if (event.target.matches('[data-role="type-search-input"]')) {
+        this.data.searchTerm = event.target.value;
+        this.filterTypes();
+      }
+    });
   },
 
   render() {
@@ -132,25 +174,46 @@ const LivestockTypes = {
         <div class="content-panel">
             <div class="content-header">
               <h2>Livestock Types</h2>
-              <span class="content-total">Total: ${this.data.filteredTypes.length}</span>
+              <span class="content-total" data-role="results-count">Total: ${this.data.filteredTypes.length}</span>
             </div>
             
             <div class="filter-section">
-              <input type="text" class="form-control" placeholder="Search types..." onkeyup="window.livestockTypesInstance.data.searchTerm = this.value; window.livestockTypesInstance.filterTypes(); window.livestockTypesInstance.updateView();">
+              <input type="text" class="form-control" value="${this.data.searchTerm || ''}" data-role="type-search-input" placeholder="Search types...">
             </div>
 
-            ${this.renderTable()}
+            <div id="livestock-types-results">
+              ${this.renderTable()}
+            </div>
           </div>
         </div>
       `
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {
