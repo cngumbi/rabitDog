@@ -12,7 +12,6 @@ const ProductionRecords = {
     filteredRecords: [],
     searchTerm: '',
     filterBatch: 'all',
-    filterQuality: 'all',
     formData: {},
     showForm: false,
     stats: {
@@ -114,10 +113,6 @@ const ProductionRecords = {
     return '';
   },
 
-  getQualityValue(record) {
-    return record.qualityGrade || record.quality || 'Grade A';
-  },
-
   filterRecords() {
     const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.productionRecords;
@@ -144,10 +139,6 @@ const ProductionRecords = {
 
     if (this.data.filterBatch !== 'all') {
       filtered = filtered.filter((record) => this.getBatchId(record) === this.data.filterBatch);
-    }
-
-    if (this.data.filterQuality !== 'all') {
-      filtered = filtered.filter((record) => this.getQualityValue(record) === this.data.filterQuality);
     }
 
     this.data.filteredRecords = filtered;
@@ -306,9 +297,6 @@ const ProductionRecords = {
       if (event.target.matches('[data-role="production-batch-filter"]')) {
         this.data.filterBatch = event.target.value;
         this.filterRecords();
-      } else if (event.target.matches('[data-role="production-quality-filter"]')) {
-        this.data.filterQuality = event.target.value;
-        this.filterRecords();
       }
     });
 
@@ -447,15 +435,6 @@ const ProductionRecords = {
                 <select class="form-select" data-role="production-batch-filter">
                   <option value="all" ${this.data.filterBatch === 'all' ? 'selected' : ''}>All Batches</option>
                   ${this.data.batches.map(b => `<option value="${b._id}" ${this.data.filterBatch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
-                </select>
-              </div>
-              <div class="filter-field">
-                <select class="form-select" data-role="production-quality-filter">
-                  <option value="all" ${this.data.filterQuality === 'all' ? 'selected' : ''}>All Grades</option>
-                  <option value="Excellent" ${this.data.filterQuality === 'Excellent' ? 'selected' : ''}>Excellent</option>
-                  <option value="Good" ${this.data.filterQuality === 'Good' ? 'selected' : ''}>Good</option>
-                  <option value="Average" ${this.data.filterQuality === 'Average' ? 'selected' : ''}>Average</option>
-                  <option value="Poor" ${this.data.filterQuality === 'Poor' ? 'selected' : ''}>Poor</option>
                 </select>
               </div>
             </div>
