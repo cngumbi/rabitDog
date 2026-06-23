@@ -30,12 +30,14 @@ const FeedingRecords = {
       const feedingRes = await livestockAPI.getAllFeedingRecords().catch(e => ({ data: [] }));
       this.data.feedingRecords = feedingRes.data || [];
       this.data.filteredRecords = this.data.feedingRecords;
+      this.data.currentPage = 1;
       this.calculateStats();
       this.data.loading = false;
       this.updateView();
 
       const batchesRes = await livestockAPI.getAllBatches().catch(e => ({ data: [] }));
       this.data.batches = batchesRes.data || [];
+      this.filterRecords();
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -97,17 +99,49 @@ const FeedingRecords = {
     }
   },
 
+  getBatchId(record) {
+    const batchRef = record.batch;
+
+    if (batchRef && typeof batchRef === 'object') {
+      return batchRef._id || '';
+    }
+
+    if (typeof batchRef === 'string' || typeof batchRef === 'number') {
+      return String(batchRef);
+    }
+
+    return '';
+  },
+
   filterRecords() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.feedingRecords;
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(r => r.feedType?.toLowerCase().includes(term));
+
+    if (searchTerm) {
+      filtered = filtered.filter((record) => {
+        const batchName = this.getBatchName(record);
+        const searchableText = [
+          record.feedType,
+          record.feedQuality,
+          record.animalCondition,
+          batchName,
+          record.quantityFed,
+          record.totalCost,
+          record.costPerKg,
+          livestockUtils.formatDate(record.feedingDate)
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
+
     if (this.data.filterBatch !== 'all') {
-      filtered = filtered.filter(r => r.batch === this.data.filterBatch);
+      filtered = filtered.filter((record) => this.getBatchId(record) === this.data.filterBatch);
     }
+
     this.data.filteredRecords = filtered;
     this.data.currentPage = 1;
+    this.refreshResultsView();
   },
 
   getBatchName(record) {
@@ -134,12 +168,102 @@ const FeedingRecords = {
     return record.batchName || 'Unassigned';
   },
 
-  render() {
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('feeding-records-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderRecordsTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredRecords.length}`;
+    }
+  },
+
+  renderRecordsTable() {
     const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
     const endIdx = startIdx + this.data.itemsPerPage;
     const pageData = this.data.filteredRecords.slice(startIdx, endIdx);
     const totalPages = Math.ceil(this.data.filteredRecords.length / this.data.itemsPerPage);
 
+    if (this.data.loading) {
+      return '<div class="loading-spinner">Loading records...</div>';
+    }
+
+    if (pageData.length === 0) {
+      return '<div class="empty-state">No feeding records found</div>';
+    }
+
+    return `
+      <table class="batches-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Batch</th>
+            <th>Feed Type</th>
+            <th>Quantity (kg)</th>
+            <th>Cost/kg</th>
+            <th>Total Cost</th>
+            <th>Quality</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pageData.map(record => `
+            <tr>
+              <td>${livestockUtils.formatDate(record.feedingDate)}</td>
+              <td>${this.getBatchName(record)}</td>
+              <td>${record.feedType}</td>
+              <td>${livestockUtils.formatNumber(record.quantityFed)}</td>
+              <td>${livestockUtils.formatCurrency(record.costPerKg)}</td>
+              <td><strong>${livestockUtils.formatCurrency(record.totalCost)}</strong></td>
+              <td><span class="badge badge-quality">${record.feedQuality || 'Good'}</span></td>
+              <td>
+                <a href="/#/livestock/feeding/${record._id}" class="action-link">View</a>
+                <button onclick="window.feedingRecordsInstance.deleteRecord('${record._id}');" class="action-link danger">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="window.feedingRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.feedingRecordsInstance.refreshResultsView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+          <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
+          <button onclick="window.feedingRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.feedingRecordsInstance.refreshResultsView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+        </div>
+      ` : ''}
+    `;
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      if (event.target.matches('[data-role="feeding-search-input"]')) {
+        this.data.searchTerm = event.target.value;
+        this.filterRecords();
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      if (event.target.matches('[data-role="feeding-batch-filter"]')) {
+        this.data.filterBatch = event.target.value;
+        this.filterRecords();
+      }
+    });
+  },
+
+  render() {
     const { batch, feedType, quantityFed, costPerKg, feedQuality } = this.data.formData;
 
     return LivestockLayout.render({
@@ -221,63 +345,26 @@ const FeedingRecords = {
         <div class="content-panel">
           <div class="content-header">
             <h2>Feeding Records</h2>
-            <span class="content-total">Total: ${this.data.filteredRecords.length}</span>
+            <span class="content-total" data-role="results-count">Total: ${this.data.filteredRecords.length}</span>
           </div>
           
           <div class="filter-section">
             <div class="filter-row">
               <div class="filter-field">
-                <input type="text" class="form-control" placeholder="Search by feed type..." onkeyup="window.feedingRecordsInstance.data.searchTerm = this.value; window.feedingRecordsInstance.filterRecords(); window.feedingRecordsInstance.updateView();">
+                <input type="text" class="form-control" value="${this.data.searchTerm || ''}" data-role="feeding-search-input" placeholder="Search feeding records...">
               </div>
               <div class="filter-field">
-                <select class="form-select" onchange="window.feedingRecordsInstance.data.filterBatch = this.value; window.feedingRecordsInstance.filterRecords(); window.feedingRecordsInstance.updateView();">
-                  <option value="all">All Batches</option>
-                  ${this.data.batches.map(b => `<option value="${b._id}">${b.batchName}</option>`).join('')}
+                <select class="form-select" data-role="feeding-batch-filter">
+                  <option value="all" ${this.data.filterBatch === 'all' ? 'selected' : ''}>All Batches</option>
+                  ${this.data.batches.map(b => `<option value="${b._id}" ${this.data.filterBatch === b._id ? 'selected' : ''}>${b.batchName}</option>`).join('')}
                 </select>
               </div>
             </div>
           </div>
 
-          ${this.data.loading ? '<div class="loading-spinner">Loading records...</div>' : (pageData.length === 0 ? '<div class="empty-state">No feeding records found</div>' : `
-            <table class="batches-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Batch</th>
-                  <th>Feed Type</th>
-                  <th>Quantity (kg)</th>
-                  <th>Cost/kg</th>
-                  <th>Total Cost</th>
-                  <th>Quality</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${pageData.map(record => `
-                  <tr>
-                    <td>${livestockUtils.formatDate(record.feedingDate)}</td>
-                    <td>${this.getBatchName(record)}</td>
-                    <td>${record.feedType}</td>
-                    <td>${livestockUtils.formatNumber(record.quantityFed)}</td>
-                    <td>${livestockUtils.formatCurrency(record.costPerKg)}</td>
-                    <td><strong>${livestockUtils.formatCurrency(record.totalCost)}</strong></td>
-                    <td><span class="badge badge-quality">${record.feedQuality || 'Good'}</span></td>
-                    <td>
-                      <a href="/#/livestock/feeding/${record._id}" class="action-link">View</a>
-                      <button onclick="window.feedingRecordsInstance.deleteRecord('${record._id}');" class="action-link danger">Delete</button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            ${totalPages > 1 ? `
-              <div class="pagination">
-                <button onclick="window.feedingRecordsInstance.data.currentPage = ${this.data.currentPage - 1}; window.feedingRecordsInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-                <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
-                <button onclick="window.feedingRecordsInstance.data.currentPage = ${this.data.currentPage + 1}; window.feedingRecordsInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
-              </div>
-            ` : ''}
-          `)}
+          <div id="feeding-records-results">
+            ${this.renderRecordsTable()}
+          </div>
         </div>
       `
     });
@@ -294,6 +381,7 @@ const FeedingRecords = {
       const container = document.getElementById('main-content');
       if (container) {
         container.innerHTML = this.render();
+        this.attachEventListeners();
       }
     };
 

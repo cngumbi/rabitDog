@@ -26,11 +26,13 @@ const AnimalHealthRecords = {
       const healthRes = await livestockAPI.getAllHealthRecords().catch(() => ({ data: [] }));
       this.data.healthRecords = healthRes.data || [];
       this.data.filteredRecords = this.data.healthRecords;
+      this.data.currentPage = 1;
       this.data.loading = false;
       this.updateView();
 
       const animalsRes = await livestockAPI.getAllRecords().catch(() => ({ data: [] }));
       this.data.animals = animalsRes.data || [];
+      this.filterRecords();
       this.updateView();
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -107,27 +109,131 @@ const AnimalHealthRecords = {
   },
 
   filterRecords() {
+    const searchTerm = (this.data.searchTerm || '').trim().toLowerCase();
     let filtered = this.data.healthRecords;
-    if (this.data.searchTerm) {
-      const term = this.data.searchTerm.toLowerCase();
-      filtered = filtered.filter(r =>
-        r.description?.toLowerCase().includes(term) ||
-        r.recordType?.toLowerCase().includes(term)
-      );
+
+    if (searchTerm) {
+      filtered = filtered.filter((record) => {
+        const animalName = this.getAnimalName(record);
+        const treatmentText = typeof record.treatment === 'object'
+          ? record.treatment?.medicineName
+          : record.treatment;
+        const searchableText = [
+          record.description,
+          record.recordType,
+          record.severity,
+          record.outcome,
+          animalName,
+          treatmentText
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        return searchableText.includes(searchTerm);
+      });
     }
+
     if (this.data.filterSeverity !== 'all') {
-      filtered = filtered.filter(r => r.severity === this.data.filterSeverity);
+      filtered = filtered.filter((record) => record.severity === this.data.filterSeverity);
     }
+
     this.data.filteredRecords = filtered;
     this.data.currentPage = 1;
+    this.refreshResultsView();
   },
 
-  render() {
+  refreshResultsView() {
+    const resultsContainer = document.getElementById('health-records-results');
+    if (resultsContainer) {
+      resultsContainer.innerHTML = this.renderRecordsTable();
+    }
+
+    const countElement = document.querySelector('[data-role="results-count"]');
+    if (countElement) {
+      countElement.textContent = `Total: ${this.data.filteredRecords.length}`;
+    }
+  },
+
+  renderRecordsTable() {
     const startIdx = (this.data.currentPage - 1) * this.data.itemsPerPage;
     const endIdx = startIdx + this.data.itemsPerPage;
     const pageData = this.data.filteredRecords.slice(startIdx, endIdx);
     const totalPages = Math.ceil(this.data.filteredRecords.length / this.data.itemsPerPage);
 
+    if (this.data.loading) {
+      return '<div class="loading-spinner">Loading records...</div>';
+    }
+
+    if (pageData.length === 0) {
+      return '<div class="empty-state">No health records found</div>';
+    }
+
+    return `
+      <table class="batches-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Animal</th>
+            <th>Record Type</th>
+            <th>Severity</th>
+            <th>Description</th>
+            <th>Outcome</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${pageData.map(record => `
+            <tr>
+              <td>${livestockUtils.formatDate(record.recordDate)}</td>
+              <td>${this.getAnimalName(record)}</td>
+              <td>${record.recordType}</td>
+              <td><span class="badge badge-${record.severity?.toLowerCase()}">${record.severity}</span></td>
+              <td>${record.description || 'N/A'}</td>
+              <td>${record.outcome || 'Pending'}</td>
+              <td>
+                <a href="/#/livestock/health/${record._id}" class="action-link">View</a>
+                <button onclick="window.animalHealthInstance.deleteHealthRecord('${record._id}');" class="action-link danger">Delete</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      ${totalPages > 1 ? `
+        <div class="pagination">
+          <button onclick="window.animalHealthInstance.data.currentPage = ${this.data.currentPage - 1}; window.animalHealthInstance.refreshResultsView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
+          <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
+          <button onclick="window.animalHealthInstance.data.currentPage = ${this.data.currentPage + 1}; window.animalHealthInstance.refreshResultsView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
+        </div>
+      ` : ''}
+    `;
+  },
+
+  attachEventListeners() {
+    if (this._listenersAttached) {
+      return;
+    }
+
+    const container = document.getElementById('main-content');
+    if (!container) {
+      return;
+    }
+
+    this._listenersAttached = true;
+
+    container.addEventListener('input', (event) => {
+      if (event.target.matches('[data-role="health-search-input"]')) {
+        this.data.searchTerm = event.target.value;
+        this.filterRecords();
+      }
+    });
+
+    container.addEventListener('change', (event) => {
+      if (event.target.matches('[data-role="health-severity-filter"]')) {
+        this.data.filterSeverity = event.target.value;
+        this.filterRecords();
+      }
+    });
+  },
+
+  render() {
     const { recordType, animal, severity, description, treatment, outcome } = this.data.formData;
 
     return LivestockLayout.render({
@@ -161,75 +267,59 @@ const AnimalHealthRecords = {
         <div class="content-panel">
           <div class="content-header">
             <h2>Health Records</h2>
-            <span class="content-total">Total: ${this.data.filteredRecords.length}</span>
+            <span class="content-total" data-role="results-count">Total: ${this.data.filteredRecords.length}</span>
           </div>
           
           <div class="filter-section">
             <div class="filter-row">
               <div class="filter-field">
-                <input type="text" class="form-control" placeholder="Search records..." onkeyup="window.animalHealthInstance.data.searchTerm = this.value; window.animalHealthInstance.filterRecords(); window.animalHealthInstance.updateView();">
+                <input type="text" class="form-control" value="${this.data.searchTerm || ''}" data-role="health-search-input" placeholder="Search records...">
               </div>
               <div class="filter-field">
-                <select class="form-select" onchange="window.animalHealthInstance.data.filterSeverity = this.value; window.animalHealthInstance.filterRecords(); window.animalHealthInstance.updateView();">
-                  <option value="all">All Severity Levels</option>
-                  <option value="Mild">Mild</option>
-                  <option value="Moderate">Moderate</option>
-                  <option value="Severe">Severe</option>
-                  <option value="Critical">Critical</option>
+                <select class="form-select" data-role="health-severity-filter">
+                  <option value="all" ${this.data.filterSeverity === 'all' ? 'selected' : ''}>All Severity Levels</option>
+                  <option value="Mild" ${this.data.filterSeverity === 'Mild' ? 'selected' : ''}>Mild</option>
+                  <option value="Moderate" ${this.data.filterSeverity === 'Moderate' ? 'selected' : ''}>Moderate</option>
+                  <option value="Severe" ${this.data.filterSeverity === 'Severe' ? 'selected' : ''}>Severe</option>
+                  <option value="Critical" ${this.data.filterSeverity === 'Critical' ? 'selected' : ''}>Critical</option>
                 </select>
               </div>
             </div>
           </div>
 
           ${this.data.errorMessage ? `<div class="empty-state">${this.data.errorMessage}</div>` : ''}
-          ${this.data.loading ? '<div class="loading-spinner">Loading records...</div>' : (pageData.length === 0 ? '<div class="empty-state">No health records found</div>' : `
-            <table class="batches-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Animal</th>
-                  <th>Record Type</th>
-                  <th>Severity</th>
-                  <th>Description</th>
-                  <th>Outcome</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${pageData.map(record => `
-                  <tr>
-                    <td>${livestockUtils.formatDate(record.recordDate)}</td>
-                    <td>${this.getAnimalName(record)}</td>
-                    <td>${record.recordType}</td>
-                    <td><span class="badge badge-${record.severity?.toLowerCase()}">${record.severity}</span></td>
-                    <td>${record.description || 'N/A'}</td>
-                    <td>${record.outcome || 'Pending'}</td>
-                    <td>
-                      <a href="/#/livestock/health/${record._id}" class="action-link">View</a>
-                      <button onclick="window.animalHealthInstance.deleteHealthRecord('${record._id}');" class="action-link danger">Delete</button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            ${totalPages > 1 ? `
-              <div class="pagination">
-                <button onclick="window.animalHealthInstance.data.currentPage = ${this.data.currentPage - 1}; window.animalHealthInstance.updateView();" ${this.data.currentPage === 1 ? 'disabled' : ''} class="btn-secondary">← Previous</button>
-                <span class="page-info">Page ${this.data.currentPage} of ${totalPages}</span>
-                <button onclick="window.animalHealthInstance.data.currentPage = ${this.data.currentPage + 1}; window.animalHealthInstance.updateView();" ${this.data.currentPage === totalPages ? 'disabled' : ''} class="btn-secondary">Next →</button>
-              </div>
-            ` : ''}
-          `)}
+          <div id="health-records-results">
+            ${this.renderRecordsTable()}
+          </div>
         </div>
       `
     });
   },
 
-  updateView() {
-    const container = document.getElementById('main-content');
-    if (container) {
-      container.innerHTML = this.render();
+  scheduleRender() {
+    if (this._renderScheduled) {
+      return;
     }
+
+    this._renderScheduled = true;
+    const renderNow = () => {
+      this._renderScheduled = false;
+      const container = document.getElementById('main-content');
+      if (container) {
+        container.innerHTML = this.render();
+        this.attachEventListeners();
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+      window.requestAnimationFrame(renderNow);
+    } else {
+      renderNow();
+    }
+  },
+
+  updateView() {
+    this.scheduleRender();
   },
 
   vignette() {
