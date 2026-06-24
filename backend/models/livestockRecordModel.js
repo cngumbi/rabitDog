@@ -39,6 +39,18 @@ const livestockRecordSchema = new mongoose.Schema({
     default: 'Active'
   },
   notes: { type: String },
+  trackerActivities: [{
+    recordId: { type: mongoose.Schema.Types.ObjectId, ref: 'LivestockHealthRecord' },
+    recordCode: { type: String },
+    message: { type: String, default: 'Health tracker update' },
+    note: { type: String },
+    severity: {
+      type: String,
+      enum: ['Mild', 'Moderate', 'Severe', 'Critical', 'Healed']
+    },
+    createdAt: { type: Date, default: Date.now },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  }],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });

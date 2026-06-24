@@ -3,6 +3,7 @@ const expressAsync = require('express-async-handler');
 const { isAuth } = require('../util');
 const logActivity = require('../util/activityLogger');
 const LivestockHealthRecord = require('../models/livestockHealthRecordModel');
+const LivestockRecord = require('../models/livestockRecordModel');
 
 const LivestockHealthRoute = express.Router();
 
@@ -82,8 +83,48 @@ LivestockHealthRoute.put('/:id', isAuth, expressAsync(async (req, res) => {
     if (record.owner.toString() !== req.user._id.toString()) {
       return res.status(403).send({ message: 'Not authorized to update' });
     }
-    
-    Object.assign(record, req.body);
+
+    const { trackEntry, trackerNote, trackerSeverity: trackerSeverityInput, trackerMessage, severity, notes, ...rest } = req.body;
+
+    if (severity) {
+      record.severity = severity;
+    }
+
+    if (notes !== undefined) {
+      record.notes = String(notes || '').trim();
+    }
+
+    const trackerNoteText = trackEntry?.note ?? trackerNote ?? '';
+    const trackerSeverityValue = trackEntry?.severity ?? trackerSeverityInput ?? '';
+    const trackerMessageText = trackEntry?.message ?? trackerMessage ?? 'Health tracker update';
+
+    if (trackerNoteText || trackerSeverityValue) {
+      const trackerEntry = {
+        message: trackerMessageText,
+        note: trackerNoteText,
+        severity: trackerSeverityValue || undefined,
+        createdAt: new Date(),
+        createdBy: req.user._id
+      };
+
+      record.trackEntries = record.trackEntries || [];
+      record.trackEntries.push(trackerEntry);
+
+      if (record.animal) {
+        const animal = await LivestockRecord.findById(record.animal);
+        if (animal) {
+          animal.trackerActivities = animal.trackerActivities || [];
+          animal.trackerActivities.push({
+            ...trackerEntry,
+            recordId: record._id,
+            recordCode: record.recordCode
+          });
+          await animal.save();
+        }
+      }
+    }
+
+    Object.assign(record, rest);
     const updatedRecord = await record.save();
     await logActivity(req.user._id, 'LIVESTOCK_HEALTH_RECORD_UPDATED', `Updated health record: ${updatedRecord.recordCode}`);
     

@@ -23,7 +23,7 @@ const livestockHealthRecordSchema = new mongoose.Schema({
   veterinarian: { type: String },
   severity: { 
     type: String, 
-    enum: ['Mild', 'Moderate', 'Severe', 'Critical'],
+    enum: ['Mild', 'Moderate', 'Severe', 'Critical', 'Healed'],
     default: 'Mild'
   },
   outcome: { 
@@ -35,6 +35,16 @@ const livestockHealthRecordSchema = new mongoose.Schema({
   followUpDate: { type: Date },
   cost: { type: Number, default: 0 },
   notes: { type: String },
+  trackEntries: [{
+    message: { type: String, default: 'Health tracker update' },
+    note: { type: String },
+    severity: {
+      type: String,
+      enum: ['Mild', 'Moderate', 'Severe', 'Critical']
+    },
+    createdAt: { type: Date, default: Date.now },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  }],
   recordedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
