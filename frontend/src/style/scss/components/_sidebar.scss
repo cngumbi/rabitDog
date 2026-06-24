@@ -1,6 +1,6 @@
 @use '../abstracts/variables' as *;
 
-$navbar-height: 47px;
+$navbar-height: 40px;
 $sidebar-width: 240px;
 
 .sidebar {
@@ -55,8 +55,9 @@ body.sidebar-open .sidebar {
   color: #bfc9e0;
   border-top: 1px solid #2d3652;
 }
-@media (min-width: 780px) {
+@media (min-width: 760px) {
   .sidebar {
+    top: 46px;
     transform: translateX(0);
   }
   body.sidebar-collapsed .sidebar {
