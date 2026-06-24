@@ -29,6 +29,13 @@ const Dashboard = {
                         <span class="dashboard-pill">Updated from your latest entries</span>
                         <span class="dashboard-pill">Enterprise-ready visibility</span>
                       </div>
+                      <div class="dashboard-hero-insight">
+                        <div class="dashboard-hero-insight-top">
+                          <span class="dashboard-hero-insight-label">Weekly outlook</span>
+                          <span id="hero-health-overview" class="dashboard-hero-insight-score">--</span>
+                        </div>
+                        <p id="hero-health-overview-text" class="dashboard-hero-insight-text">Loading outlook…</p>
+                      </div>
                     </div>
                     <div class="dashboard-hero-meta" aria-label="Snapshot summary">
                       <div class="dashboard-mini-stat">
@@ -77,6 +84,32 @@ const Dashboard = {
                   </div>
                 </div>
 
+                <section class="card dashboard-executive-card">
+                  <div class="dashboard-card-title-padded">
+                    <div class="dashboard-card-heading">
+                      <div>
+                        <h3>Executive summary</h3>
+                        <p>Board-level visibility into readiness, output, and immediate priorities.</p>
+                      </div>
+                      <span class="dashboard-status-chip">Strategic view</span>
+                    </div>
+                  </div>
+                  <div class="dashboard-card-body-padded dashboard-executive-grid">
+                    <div class="dashboard-scoreboard">
+                      <div class="dashboard-scoreboard-main">
+                        <span class="dashboard-score-label">Operational health index</span>
+                        <div id="dashboard-health-score" class="dashboard-health-score">--</div>
+                        <p id="dashboard-health-note" class="dashboard-health-note">Loading readiness signals…</p>
+                      </div>
+                      <div id="dashboard-priority-list" class="dashboard-priority-list"></div>
+                    </div>
+                    <div class="dashboard-insight-panel">
+                      <h4>Priority actions</h4>
+                      <ul id="dashboard-priority-actions" class="dashboard-insight-list"></ul>
+                    </div>
+                  </div>
+                </section>
+
                 <div class="dashboard-enterprise-section">
                   <section class="dashboard-chart--wide card dashboard-panel-card">
                     <div class="dashboard-card-title-padded">
@@ -122,13 +155,19 @@ const Dashboard = {
         const heroAnimals = document.getElementById('hero-animals');
         const heroAlerts = document.getElementById('hero-alerts');
         const heroProduction = document.getElementById('hero-production');
+        const heroHealthOverview = document.getElementById('hero-health-overview');
+        const heroHealthOverviewText = document.getElementById('hero-health-overview-text');
         const kpiGrid = document.getElementById('dashboard-kpi-grid');
         const statusList = document.getElementById('dashboard-status-list');
         const focusList = document.getElementById('dashboard-focus-list');
         const healthSummary = document.getElementById('dashboard-health-summary');
         const progressGraph = document.getElementById('dashboard-progress-graph');
+        const dashboardHealthScore = document.getElementById('dashboard-health-score');
+        const dashboardHealthNote = document.getElementById('dashboard-health-note');
+        const dashboardPriorityList = document.getElementById('dashboard-priority-list');
+        const dashboardPriorityActions = document.getElementById('dashboard-priority-actions');
 
-        if (!kpiGrid || !statusList || !focusList || !healthSummary || !progressGraph) return;
+        if (!kpiGrid || !statusList || !focusList || !healthSummary || !progressGraph || !dashboardHealthScore || !dashboardHealthNote || !dashboardPriorityList || !dashboardPriorityActions || !heroHealthOverview || !heroHealthOverviewText) return;
 
         const renderLoading = () => {
             kpiGrid.innerHTML = [
@@ -147,6 +186,12 @@ const Dashboard = {
             focusList.innerHTML = '<li class="dashboard-status-item">Loading dashboard…</li>';
             healthSummary.innerHTML = '<div class="dashboard-status-item"><span class="dashboard-status-label">Loading health summary…</span></div>';
             progressGraph.innerHTML = '<div class="dashboard-progress-placeholder">Loading progress graph…</div>';
+            dashboardHealthScore.textContent = '--';
+            dashboardHealthNote.textContent = 'Loading readiness signals…';
+            heroHealthOverview.textContent = '--';
+            heroHealthOverviewText.textContent = 'Loading outlook…';
+            dashboardPriorityList.innerHTML = '<div class="dashboard-priority-item"><span>Preparing live insights…</span></div>';
+            dashboardPriorityActions.innerHTML = '<li>Preparing live insights…</li>';
         };
 
         renderLoading();
@@ -185,6 +230,15 @@ const Dashboard = {
             const animalProgress = totalAnimals ? Math.min(100, Math.round((activeAnimals / totalAnimals) * 100)) : 0;
             const healthProgress = Math.max(0, Math.min(100, 100 - healthAlerts * 15));
             const productionProgress = totalAnimals ? Math.min(100, Math.round((productionRecords.length / Math.max(totalAnimals, 1)) * 100)) : 0;
+            const overallHealthScore = Math.max(0, Math.min(100, Math.round((batchProgress * 0.3) + (animalProgress * 0.25) + (healthProgress * 0.25) + (productionProgress * 0.2))));
+            const healthNarrative = overallHealthScore >= 80 ? 'Strong operational readiness' : overallHealthScore >= 60 ? 'Stable performance with targeted follow-up' : 'Attention required to improve readiness';
+            const priorityActions = [
+                ...(healthAlerts > 0 ? [`${healthAlerts} health alerts need attention`] : []),
+                ...(vaccinationDue > 0 ? [`${vaccinationDue} vaccinations are due`] : []),
+                ...(activeBatches === 0 ? ['No active batches are currently open'] : []),
+                ...(productionRecords.length === 0 ? ['No production entries logged yet'] : []),
+            ];
+            const actionItems = priorityActions.length ? priorityActions : ['Operations are on track with no immediate blockers'];
 
             if (heroBatches) heroBatches.textContent = `${activeBatches}/${batches.length}`;
             if (heroAnimals) heroAnimals.textContent = formatNumber(totalAnimals);
@@ -282,6 +336,22 @@ const Dashboard = {
                     </div>
                 </div>
             `).join('');
+
+            dashboardHealthScore.textContent = `${overallHealthScore}%`;
+            dashboardHealthNote.textContent = healthNarrative;
+            heroHealthOverview.textContent = `${overallHealthScore}%`;
+            heroHealthOverviewText.textContent = healthNarrative;
+            dashboardPriorityList.innerHTML = [
+                { label: 'Active batches', value: `${activeBatches}/${batches.length}` },
+                { label: 'Health alerts', value: `${healthAlerts}` },
+                { label: 'Production value', value: formatCurrency(totalProductionValue) },
+            ].map((item) => `
+                <div class="dashboard-priority-item">
+                    <span>${item.label}</span>
+                    <strong>${item.value}</strong>
+                </div>
+            `).join('');
+            dashboardPriorityActions.innerHTML = actionItems.map((item) => `<li>${item}</li>`).join('');
         } catch (error) {
             if (heroBatches) heroBatches.textContent = '0/0';
             if (heroAnimals) heroAnimals.textContent = '0';
@@ -299,6 +369,12 @@ const Dashboard = {
             focusList.innerHTML = '<li class="dashboard-status-item">Live dashboard data could not be loaded.</li>';
             healthSummary.innerHTML = '<div class="dashboard-status-item"><span class="dashboard-status-label">No health data available</span></div>';
             progressGraph.innerHTML = '<div class="dashboard-progress-placeholder">Progress graph unavailable</div>';
+            dashboardHealthScore.textContent = '0%';
+            dashboardHealthNote.textContent = 'Unable to load readiness signals';
+            heroHealthOverview.textContent = '0%';
+            heroHealthOverviewText.textContent = 'Unable to load outlook';
+            dashboardPriorityList.innerHTML = '<div class="dashboard-priority-item"><span>Metrics unavailable</span></div>';
+            dashboardPriorityActions.innerHTML = '<li>Unable to load live insights</li>';
         }
     },
 };
