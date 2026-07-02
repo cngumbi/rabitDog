@@ -1,10 +1,12 @@
 import axios from 'axios';
+import { getUserInfo } from '../../localStorage';
 
 const InvoiceCreate = {
   data: {
     loading: false,
     parties: [],
     formData: {
+      partyId: '',
       customer: '',
       lineItems: [{ description: '', quantity: 1, unitPrice: 0, lineTotal: 0, taxAmount: 0 }],
       discountAmount: 0,
@@ -16,9 +18,55 @@ const InvoiceCreate = {
     return this.data.formData.lineItems.reduce((sum, item) => {
       const quantity = Number(item.quantity) || 0;
       const unitPrice = Number(item.unitPrice) || 0;
-      const lineTotal = Number(item.lineTotal) || quantity * unitPrice;
-      return sum + lineTotal + (Number(item.taxAmount) || 0);
+      const taxAmount = Number(item.taxAmount) || 0;
+      const lineTotal = quantity * unitPrice + taxAmount;
+      return sum + lineTotal;
     }, 0).toFixed(2);
+  },
+
+  updateLineItem(index, field, value) {
+    const item = this.data.formData.lineItems[index];
+    if (!item) return;
+
+    if (field === 'description') {
+      item.description = value;
+    } else if (field === 'quantity') {
+      item.quantity = Number(value) || 0;
+    } else if (field === 'unitPrice') {
+      item.unitPrice = Number(value) || 0;
+    } else if (field === 'taxAmount') {
+      item.taxAmount = Number(value) || 0;
+    }
+
+    item.lineTotal = item.quantity * item.unitPrice + Number(item.taxAmount || 0);
+    this.refreshLineTotals(index);
+  },
+
+  refreshLineTotals(index) {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const lineTotalCell = container.querySelector(`[data-line-total="${index}"]`);
+    if (lineTotalCell) {
+      const item = this.data.formData.lineItems[index];
+      lineTotalCell.textContent = `$${(Number(item.quantity || 0) * Number(item.unitPrice || 0) + Number(item.taxAmount || 0)).toFixed(2)}`;
+    }
+
+    const totalElement = container.querySelector('[data-invoice-total]');
+    if (totalElement) {
+      totalElement.textContent = `$${this.calculateTotal()}`;
+    }
+  },
+
+  addLineItem() {
+    this.data.formData.lineItems.push({ description: '', quantity: 1, unitPrice: 0, lineTotal: 0, taxAmount: 0 });
+    this.updateView();
+  },
+
+  removeLineItem(index) {
+    if (this.data.formData.lineItems.length <= 1) return;
+    this.data.formData.lineItems.splice(index, 1);
+    this.updateView();
   },
 
   async handleSubmit() {
@@ -27,23 +75,29 @@ const InvoiceCreate = {
       const lineItems = this.data.formData.lineItems.map((item) => {
         const quantity = Number(item.quantity) || 0;
         const unitPrice = Number(item.unitPrice) || 0;
-        const lineTotal = quantity * unitPrice;
+        const taxAmount = Number(item.taxAmount) || 0;
+        const lineTotal = quantity * unitPrice + taxAmount;
         return {
           description: item.description,
           quantity,
           unitPrice,
           lineTotal,
-          taxAmount: Number(item.taxAmount) || 0
+          taxAmount
         };
       });
 
       const payload = {
         ...this.data.formData,
+        customer: this.data.formData.customer || this.data.formData.partyId,
+        partyId: this.data.formData.partyId,
         lineItems,
         total: Number(this.calculateTotal())
       };
 
-      if (!payload.customer) {
+      const { token } = getUserInfo();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      if (!payload.partyId) {
         alert('Please select a customer for the invoice.');
         return;
       }
@@ -53,7 +107,7 @@ const InvoiceCreate = {
         return;
       }
 
-      await axios.post('/api/accounting/invoices/create', payload);
+      await axios.post('/api/accounting/invoices/create', payload, { withCredentials: true, headers });
       alert('Invoice created successfully!');
       window.location.hash = '#/invoices';
     } catch (error) {
@@ -63,6 +117,43 @@ const InvoiceCreate = {
       this.data.loading = false;
       this.updateView();
     }
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const partySelect = container.querySelector('[data-party-select]');
+    const addButton = container.querySelector('[data-add-line]');
+    const submitButton = container.querySelector('[data-submit-invoice]');
+
+    if (partySelect) {
+      partySelect.addEventListener('change', (event) => {
+        this.data.formData.partyId = event.target.value;
+        this.updateView();
+      });
+    }
+
+    container.querySelectorAll('[data-line-input]').forEach((input) => {
+      input.addEventListener('input', (event) => {
+        const index = Number(input.dataset.index);
+        const field = input.dataset.lineInput;
+        this.updateLineItem(index, field, event.target.value);
+      });
+    });
+
+    if (addButton) {
+      addButton.addEventListener('click', () => this.addLineItem());
+    }
+
+    if (submitButton) {
+      submitButton.addEventListener('click', () => this.handleSubmit());
+    }
+
+    container.querySelectorAll('[data-remove-line]').forEach((button) => {
+      const index = Number(button.dataset.removeLine);
+      button.addEventListener('click', () => this.removeLineItem(index));
+    });
   },
 
   render() {
@@ -85,10 +176,10 @@ const InvoiceCreate = {
         <div class="invoice-form">
           <div class="form-group">
             <label>Customer</label>
-            <select onchange="window.invoiceCreateInstance.data.formData.customer = this.value; window.invoiceCreateInstance.updateView();">
+            <select data-party-select value="${formData.partyId}">
               <option value="">Select customer</option>
               ${parties.map((party) => `
-                <option value="${party._id}" ${party._id === formData.customer ? 'selected' : ''}>${party.name}${party.email ? ' · ' + party.email : ''}</option>
+                <option value="${party._id}" ${party._id === formData.partyId ? 'selected' : ''}>${party.name}${party.email ? ' · ' + party.email : ''}</option>
               `).join('')}
             </select>
           </div>
@@ -109,24 +200,24 @@ const InvoiceCreate = {
               <tbody>
                 ${formData.lineItems.map((item, index) => `
                   <tr>
-                    <td><input type="text" value="${item.description}" onchange="window.invoiceCreateInstance.data.formData.lineItems[${index}].description = this.value; window.invoiceCreateInstance.updateView();" /></td>
-                    <td><input type="number" step="1" value="${item.quantity}" onchange="window.invoiceCreateInstance.data.formData.lineItems[${index}].quantity = parseFloat(this.value); window.invoiceCreateInstance.data.formData.lineItems[${index}].lineTotal = (window.invoiceCreateInstance.data.formData.lineItems[${index}].quantity || 0) * (window.invoiceCreateInstance.data.formData.lineItems[${index}].unitPrice || 0); window.invoiceCreateInstance.updateView();" /></td>
-                    <td><input type="number" step="0.01" value="${item.unitPrice}" onchange="window.invoiceCreateInstance.data.formData.lineItems[${index}].unitPrice = parseFloat(this.value); window.invoiceCreateInstance.data.formData.lineItems[${index}].lineTotal = (window.invoiceCreateInstance.data.formData.lineItems[${index}].quantity || 0) * (window.invoiceCreateInstance.data.formData.lineItems[${index}].unitPrice || 0); window.invoiceCreateInstance.updateView();" /></td>
-                    <td><input type="number" step="0.01" value="${item.taxAmount || 0}" onchange="window.invoiceCreateInstance.data.formData.lineItems[${index}].taxAmount = parseFloat(this.value) || 0; window.invoiceCreateInstance.updateView();" /></td>
-                    <td class="amount">$${item.lineTotal ? Number(item.lineTotal).toFixed(2) : '0.00'}</td>
-                    <td>${formData.lineItems.length > 1 ? `<button onclick="window.invoiceCreateInstance.data.formData.lineItems.splice(${index}, 1); window.invoiceCreateInstance.updateView();" class="btn-remove">Remove</button>` : ''}</td>
+                    <td><input type="text" value="${item.description}" data-line-input="description" data-index="${index}" /></td>
+                    <td><input type="number" step="1" value="${item.quantity}" data-line-input="quantity" data-index="${index}" /></td>
+                    <td><input type="number" step="0.01" value="${item.unitPrice}" data-line-input="unitPrice" data-index="${index}" /></td>
+                    <td><input type="number" step="0.01" value="${item.taxAmount || 0}" data-line-input="taxAmount" data-index="${index}" /></td>
+                    <td class="amount" data-line-total="${index}">$${(Number(item.quantity || 0) * Number(item.unitPrice || 0) + Number(item.taxAmount || 0)).toFixed(2)}</td>
+                    <td>${formData.lineItems.length > 1 ? `<button type="button" data-remove-line="${index}" class="btn-remove">Remove</button>` : ''}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
             <div class="line-totals">
-              <p><strong>Total:</strong> $${total}</p>
+              <p><strong>Total:</strong> <span data-invoice-total>$${total}</span></p>
             </div>
-            <button type="button" onclick="window.invoiceCreateInstance.data.formData.lineItems.push({ description: '', quantity: 1, unitPrice: 0, lineTotal: 0, taxAmount: 0 }); window.invoiceCreateInstance.updateView();" class="btn-add">Add Line Item</button>
+            <button type="button" data-add-line class="btn-add">Add Line Item</button>
           </div>
 
           <div class="form-actions">
-            <button type="button" onclick="window.invoiceCreateInstance.handleSubmit();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Creating...' : 'Create Invoice'}</button>
+            <button type="button" data-submit-invoice class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Creating...' : 'Create Invoice'}</button>
             <a href="#/invoices" class="btn-cancel">Cancel</a>
           </div>
         </div>
@@ -162,7 +253,7 @@ const InvoiceCreate = {
 
   async fetchParties() {
     try {
-      const response = await axios.get('/api/parties');
+      const response = await axios.get('/api/parties', { withCredentials: true });
       this.data.parties = response.data || [];
     } catch (error) {
       console.error('Error fetching customers:', error);
@@ -171,9 +262,11 @@ const InvoiceCreate = {
   },
 
   updateView() {
+    window.invoiceCreateInstance = this;
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
     }
   },
 

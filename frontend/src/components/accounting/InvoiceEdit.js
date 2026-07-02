@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { getUserInfo } from '../../localStorage';
 
 const InvoiceEdit = {
   data: {
     loading: false,
+    parties: [],
     invoice: null,
     error: null
   },
@@ -12,17 +14,64 @@ const InvoiceEdit = {
     return this.data.invoice.lineItems.reduce((sum, item) => {
       const quantity = Number(item.quantity) || 0;
       const unitPrice = Number(item.unitPrice) || 0;
-      const lineTotal = Number(item.lineTotal) || quantity * unitPrice;
-      return sum + lineTotal + (Number(item.taxAmount) || 0);
+      const taxAmount = Number(item.taxAmount) || 0;
+      const lineTotal = quantity * unitPrice + taxAmount;
+      return sum + lineTotal;
     }, 0).toFixed(2);
+  },
+
+  updateLineItem(index, field, value) {
+    const item = this.data.invoice?.lineItems[index];
+    if (!item) return;
+
+    if (field === 'description') {
+      item.description = value;
+    } else if (field === 'quantity') {
+      item.quantity = Number(value) || 0;
+    } else if (field === 'unitPrice') {
+      item.unitPrice = Number(value) || 0;
+    } else if (field === 'taxAmount') {
+      item.taxAmount = Number(value) || 0;
+    }
+
+    item.lineTotal = item.quantity * item.unitPrice + Number(item.taxAmount || 0);
+    this.refreshLineTotals(index);
+  },
+
+  refreshLineTotals(index) {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const lineTotalCell = container.querySelector(`[data-line-total="${index}"]`);
+    if (lineTotalCell) {
+      const item = this.data.invoice.lineItems[index];
+      lineTotalCell.textContent = `$${(Number(item.quantity || 0) * Number(item.unitPrice || 0) + Number(item.taxAmount || 0)).toFixed(2)}`;
+    }
+
+    const totalElement = container.querySelector('[data-invoice-total]');
+    if (totalElement) {
+      totalElement.textContent = `$${this.calculateTotal()}`;
+    }
+  },
+
+  addLineItem() {
+    this.data.invoice.lineItems.push({ description: '', quantity: 1, unitPrice: 0, lineTotal: 0, taxAmount: 0 });
+    this.updateView();
+  },
+
+  removeLineItem(index) {
+    if (!this.data.invoice || this.data.invoice.lineItems.length <= 1) return;
+    this.data.invoice.lineItems.splice(index, 1);
+    this.updateView();
   },
 
   async fetchInvoice(id) {
     this.data.loading = true;
     this.data.error = null;
     try {
-      const response = await axios.get(`/api/accounting/invoices/${id}`);
+      const response = await axios.get(`/api/accounting/invoices/${id}`, { withCredentials: true });
       this.data.invoice = response.data;
+      this.data.invoice.partyId = this.data.invoice.partyId?._id || this.data.invoice.partyId || this.data.invoice.customer;
     } catch (error) {
       console.error('Error loading invoice for edit:', error);
       this.data.error = error.response?.data?.message || error.message;
@@ -37,21 +86,26 @@ const InvoiceEdit = {
     try {
       this.data.loading = true;
       const invoice = { ...this.data.invoice };
+      invoice.partyId = this.data.invoice.partyId || this.data.invoice.customer;
+      invoice.customer = this.data.invoice.customer || this.data.invoice.partyId;
       invoice.lineItems = invoice.lineItems.map((item) => {
         const quantity = Number(item.quantity) || 0;
         const unitPrice = Number(item.unitPrice) || 0;
-        const lineTotal = Number(item.lineTotal) || quantity * unitPrice;
+        const taxAmount = Number(item.taxAmount) || 0;
+        const lineTotal = quantity * unitPrice + taxAmount;
         return {
           description: item.description,
           quantity,
           unitPrice,
           lineTotal,
-          taxAmount: Number(item.taxAmount) || 0
+          taxAmount
         };
       });
       invoice.total = Number(this.calculateTotal());
 
-      await axios.put(`/api/accounting/invoices/${invoice._id}`, invoice);
+      const { token } = getUserInfo();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await axios.put(`/api/accounting/invoices/${invoice._id}`, invoice, { withCredentials: true, headers });
       alert('Invoice updated successfully!');
       window.location.hash = `#/invoices/${invoice._id}`;
     } catch (error) {
@@ -66,17 +120,20 @@ const InvoiceEdit = {
   renderLineItems() {
     return this.data.invoice.lineItems.map((item, index) => `
       <tr>
-        <td><input type="text" value="${item.description || ''}" onchange="window.invoiceEditInstance.data.invoice.lineItems[${index}].description = this.value; window.invoiceEditInstance.updateView();" /></td>
-        <td><input type="number" step="1" value="${item.quantity || 0}" onchange="window.invoiceEditInstance.data.invoice.lineItems[${index}].quantity = parseFloat(this.value); window.invoiceEditInstance.data.invoice.lineItems[${index}].lineTotal = (window.invoiceEditInstance.data.invoice.lineItems[${index}].quantity || 0) * (window.invoiceEditInstance.data.invoice.lineItems[${index}].unitPrice || 0); window.invoiceEditInstance.updateView();" /></td>
-        <td><input type="number" step="0.01" value="${item.unitPrice || 0}" onchange="window.invoiceEditInstance.data.invoice.lineItems[${index}].unitPrice = parseFloat(this.value); window.invoiceEditInstance.data.invoice.lineItems[${index}].lineTotal = (window.invoiceEditInstance.data.invoice.lineItems[${index}].quantity || 0) * (window.invoiceEditInstance.data.invoice.lineItems[${index}].unitPrice || 0); window.invoiceEditInstance.updateView();" /></td>
-        <td><input type="number" step="0.01" value="${item.taxAmount || 0}" onchange="window.invoiceEditInstance.data.invoice.lineItems[${index}].taxAmount = parseFloat(this.value) || 0; window.invoiceEditInstance.updateView();" /></td>
-        <td class="amount">$${Number(item.lineTotal || 0).toFixed(2)}</td>
-        <td>${this.data.invoice.lineItems.length > 1 ? `<button onclick="window.invoiceEditInstance.data.invoice.lineItems.splice(${index}, 1); window.invoiceEditInstance.updateView();" class="btn-remove">Remove</button>` : ''}</td>
+        <td><input type="text" value="${item.description || ''}" data-line-input="description" data-index="${index}" /></td>
+        <td><input type="number" step="1" value="${item.quantity || 0}" data-line-input="quantity" data-index="${index}" /></td>
+        <td><input type="number" step="0.01" value="${item.unitPrice || 0}" data-line-input="unitPrice" data-index="${index}" /></td>
+        <td><input type="number" step="0.01" value="${item.taxAmount || 0}" data-line-input="taxAmount" data-index="${index}" /></td>
+        <td class="amount" data-line-total="${index}">$${(Number(item.quantity || 0) * Number(item.unitPrice || 0) + Number(item.taxAmount || 0)).toFixed(2)}</td>
+        <td>${this.data.invoice.lineItems.length > 1 ? `<button type="button" data-remove-line="${index}" class="btn-remove">Remove</button>` : ''}</td>
       </tr>
     `).join('');
   },
 
   render() {
+    if (!this.data.parties.length && !this.data.loading) {
+      this.fetchParties();
+    }
     if (this.data.loading) {
       return `<div class="invoice-container"><p>Loading invoice...</p></div>`;
     }
@@ -106,8 +163,13 @@ const InvoiceEdit = {
 
         <div class="invoice-form">
           <div class="form-group">
-            <label>Customer ID</label>
-            <input type="text" value="${invoice.customer?._id || invoice.customer || ''}" onchange="window.invoiceEditInstance.data.invoice.customer = this.value; window.invoiceEditInstance.updateView();" />
+            <label>Customer</label>
+            <select data-party-select>
+              <option value="">Select customer</option>
+              ${this.data.parties.map((party) => `
+                <option value="${party._id}" ${party._id === (invoice.partyId || invoice.customer) ? 'selected' : ''}>${party.name}${party.email ? ' · ' + party.email : ''}</option>
+              `).join('')}
+            </select>
           </div>
 
           <div class="line-items">
@@ -125,12 +187,12 @@ const InvoiceEdit = {
               </thead>
               <tbody>${this.renderLineItems()}</tbody>
             </table>
-            <div class="line-totals"><p><strong>Total:</strong> $${total}</p></div>
-            <button onclick="window.invoiceEditInstance.data.invoice.lineItems.push({ description: '', quantity: 1, unitPrice: 0, lineTotal: 0, taxAmount: 0 }); window.invoiceEditInstance.updateView();" class="btn-add">Add Line Item</button>
+            <div class="line-totals"><p><strong>Total:</strong> <span data-invoice-total>$${total}</span></p></div>
+            <button type="button" data-add-line class="btn-add">Add Line Item</button>
           </div>
 
           <div class="form-actions">
-            <button onclick="window.invoiceEditInstance.handleSubmit();" class="btn-submit" ${invoice.status !== 'Draft' ? 'disabled' : ''}>${this.data.loading ? 'Saving...' : 'Save Invoice'}</button>
+            <button type="button" data-submit-invoice class="btn-submit" ${invoice.status !== 'Draft' ? 'disabled' : ''}>${this.data.loading ? 'Saving...' : 'Save Invoice'}</button>
             <a href="/#/invoices/${invoice._id}" class="btn-cancel">Back to Details</a>
           </div>
         </div>
@@ -163,10 +225,59 @@ const InvoiceEdit = {
     `;
   },
 
+  async fetchParties() {
+    try {
+      const response = await axios.get('/api/parties', { withCredentials: true });
+      this.data.parties = response.data || [];
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      this.data.parties = [];
+    }
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const partySelect = container.querySelector('[data-party-select]');
+    const addButton = container.querySelector('[data-add-line]');
+    const submitButton = container.querySelector('[data-submit-invoice]');
+
+    if (partySelect) {
+      partySelect.addEventListener('change', (event) => {
+        this.data.invoice.partyId = event.target.value;
+        this.updateView();
+      });
+    }
+
+    container.querySelectorAll('[data-line-input]').forEach((input) => {
+      input.addEventListener('input', (event) => {
+        const index = Number(input.dataset.index);
+        const field = input.dataset.lineInput;
+        this.updateLineItem(index, field, event.target.value);
+      });
+    });
+
+    if (addButton) {
+      addButton.addEventListener('click', () => this.addLineItem());
+    }
+
+    if (submitButton) {
+      submitButton.addEventListener('click', () => this.handleSubmit());
+    }
+
+    container.querySelectorAll('[data-remove-line]').forEach((button) => {
+      const index = Number(button.dataset.removeLine);
+      button.addEventListener('click', () => this.removeLineItem(index));
+    });
+  },
+
   updateView() {
+    window.invoiceEditInstance = this;
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
     }
   },
 

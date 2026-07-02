@@ -1,17 +1,21 @@
 import axios from 'axios';
+import { getUserInfo } from '../../localStorage';
 
 const InvoiceDetails = {
   data: {
     invoice: null,
     loading: false,
-    error: null
+    error: null,
+    paymentAmount: '',
+    paymentMethod: 'Cash',
+    paymentNote: ''
   },
 
   async fetchInvoice(id) {
     this.data.loading = true;
     this.data.error = null;
     try {
-      const response = await axios.get(`/api/accounting/invoices/${id}`);
+      const response = await axios.get(`/api/accounting/invoices/${id}`, { withCredentials: true });
       this.data.invoice = response.data;
     } catch (error) {
       console.error('Error fetching invoice details:', error);
@@ -25,7 +29,7 @@ const InvoiceDetails = {
   async handleSendInvoice(invoiceId) {
     try {
       this.data.loading = true;
-      await axios.post(`/api/accounting/invoices/${invoiceId}/send`);
+      await axios.post(`/api/accounting/invoices/${invoiceId}/send`, {}, { withCredentials: true });
       alert('Invoice sent successfully!');
       await this.fetchInvoice(invoiceId);
     } catch (error) {
@@ -41,7 +45,9 @@ const InvoiceDetails = {
     if (amount) {
       try {
         this.data.loading = true;
-        await axios.post(`/api/accounting/invoices/${invoiceId}/pay`, { amountPaid: parseFloat(amount) });
+        const { token } = getUserInfo();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        await axios.post(`/api/accounting/invoices/${invoiceId}/pay`, { amountPaid: parseFloat(amount) }, { withCredentials: true, headers });
         alert('Payment recorded successfully!');
         await this.fetchInvoice(invoiceId);
       } catch (error) {
@@ -50,6 +56,65 @@ const InvoiceDetails = {
       } finally {
         this.data.loading = false;
       }
+    }
+  },
+
+  async handleRecordPayment(invoiceId) {
+    const amount = Number(this.data.paymentAmount);
+    if (!amount || amount <= 0) {
+      alert('Please enter a valid payment amount.');
+      return;
+    }
+
+    try {
+      this.data.loading = true;
+      const { token } = getUserInfo();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await axios.post(
+        `/api/accounting/invoices/${invoiceId}/pay`,
+        {
+          amountPaid: amount,
+          paymentMethod: this.data.paymentMethod,
+          paymentNote: this.data.paymentNote
+        },
+        { withCredentials: true, headers }
+      );
+      alert('Payment recorded successfully!');
+      this.data.paymentAmount = '';
+      this.data.paymentNote = '';
+      await this.fetchInvoice(invoiceId);
+    } catch (error) {
+      console.error('Error recording payment:', error);
+      alert('Error: ' + (error.response?.data?.message || error.message));
+    } finally {
+      this.data.loading = false;
+      this.updateView();
+    }
+  },
+
+  handlePaymentFieldChange(field, value) {
+    this.data[field] = value;
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    container.querySelectorAll('[data-payment-input]').forEach((input) => {
+      input.addEventListener('input', (event) => {
+        const field = input.dataset.paymentInput;
+        this.handlePaymentFieldChange(field, event.target.value);
+      });
+    });
+
+    const recordPaymentButton = container.querySelector('[data-record-payment]');
+    if (recordPaymentButton) {
+      recordPaymentButton.addEventListener('click', () => this.handleRecordPayment(this.data.invoice._id));
+    }
+
+    const sendInvoiceButton = container.querySelector('[data-send-invoice]');
+    if (sendInvoiceButton) {
+      sendInvoiceButton.addEventListener('click', () => this.handleSendInvoice(this.data.invoice._id));
     }
   },
 
@@ -87,7 +152,7 @@ const InvoiceDetails = {
         <div class="invoice-meta">
           <div><strong>Invoice #:</strong> ${invoice.invoiceNumber}</div>
           <div><strong>Status:</strong> ${invoice.status}</div>
-          <div><strong>Customer ID:</strong> ${invoice.customer?._id || invoice.customer || 'Unknown'}</div>
+          <div><strong>Customer:</strong> ${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown'}</div>
           <div><strong>Invoice Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</div>
           <div><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</div>
         </div>
@@ -127,11 +192,46 @@ const InvoiceDetails = {
           </table>
         </div>
 
+        ${invoice.status !== 'Paid' ? `
+        <div class="payment-section">
+          <h3>Record Payment</h3>
+          <div class="payment-form-row">
+            <label>Amount</label>
+            <input
+              type="number"
+              step="0.01"
+              value="${this.data.paymentAmount}"
+              data-payment-input="paymentAmount"
+              placeholder="Enter payment amount"
+            />
+          </div>
+          <div class="payment-form-row">
+            <label>Payment Method</label>
+            <select
+              data-payment-input="paymentMethod"
+            >
+              <option value="Cash" ${this.data.paymentMethod === 'Cash' ? 'selected' : ''}>Cash</option>
+              <option value="Bank Transfer" ${this.data.paymentMethod === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+              <option value="Mobile Money" ${this.data.paymentMethod === 'Mobile Money' ? 'selected' : ''}>Mobile Money</option>
+              <option value="Credit Card" ${this.data.paymentMethod === 'Credit Card' ? 'selected' : ''}>Credit Card</option>
+            </select>
+          </div>
+          <div class="payment-form-row">
+            <label>Payment Note</label>
+            <textarea
+              rows="3"
+              data-payment-input="paymentNote"
+              placeholder="Optional note"
+            >${this.data.paymentNote || ''}</textarea>
+          </div>
+          <button type="button" class="btn-action btn-pay" data-record-payment>Record Payment</button>
+        </div>
+        ` : ''}
+
         <div class="form-actions">
           <a href="/#/invoices" class="btn-secondary">Back to Invoices</a>
           ${invoice.status === 'Draft' ? `<a href="/#/invoices/${invoice._id}/edit" class="btn-action btn-edit">Edit</a>` : ''}
-          ${invoice.status === 'Draft' ? `<button onclick="window.invoiceDetailsInstance.handleSendInvoice('${invoice._id}');" class="btn-action">Send</button>` : ''}
-          ${invoice.status !== 'Paid' ? `<button onclick="window.invoiceDetailsInstance.handlePayInvoice('${invoice._id}');" class="btn-action">Record Payment</button>` : ''}
+          ${invoice.status === 'Draft' ? `<button type="button" class="btn-action" data-send-invoice>Send</button>` : ''}
         </div>
 
         <style>
@@ -146,7 +246,15 @@ const InvoiceDetails = {
           .line-items-details table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
           .line-items-details th, .line-items-details td { padding: 10px; border: 1px solid #ddd; text-align: left; }
           .line-items-details th { background-color: #007bff; color: white; }
-          .form-actions { display: flex; gap: 10px; }
+          .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+          .payment-section { background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0; }
+          .payment-section h3 { margin-bottom: 16px; }
+          .payment-form-row { display: grid; gap: 8px; margin-bottom: 12px; }
+          .payment-form-row label { font-weight: 600; }
+          .payment-form-row input,
+          .payment-form-row select,
+          .payment-form-row textarea { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; }
+          .btn-pay { background-color: #10b981; color: white; }
           .btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: #6c757d; color: white; border-radius: 4px; text-decoration: none; }
           .error { color: #dc3545; }
         </style>
@@ -155,9 +263,11 @@ const InvoiceDetails = {
   },
 
   updateView() {
+    window.invoiceDetailsInstance = this;
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
     }
   },
 

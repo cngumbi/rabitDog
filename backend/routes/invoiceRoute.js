@@ -1,5 +1,6 @@
 const express = require('express');
 const asyncHandler = require('express-async-handler');
+const { isAuth } = require('../util');
 const Invoice = require('../models/invoiceModel');
 const JournalEntry = require('../models/journalEntryModel');
 const AuditLog = require('../models/auditLogModel');
@@ -16,6 +17,7 @@ const generateInvoiceNumber = async () => {
 // Create Invoice
 router.post(
   '/create',
+  isAuth,
   asyncHandler(async (req, res) => {
     const { customer, lineItems, total, partyId } = req.body;
 
@@ -31,10 +33,13 @@ router.post(
     let discountAmount = req.body.discountAmount || 0;
 
     lineItems.forEach(item => {
-      subtotal += item.lineTotal || 0;
-      taxAmount += item.taxAmount || 0;
+      const lineTotal = Number(item.lineTotal) || 0;
+      const tax = Number(item.taxAmount) || 0;
+      subtotal += lineTotal - tax;
+      taxAmount += tax;
     });
 
+    const createdById = req.user?.id || req.user?._id || req.session.user?._id || req.session.user?.id;
     const invoice = await Invoice.create({
       invoiceNumber,
       customer,
@@ -45,13 +50,13 @@ router.post(
       total: subtotal + taxAmount - discountAmount,
       partyId,
       ...req.body,
-      createdBy: req.session.user?.id
+      createdBy: createdById
     });
 
     // Log activity
     await AuditLog.create({
       logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
+      user: createdById,
       action: 'Create',
       module: 'Invoice',
       entityType: 'Invoice',
@@ -109,6 +114,7 @@ router.get(
 // Update Invoice
 router.put(
   '/:id',
+  isAuth,
   asyncHandler(async (req, res) => {
     const invoice = await Invoice.findById(req.params.id);
 
@@ -120,23 +126,27 @@ router.put(
       return res.status(400).json({ message: 'Only draft invoices can be edited' });
     }
 
+    const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
+
     const updated = await Invoice.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedBy: req.session.user?.id },
+      { ...req.body, updatedBy: currentUserId },
       { new: true }
     );
 
     // Log activity
-    await AuditLog.create({
-      logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
-      action: 'Update',
-      module: 'Invoice',
-      entityType: 'Invoice',
-      entityId: updated._id,
-      entityName: updated.invoiceNumber,
-      description: `Updated invoice: ${updated.invoiceNumber}`
-    });
+    if (currentUserId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: currentUserId,
+        action: 'Update',
+        module: 'Invoice',
+        entityType: 'Invoice',
+        entityId: updated._id,
+        entityName: updated.invoiceNumber,
+        description: `Updated invoice: ${updated.invoiceNumber}`
+      });
+    }
 
     res.json({ message: 'Invoice updated successfully', invoice: updated });
   })
@@ -145,10 +155,13 @@ router.put(
 // Send Invoice
 router.post(
   '/:id/send',
+  isAuth,
   asyncHandler(async (req, res) => {
+    const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
+
     const invoice = await Invoice.findByIdAndUpdate(
       req.params.id,
-      { status: 'Sent', updatedBy: req.session.user?.id },
+      { status: 'Sent', updatedBy: currentUserId },
       { new: true }
     );
 
@@ -157,6 +170,19 @@ router.post(
     }
 
     // Here you would send email to customer
+    if (currentUserId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: currentUserId,
+        action: 'Update',
+        module: 'Invoice',
+        entityType: 'Invoice',
+        entityId: invoice._id,
+        entityName: invoice.invoiceNumber,
+        description: `Sent invoice: ${invoice.invoiceNumber}`
+      });
+    }
+
     res.json({ message: 'Invoice sent successfully', invoice });
   })
 );
@@ -164,6 +190,7 @@ router.post(
 // Mark Invoice as Paid
 router.post(
   '/:id/pay',
+  isAuth,
   asyncHandler(async (req, res) => {
     const { amountPaid } = req.body;
     const invoice = await Invoice.findById(req.params.id);
@@ -184,17 +211,20 @@ router.post(
 
     await invoice.save();
 
-    // Log activity
-    await AuditLog.create({
-      logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
-      action: 'Update',
-      module: 'Invoice',
-      entityType: 'Invoice',
-      entityId: invoice._id,
-      entityName: invoice.invoiceNumber,
-      description: `Recorded payment for invoice: ${invoice.invoiceNumber}`
-    });
+    const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
+
+    if (currentUserId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: currentUserId,
+        action: 'Update',
+        module: 'Invoice',
+        entityType: 'Invoice',
+        entityId: invoice._id,
+        entityName: invoice.invoiceNumber,
+        description: `Recorded payment for invoice: ${invoice.invoiceNumber}`
+      });
+    }
 
     res.json({ message: 'Payment recorded successfully', invoice });
   })
@@ -203,6 +233,7 @@ router.post(
 // Delete Invoice
 router.delete(
   '/:id',
+  isAuth,
   asyncHandler(async (req, res) => {
     const invoice = await Invoice.findById(req.params.id);
 
@@ -216,17 +247,21 @@ router.delete(
 
     await Invoice.findByIdAndDelete(req.params.id);
 
+    const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
+
     // Log activity
-    await AuditLog.create({
-      logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
-      action: 'Delete',
-      module: 'Invoice',
-      entityType: 'Invoice',
-      entityId: invoice._id,
-      entityName: invoice.invoiceNumber,
-      description: `Deleted invoice: ${invoice.invoiceNumber}`
-    });
+    if (currentUserId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: currentUserId,
+        action: 'Delete',
+        module: 'Invoice',
+        entityType: 'Invoice',
+        entityId: invoice._id,
+        entityName: invoice.invoiceNumber,
+        description: `Deleted invoice: ${invoice.invoiceNumber}`
+      });
+    }
 
     res.json({ message: 'Invoice deleted successfully' });
   })

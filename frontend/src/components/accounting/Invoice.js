@@ -10,7 +10,10 @@ const Invoice = {
   async fetchInvoices() {
     this.data.loading = true;
     try {
-      const response = await axios.get('/api/accounting/invoices/list', { params: this.data.filter });
+      const response = await axios.get('/api/accounting/invoices/list', {
+        params: this.data.filter,
+        withCredentials: true,
+      });
       this.data.invoices = response.data.invoices || [];
     } catch (error) {
       console.error('Error fetching invoices:', error);
@@ -23,7 +26,7 @@ const Invoice = {
   async handleSendInvoice(invoiceId) {
     try {
       this.data.loading = true;
-      await axios.post(`/api/accounting/invoices/${invoiceId}/send`);
+      await axios.post(`/api/accounting/invoices/${invoiceId}/send`, {}, { withCredentials: true });
       alert('Invoice sent successfully!');
       await this.fetchInvoices();
       this.updateView();
@@ -40,7 +43,7 @@ const Invoice = {
     if (amount) {
       try {
         this.data.loading = true;
-        await axios.post(`/api/accounting/invoices/${invoiceId}/pay`, { amountPaid: parseFloat(amount) });
+        await axios.post(`/api/accounting/invoices/${invoiceId}/pay`, { amountPaid: parseFloat(amount) }, { withCredentials: true });
         alert('Payment recorded successfully!');
         await this.fetchInvoices();
         this.updateView();
@@ -105,7 +108,7 @@ const Invoice = {
                 ${invoices.map(invoice => `
                   <tr>
                     <td>${invoice.invoiceNumber}</td>
-                    <td>${invoice.customer?.name || 'Unknown'}</td>
+                    <td>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown'}</td>
                     <td>${new Date(invoice.invoiceDate).toLocaleDateString()}</td>
                     <td class="amount">$${(invoice.total || 0).toFixed(2)}</td>
                     <td class="amount">$${(invoice.amountPaid || 0).toFixed(2)}</td>
@@ -117,7 +120,7 @@ const Invoice = {
                         <button onclick="window.invoiceInstance.handleSendInvoice('${invoice._id}');" class="btn-action">Send</button>
                       ` : ''}
                       ${invoice.status !== 'Paid' ? `
-                        <button onclick="window.invoiceInstance.handlePayInvoice('${invoice._id}');" class="btn-action">Record Payment</button>
+                        <button onclick="window.invoiceInstance.handlePayInvoice('${invoice._id}');" class="btn-action">Generate PDF</button>
                       ` : ''}
                     </td>
                   </tr>
