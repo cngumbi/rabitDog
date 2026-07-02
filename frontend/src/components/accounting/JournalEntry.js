@@ -138,6 +138,13 @@ const JournalEntry = {
 
     return `
       <div class="journal-entry-container">
+        <div class="financial-nav">
+          <a href="/#/cashbank" class="financial-nav-link">Cashbook</a>
+          <a href="/#/budget" class="financial-nav-link">Budgets</a>
+          <a href="/#/financial-reports" class="financial-nav-link">Financial Reports</a>
+          <a href="/#/invoices" class="financial-nav-link">Invoices</a>
+          <a href="/#/journal-entries" class="financial-nav-link active">Journal Entries</a>
+        </div>
         <h2>Journal Entry Management</h2>
 
         <div class="controls">
@@ -221,6 +228,9 @@ const JournalEntry = {
           .form-actions button { flex: 1; }
           .entries-list { background: white; padding: 20px; border-radius: 8px; }
           .entries-list table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          .financial-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+          .financial-nav-link { padding: 8px 12px; border-radius: 999px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 600; }
+          .financial-nav-link.active { background: #007bff; color: white; }
           .entries-list th, .entries-list td { padding: 12px; border: 1px solid #ddd; text-align: left; }
           .entries-list th { background-color: #007bff; color: white; }
         </style>

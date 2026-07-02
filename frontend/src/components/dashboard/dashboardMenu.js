@@ -11,9 +11,9 @@ const DashboardMenu = {
                     <li><a href="/#/saleslist" class="${cons.selected === 'salesList' ? 'selected': ''}">Sales</a></li>
                     <li><a href="/#/purchases" class="${cons.selected === 'purchases' ? 'selected': ''}">Purchases</a></li>-->
                     <li><a href="/#/transfers" class="${cons.selected === 'transfers' ? 'selected': ''}">Stock Transfers</a></li>
-                    <!-- <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">POS</a></li>
-                    <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Cash & Bank</a></li>
-                    <li><a href="/#/expenses" class="${cons.selected === 'expenses' ? 'selected': ''}">Expenses</a></li>-->
+                    <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">POS</a></li>
+                    <li><a href="/#/cashbank" class="${cons.selected === 'cashbank' ? 'selected': ''}">Cash & Bank</a></li>
+                    <!--<li><a href="/#/expenses" class="${cons.selected === 'expenses' ? 'selected': ''}">Expenses</a></li>-->
                     <li><a href="/#/medicallogs" class="${cons.selected === 'medicallogs' ? 'selected': ''}">Health Records</a></li>
                     <li><a href="/#/livestock" class="${cons.selected === 'livestock' ? 'selected': ''}">Livestock Management</a></li>
                     <!--<li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">Sales Reports</a></li>

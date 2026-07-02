@@ -66,6 +66,16 @@ import ViewFeeding from './components/livestock/viewFeeding';
 import AddProductionRecord from './components/livestock/addProductionRecord';
 import ProductionRecords from './components/livestock/productionRecords';
 import ViewProduction from './components/livestock/viewProduction';
+import CashBook from './components/accounting/Cashbook';
+import AddAccount from './components/accounting/AddAccount';
+import Budget from './components/accounting/Budget';
+import BudgetNew from './components/accounting/BudgetNew';
+import FinancialReports from './components/accounting/FinancialReports';
+import Invoice from './components/accounting/Invoice';
+import InvoiceCreate from './components/accounting/InvoiceCreate';
+import InvoiceDetails from './components/accounting/InvoiceDetails';
+import InvoiceEdit from './components/accounting/InvoiceEdit';
+import JournalEntry from './components/accounting/JournalEntry';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 if (faviconImg) {
@@ -147,6 +157,17 @@ const routes = {
     '/livestock/production/:id': ViewProduction,
     '/livestock/add': AddBatch,
     '/livestock/batch/:id': ViewBatch,
+    //cash & bank
+    '/cashbank': CashBook,
+    '/account/add': AddAccount,
+    '/budget': Budget,
+    '/budget/new': BudgetNew,
+    '/financial-reports': FinancialReports,
+    '/invoices': Invoice,
+    '/invoices/create': InvoiceCreate,
+    '/invoices/:id': InvoiceDetails,
+    '/invoices/:id/edit': InvoiceEdit,
+    '/journal-entries': JournalEntry,
 };
 //==================ROUTER FUNCTION===========
 const router = async () => {
@@ -210,6 +231,16 @@ const router = async () => {
         '/livestock/production/:id',
         '/livestock/add',
         '/livestock/batch/:id',
+        '/cashbank',
+        '/account/add',
+        '/budget',
+        '/budget/new',
+        '/financial-reports',
+        '/invoices',
+        '/invoices/create',
+        '/invoices/:id',
+        '/invoices/:id/edit',
+        '/journal-entries',
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';
@@ -290,7 +321,7 @@ const router = async () => {
     });
    }else{
     main.innerHTML = await Page.render();
-    if (Page.vignette) await Page.vignette();
+    if (Page.vignette) await Page.vignette(request);
    }
 };
 window.addEventListener('load', router);

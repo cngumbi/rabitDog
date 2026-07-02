@@ -159,6 +159,13 @@ const FinancialReports = {
 
     return `
       <div class="financial-reports-container">
+        <div class="financial-nav">
+          <a href="/#/cashbank" class="financial-nav-link">Cashbook</a>
+          <a href="/#/budget" class="financial-nav-link">Budgets</a>
+          <a href="/#/financial-reports" class="financial-nav-link active">Financial Reports</a>
+          <a href="/#/invoices" class="financial-nav-link">Invoices</a>
+          <a href="/#/journal-entries" class="financial-nav-link">Journal Entries</a>
+        </div>
         <h2>Financial Reports</h2>
 
         <div class="report-controls">
@@ -207,6 +214,9 @@ const FinancialReports = {
           .balance-sheet { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
           .column h4 { background: #007bff; color: white; padding: 10px; border-radius: 4px; }
           .ratio-section { margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 4px; }
+          .financial-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+          .financial-nav-link { padding: 8px 12px; border-radius: 999px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 600; }
+          .financial-nav-link.active { background: #007bff; color: white; }
           .ratio-section h4 { margin-top: 0; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
           .ratio-section p { margin: 8px 0; display: flex; justify-content: space-between; }
           .bold { font-weight: bold; }

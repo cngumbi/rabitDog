@@ -4,14 +4,7 @@ const Invoice = {
   data: {
     invoices: [],
     loading: false,
-    showForm: false,
-    filter: { status: '' },
-    formData: {
-      customer: '',
-      lineItems: [{ description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }],
-      total: 0,
-      status: 'Draft'
-    }
+    filter: { status: '' }
   },
 
   async fetchInvoices() {
@@ -60,113 +53,43 @@ const Invoice = {
     }
   },
 
-  async handleSubmit() {
-    try {
-      this.data.loading = true;
-      await axios.post('/api/accounting/invoices/create', this.data.formData);
-      alert('Invoice created successfully!');
-      this.data.formData = {
-        customer: '',
-        lineItems: [{ description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }],
-        total: 0,
-        status: 'Draft'
-      };
-      this.data.showForm = false;
-      await this.fetchInvoices();
-      this.updateView();
-    } catch (error) {
-      console.error('Error creating invoice:', error);
-      alert('Error: ' + (error.response?.data?.message || error.message));
-    } finally {
-      this.data.loading = false;
-    }
-  },
-
-  calculateTotal() {
-    const total = this.data.formData.lineItems.reduce((sum, item) => sum + (item.lineTotal || 0), 0);
-    return total.toFixed(2);
-  },
-
   render() {
-    const { invoices, loading, showForm, filter, formData } = this.data;
-    const total = this.calculateTotal();
+    const { invoices, loading, filter } = this.data;
 
     return `
       <div class="invoice-container">
-        <h2>Invoice Management</h2>
+        <div class="financial-nav">
+          <a href="/#/cashbank" class="financial-nav-link">Cashbook</a>
+          <a href="/#/budget" class="financial-nav-link">Budgets</a>
+          <a href="/#/financial-reports" class="financial-nav-link">Financial Reports</a>
+          <a href="/#/invoices" class="financial-nav-link active">Invoices</a>
+          <a href="/#/journal-entries" class="financial-nav-link">Journal Entries</a>
+        </div>
 
-        ${!showForm ? `
-          <button onclick="window.invoiceInstance.data.showForm = true; window.invoiceInstance.updateView();" class="btn-create">
-            + Create Invoice
-          </button>
-
-          <div class="filters">
-            <select onchange="window.invoiceInstance.data.filter.status = this.value; window.invoiceInstance.fetchInvoices().then(() => window.invoiceInstance.updateView());">
-              <option value="">All Status</option>
-              <option value="Draft">Draft</option>
-              <option value="Sent">Sent</option>
-              <option value="Paid">Paid</option>
-              <option value="Partially Paid">Partially Paid</option>
-              <option value="Overdue">Overdue</option>
-            </select>
+        <div class="invoice-header-row">
+          <div>
+            <h2 class="page-title">Invoice Management</h2>
+            <p class="page-subtitle">Create and manage invoices for your business.</p>
           </div>
-        ` : `
-          <div class="invoice-form">
-            <h3>Create New Invoice</h3>
-            <div class="form-group">
-              <label>Customer ID</label>
-              <input type="text" value="${formData.customer}" onchange="window.invoiceInstance.data.formData.customer = this.value;" required />
-            </div>
-
-            <div class="line-items">
-              <h4>Line Items</h4>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Line Total</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${formData.lineItems.map((item, index) => `
-                    <tr>
-                      <td><input type="text" value="${item.description}" onchange="window.invoiceInstance.data.formData.lineItems[${index}].description = this.value;" required /></td>
-                      <td><input type="number" step="1" value="${item.quantity}" onchange="window.invoiceInstance.data.formData.lineItems[${index}].quantity = parseFloat(this.value); window.invoiceInstance.updateView();" required /></td>
-                      <td><input type="number" step="0.01" value="${item.unitPrice}" onchange="window.invoiceInstance.data.formData.lineItems[${index}].unitPrice = parseFloat(this.value); window.invoiceInstance.data.formData.lineItems[${index}].lineTotal = (this.value * window.invoiceInstance.data.formData.lineItems[${index}].quantity).toFixed(2); window.invoiceInstance.updateView();" required /></td>
-                      <td class="amount">$${item.lineTotal.toFixed(2)}</td>
-                      <td>${formData.lineItems.length > 1 ? `<button onclick="window.invoiceInstance.data.formData.lineItems.splice(${index}, 1); window.invoiceInstance.updateView();" class="btn-remove">Remove</button>` : ''}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-
-              <div class="line-totals">
-                <p>Total: $${total}</p>
-              </div>
-
-              <button onclick="window.invoiceInstance.data.formData.lineItems.push({ description: '', quantity: 1, unitPrice: 0, lineTotal: 0 }); window.invoiceInstance.updateView();" class="btn-add">
-                Add Line Item
-              </button>
-            </div>
-
-            <div class="form-actions">
-              <button onclick="window.invoiceInstance.handleSubmit();" ${loading ? 'disabled' : ''} class="btn-submit">
-                ${loading ? 'Creating...' : 'Create Invoice'}
-              </button>
-              <button onclick="window.invoiceInstance.data.showForm = false; window.invoiceInstance.updateView();" class="btn-cancel">
-                Cancel
-              </button>
+          <div class="invoice-actions-row">
+            <a href="#/invoices/create" class="btn-create">+ Create Invoice</a>
+            <div class="filters">
+              <select onchange="window.invoiceInstance.data.filter.status = this.value; window.invoiceInstance.fetchInvoices().then(() => window.invoiceInstance.updateView());">
+                <option value="">All Status</option>
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Paid">Paid</option>
+                <option value="Partially Paid">Partially Paid</option>
+                <option value="Overdue">Overdue</option>
+              </select>
             </div>
           </div>
-        `}
+        </div>
 
         <div class="invoices-list">
           <h3>Invoices</h3>
           ${loading ? '<p>Loading...</p>' : `
-            <table>
+            <table class="invoice-list-table">
               <thead>
                 <tr>
                   <th>Invoice #</th>
@@ -187,8 +110,10 @@ const Invoice = {
                     <td class="amount">$${(invoice.total || 0).toFixed(2)}</td>
                     <td class="amount">$${(invoice.amountPaid || 0).toFixed(2)}</td>
                     <td>${invoice.status}</td>
-                    <td>
+                    <td class="actions-cell">
+                      <a href="#/invoices/${invoice._id}" class="btn-action btn-view">View</a>
                       ${invoice.status === 'Draft' ? `
+                        <a href="#/invoices/${invoice._id}/edit" class="btn-action btn-edit">Edit</a>
                         <button onclick="window.invoiceInstance.handleSendInvoice('${invoice._id}');" class="btn-action">Send</button>
                       ` : ''}
                       ${invoice.status !== 'Paid' ? `
@@ -204,7 +129,13 @@ const Invoice = {
 
         <style>
           .invoice-container { padding: 20px; max-width: 1200px; margin: 0 auto; }
-          .btn-create { margin-bottom: 20px; padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+          .page-header-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 24px; box-shadow: 0 18px 38px rgba(15, 23, 42, 0.06); margin-bottom: 24px; }
+          .invoice-header-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+          .page-title { margin: 0 0 6px; font-size: 28px; }
+          .page-subtitle { margin: 0; color: #475569; }
+          .invoice-actions-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+          .invoices-list { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); }
+          .btn-create { padding: 12px 22px; background-color: #2563eb; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
           .invoice-form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
           .form-group { margin-bottom: 15px; }
           .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -216,21 +147,23 @@ const Invoice = {
           .line-items input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
           .line-totals { background: #e8f4f8; padding: 10px; border-radius: 4px; margin: 10px 0; }
           .amount { text-align: right; font-family: monospace; font-weight: bold; }
-          .btn-remove, .btn-add, .btn-submit, .btn-cancel, .btn-action { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-          .btn-add { background-color: #17a2b8; color: white; margin-top: 10px; }
-          .btn-remove { background-color: #dc3545; color: white; }
-          .btn-submit { background-color: #28a745; color: white; }
-          .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
-          .btn-cancel { background-color: #6c757d; color: white; }
-          .btn-action { background-color: #007bff; color: white; font-size: 0.9em; padding: 6px 10px; margin: 2px; }
-          .form-actions { display: flex; gap: 10px; margin-top: 20px; }
-          .form-actions button { flex: 1; }
-          .invoices-list { background: white; padding: 20px; border-radius: 8px; }
-          .invoices-list table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          .invoices-list th, .invoices-list td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-          .invoices-list th { background-color: #007bff; color: white; }
-          .filters { margin-bottom: 15px; }
-          .filters select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+          .btn-action { background-color: #007bff; color: white; font-size: 0.9em; padding: 6px 10px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+          .btn-view { background-color: #17a2b8; }
+          .btn-edit { background-color: #ffc107; }
+          .financial-nav { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+          .financial-nav-link { padding: 8px 12px; border-radius: 999px; background: #e2e8f0; color: #0f172a; text-decoration: none; font-weight: 600; }
+          .financial-nav-link.active { background: #007bff; color: white; }
+          .filters { margin: 0; }
+          .filters select { padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; background: #fff; min-width: 190px; }
+          .invoice-list-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          .invoice-list-table th, .invoice-list-table td { padding: 14px 12px; border-bottom: 1px solid #e5e7eb; }
+          .invoice-list-table th { background: #f8fafc; color: #0f172a; font-weight: 700; }
+          .invoice-list-table tr:hover { background: #f8fafc; }
+          .actions-cell { white-space: nowrap; }
+          .btn-action { min-width: 90px; }
+          @media (max-width: 900px) {
+            .invoice-header-row { flex-direction: column; align-items: stretch; }
+          }
         </style>
       </div>
     `;
@@ -243,9 +176,14 @@ const Invoice = {
     }
   },
 
-  init() {
+  async init() {
     window.invoiceInstance = this;
-    this.fetchInvoices().then(() => this.updateView());
+    await this.fetchInvoices();
+    this.updateView();
+  },
+
+  vignette() {
+    return this.init();
   }
 };
 
