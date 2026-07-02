@@ -40,6 +40,7 @@ router.post(
     });
 
     const createdById = req.user?.id || req.user?._id || req.session.user?._id || req.session.user?.id;
+    const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const invoice = await Invoice.create({
       invoiceNumber,
       customer,
@@ -49,6 +50,7 @@ router.post(
       discountAmount,
       total: subtotal + taxAmount - discountAmount,
       partyId,
+      dueDate,
       ...req.body,
       createdBy: createdById
     });

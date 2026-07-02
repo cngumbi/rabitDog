@@ -38,6 +38,138 @@ const Invoice = {
     }
   },
 
+  async handleGenerateInvoice(invoiceId) {
+    const printWindow = window.open('about:blank', '_blank');
+    if (!printWindow) {
+      alert('Unable to open print window. Please allow popups.');
+      return;
+    }
+
+    printWindow.document.write('<html><head><title>Preparing invoice...</title></head><body><p>Loading invoice preview...</p></body></html>');
+    printWindow.document.close();
+
+    try {
+      this.data.loading = true;
+      const response = await axios.get(`/api/accounting/invoices/${invoiceId}`, { withCredentials: true });
+      const invoice = response.data;
+      const businessName = 'RabitDog Accounting';
+      const businessAddress = '123 Finance Lane, Suite 400, Cityville, CA 90210';
+      const businessContact = 'Phone: (555) 123-4567 | Email: billing@rabitdog.com';
+      const paymentTerms = invoice.paymentTerms || 'Payment due within 30 days of invoice date. Late payments may be subject to fees.';
+
+      const invoiceHtml = `
+        <html>
+          <head>
+            <title>Invoice ${invoice.invoiceNumber}</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 24px; color: #1f2937; background: #f8fafc; }
+              .brand-panel { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); margin-bottom: 24px; }
+              .brand-logo { font-size: 32px; font-weight: 800; color: #1d4ed8; letter-spacing: 0.04em; margin: 0 0 8px; }
+              .brand-details { color: #475569; line-height: 1.7; }
+              .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
+              .invoice-summary, .invoice-meta, .payment-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+              .invoice-summary div, .invoice-meta div, .payment-details div { background: #ffffff; border: 1px solid #e5e7eb; padding: 16px; border-radius: 12px; }
+              table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+              th, td { border-bottom: 1px solid #e2e8f0; padding: 14px 16px; text-align: left; }
+              th { background: #eef2ff; font-weight: 700; color: #1e3a8a; }
+              td.amount, th.amount { text-align: right; }
+              .section-title { margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #0f172a; }
+              .payment-terms { padding: 20px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 14px; color: #0c4a6e; line-height: 1.7; }
+              .footer-note { font-size: 13px; color: #64748b; margin-top: 16px; }
+            </style>
+          </head>
+          <body>
+            <div class="brand-panel">
+              <div class="brand-logo">${businessName}</div>
+              <div class="brand-details">${businessAddress}<br>${businessContact}</div>
+            </div>
+
+            <div class="invoice-header">
+              <div>
+                <div class="section-title">Bill To</div>
+                <div><strong>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown Customer'}</strong></div>
+                <div>${invoice.customer?.email || invoice.partner?.email || ''}</div>
+                <div>${invoice.customer?.address || invoice.partyId?.address || ''}</div>
+              </div>
+
+              <div>
+                <div class="section-title">Invoice Details</div>
+                <div><strong>Invoice #:</strong> ${invoice.invoiceNumber}</div>
+                <div><strong>Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</div>
+                <div><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</div>
+                <div><strong>Status:</strong> ${invoice.status}</div>
+              </div>
+            </div>
+
+            <div class="invoice-summary">
+              <div><strong>Subtotal</strong><br>$${Number(invoice.subtotal || 0).toFixed(2)}</div>
+              <div><strong>Tax</strong><br>$${Number(invoice.taxAmount || 0).toFixed(2)}</div>
+              <div><strong>Discount</strong><br>$${Number(invoice.discountAmount || 0).toFixed(2)}</div>
+              <div><strong>Total</strong><br>$${Number(invoice.total || 0).toFixed(2)}</div>
+              <div><strong>Amount Paid</strong><br>$${Number(invoice.amountPaid || 0).toFixed(2)}</div>
+              <div><strong>Balance Due</strong><br>$${Number(invoice.balanceDue || 0).toFixed(2)}</div>
+            </div>
+
+            <div>
+              <div class="section-title">Items</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Tax Amount</th>
+                    <th class="amount">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${Array.isArray(invoice.lineItems) && invoice.lineItems.length ? invoice.lineItems.map(item => `
+                    <tr>
+                      <td>${item.description || '—'}</td>
+                      <td>${item.quantity || 0}</td>
+                      <td>$${Number(item.unitPrice || 0).toFixed(2)}</td>
+                      <td>$${Number(item.taxAmount || 0).toFixed(2)}</td>
+                      <td class="amount">$${Number(item.lineTotal || 0).toFixed(2)}</td>
+                    </tr>
+                  `).join('') : `
+                    <tr>
+                      <td colspan="5">No line items found.</td>
+                    </tr>
+                  `}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="payment-details">
+              <div>
+                <div class="section-title">Payment Terms</div>
+                <div class="payment-terms">${paymentTerms}</div>
+              </div>
+              <div>
+                <div class="section-title">Payment Instructions</div>
+                <div>Please make payment to:<br><strong>RabitDog Accounting</strong><br>Bank: Example Bank<br>Account #: 123456789<br>Routing #: 987654321</div>
+              </div>
+            </div>
+
+            <div class="footer-note">Thank you for your business. If you have questions about this invoice, please contact billing@rabitdog.com.</div>
+          </body>
+        </html>
+      `;
+
+      printWindow.document.open();
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      printWindow.close();
+      alert('Error: ' + (error.response?.data?.message || error.message));
+    } finally {
+      this.data.loading = false;
+    }
+  },
+
   async handlePayInvoice(invoiceId) {
     const amount = prompt('Enter payment amount:');
     if (amount) {
@@ -117,10 +249,10 @@ const Invoice = {
                       <a href="#/invoices/${invoice._id}" class="btn-action btn-view">View</a>
                       ${invoice.status === 'Draft' ? `
                         <a href="#/invoices/${invoice._id}/edit" class="btn-action btn-edit">Edit</a>
-                        <button onclick="window.invoiceInstance.handleSendInvoice('${invoice._id}');" class="btn-action">Send</button>
+                        <button type="button" data-send-invoice="${invoice._id}" class="btn-action">Send</button>
                       ` : ''}
                       ${invoice.status !== 'Paid' ? `
-                        <button onclick="window.invoiceInstance.handlePayInvoice('${invoice._id}');" class="btn-action">Generate PDF</button>
+                        <button type="button" data-generate-invoice="${invoice._id}" class="btn-action">Generate Invoice</button>
                       ` : ''}
                     </td>
                   </tr>
@@ -172,10 +304,26 @@ const Invoice = {
     `;
   },
 
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    container.querySelectorAll('[data-generate-invoice]').forEach((button) => {
+      const invoiceId = button.dataset.generateInvoice;
+      button.addEventListener('click', () => this.handleGenerateInvoice(invoiceId));
+    });
+
+    container.querySelectorAll('[data-send-invoice]').forEach((button) => {
+      const invoiceId = button.dataset.sendInvoice;
+      button.addEventListener('click', () => this.handleSendInvoice(invoiceId));
+    });
+  },
+
   updateView() {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
     }
   },
 

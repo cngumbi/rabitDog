@@ -26,21 +26,91 @@ const InvoiceDetails = {
     }
   },
 
-  async handleSendInvoice(invoiceId) {
+  async handleGenerateInvoice(invoiceId) {
     try {
-      this.data.loading = true;
-      await axios.post(`/api/accounting/invoices/${invoiceId}/send`, {}, { withCredentials: true });
-      alert('Invoice sent successfully!');
-      await this.fetchInvoice(invoiceId);
+      const invoice = this.data.invoice;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('Unable to open print window. Please allow popups.');
+        return;
+      }
+
+      const invoiceHtml = `
+        <html>
+          <head>
+            <title>Invoice ${invoice.invoiceNumber}</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; color: #1f2937; }
+              .invoice-header { display: flex; justify-content: space-between; margin-bottom: 24px; }
+              .invoice-header h1 { margin: 0; font-size: 28px; }
+              .invoice-meta, .invoice-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
+              .invoice-summary div, .invoice-meta div { border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+              th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; }
+              th { background: #f8fafc; }
+              .amount { text-align: right; }
+            </style>
+          </head>
+          <body>
+            <div class="invoice-header">
+              <div>
+                <h1>Invoice ${invoice.invoiceNumber}</h1>
+                <p>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown'}</p>
+              </div>
+              <div>
+                <p><strong>Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</p>
+                <p><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
+              </div>
+            </div>
+
+            <div class="invoice-summary">
+              <div><strong>Subtotal:</strong> ${this.formatCurrency(invoice.subtotal)}</div>
+              <div><strong>Tax:</strong> ${this.formatCurrency(invoice.taxAmount)}</div>
+              <div><strong>Discount:</strong> ${this.formatCurrency(invoice.discountAmount)}</div>
+              <div><strong>Total:</strong> ${this.formatCurrency(invoice.total)}</div>
+              <div><strong>Amount Paid:</strong> ${this.formatCurrency(invoice.amountPaid)}</div>
+              <div><strong>Balance Due:</strong> ${this.formatCurrency(invoice.balanceDue)}</div>
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th>Tax Amount</th>
+                  <th class="amount">Line Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${invoice.lineItems.map((item) => `
+                  <tr>
+                    <td>${item.description || '—'}</td>
+                    <td>${item.quantity || 0}</td>
+                    <td>${this.formatCurrency(item.unitPrice)}</td>
+                    <td>${this.formatCurrency(item.taxAmount)}</td>
+                    <td class="amount">${this.formatCurrency(item.lineTotal)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+
+            <p><strong>Notes:</strong> ${invoice.notes || 'None'}</p>
+          </body>
+        </html>
+      `;
+
+      printWindow.document.write(invoiceHtml);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
     } catch (error) {
-      console.error('Error sending invoice:', error);
+      console.error('Error generating invoice print view:', error);
       alert('Error: ' + (error.response?.data?.message || error.message));
-    } finally {
-      this.data.loading = false;
     }
   },
 
-  async handlePayInvoice(invoiceId) {
+  async handleSendInvoice(invoiceId) {
     const amount = prompt('Enter payment amount:');
     if (amount) {
       try {
@@ -106,6 +176,11 @@ const InvoiceDetails = {
         this.handlePaymentFieldChange(field, event.target.value);
       });
     });
+
+    const generateInvoiceButton = container.querySelector('[data-generate-invoice]');
+    if (generateInvoiceButton) {
+      generateInvoiceButton.addEventListener('click', () => this.handleGenerateInvoice(this.data.invoice._id));
+    }
 
     const recordPaymentButton = container.querySelector('[data-record-payment]');
     if (recordPaymentButton) {
@@ -232,6 +307,7 @@ const InvoiceDetails = {
           <a href="/#/invoices" class="btn-secondary">Back to Invoices</a>
           ${invoice.status === 'Draft' ? `<a href="/#/invoices/${invoice._id}/edit" class="btn-action btn-edit">Edit</a>` : ''}
           ${invoice.status === 'Draft' ? `<button type="button" class="btn-action" data-send-invoice>Send</button>` : ''}
+          <button type="button" class="btn-action btn-generate" data-generate-invoice>Generate Invoice</button>
         </div>
 
         <style>
@@ -255,6 +331,7 @@ const InvoiceDetails = {
           .payment-form-row select,
           .payment-form-row textarea { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; }
           .btn-pay { background-color: #10b981; color: white; }
+          .btn-generate { background-color: #6366f1; color: white; }
           .btn-secondary { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; background: #6c757d; color: white; border-radius: 4px; text-decoration: none; }
           .error { color: #dc3545; }
         </style>
