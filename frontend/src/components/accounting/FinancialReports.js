@@ -20,22 +20,47 @@ const FinancialReports = {
     { value: 'cash-flow-statement', label: 'Cash Flow Statement' },
     { value: 'receivables-aging', label: 'Accounts Receivable Aging' },
     { value: 'payables-aging', label: 'Accounts Payable Aging' },
+    { value: 'invoice-aging', label: 'Invoice Aging' },
     { value: 'financial-ratios', label: 'Financial Ratios' }
   ],
 
   async generateReport() {
     try {
       this.data.loading = true;
-      const endpoint = `/api/accounting/reports/${this.data.reportType}`;
-      const response = await axios.get(endpoint, { params: this.data.params });
-      this.data.reportData = response.data;
+      this.data.reportData = null;
       this.updateView();
+      let endpoint = `/api/accounting/reports/${this.data.reportType}`;
+      if (this.data.reportType === 'invoice-aging') {
+        endpoint = '/api/accounting/invoices/reports/aging';
+      }
+      const response = await axios.get(endpoint, { params: this.data.params, withCredentials: true });
+      this.data.reportData = response.data || {};
     } catch (error) {
       console.error('Error generating report:', error);
       alert('Error: ' + (error.response?.data?.message || error.message));
+      this.data.reportData = {};
     } finally {
       this.data.loading = false;
+      this.updateView();
     }
+  },
+  handleReportTypeChange(reportType) {
+    this.data.reportType = reportType;
+    this.updateView();
+  },
+  async vignette(request) {
+    window.financialReportsInstance = this;
+    if (request?.query?.reportType) {
+      this.data.reportType = request.query.reportType;
+    } else if (request?.id) {
+      this.data.reportType = request.id;
+    } else if (window.location.hash.toLowerCase().includes('invoice-aging')) {
+      this.data.reportType = 'invoice-aging';
+    }
+    this.data.reportData = null;
+    this.data.loading = true;
+    this.updateView();
+    await this.generateReport();
   },
 
   render() {
@@ -44,7 +69,7 @@ const FinancialReports = {
 
     if (loading) {
       reportContent = '<p>Loading...</p>';
-    } else if (reportData) {
+    } else if (reportData && Object.keys(reportData).length > 0) {
       if (reportType === 'trial-balance') {
         reportContent = `
           <div>
@@ -125,6 +150,48 @@ const FinancialReports = {
             </div>
           </div>
         `;
+      } else if (reportType === 'invoice-aging') {
+        reportContent = `
+          <div>
+            <h3>Invoice Aging Report</h3>
+            <p>Total Outstanding: $${(reportData.current + reportData.days30 + reportData.days60 + reportData.days90 + reportData.over90).toFixed(2)}</p>
+            <div class="aging-summary">
+              <div class="aging-card"><strong>Current</strong><span>$${reportData.current.toFixed(2)}</span></div>
+              <div class="aging-card"><strong>1-30 Days</strong><span>$${reportData.days30.toFixed(2)}</span></div>
+              <div class="aging-card"><strong>31-60 Days</strong><span>$${reportData.days60.toFixed(2)}</span></div>
+              <div class="aging-card"><strong>61-90 Days</strong><span>$${reportData.days90.toFixed(2)}</span></div>
+              <div class="aging-card"><strong>Over 90 Days</strong><span>$${reportData.over90.toFixed(2)}</span></div>
+            </div>
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Customer</th>
+                  <th>Due Date</th>
+                  <th>Balance Due</th>
+                  <th>Bucket</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${[].concat(
+                  reportData.invoices.current.map(inv => ({ ...inv, bucket: 'Current' })),
+                  reportData.invoices.days30.map(inv => ({ ...inv, bucket: '1-30 Days' })),
+                  reportData.invoices.days60.map(inv => ({ ...inv, bucket: '31-60 Days' })),
+                  reportData.invoices.days90.map(inv => ({ ...inv, bucket: '61-90 Days' })),
+                  reportData.invoices.over90.map(inv => ({ ...inv, bucket: 'Over 90 Days' }))
+                ).map(inv => `
+                  <tr>
+                    <td>${inv.invoiceNumber}</td>
+                    <td>${inv.customer?.name || inv.partyId?.name || (typeof inv.customer === 'string' ? inv.customer : 'Unknown')}</td>
+                    <td>${inv.dueDate ? new Date(inv.dueDate).toLocaleDateString() : 'N/A'}</td>
+                    <td class="amount">$${(inv.balanceDue || 0).toFixed(2)}</td>
+                    <td>${inv.bucket}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
       } else if (reportType === 'financial-ratios') {
         reportContent = `
           <div>
@@ -157,6 +224,10 @@ const FinancialReports = {
       }
     }
 
+    if (!loading && (!reportData || Object.keys(reportData).length === 0)) {
+      reportContent = '<p>No report data available. Try another report or click Generate Report again.</p>';
+    }
+
     return `
       <div class="financial-reports-container">
         <div class="financial-nav">
@@ -171,8 +242,8 @@ const FinancialReports = {
         <div class="report-controls">
           <div class="control-group">
             <label>Report Type:</label>
-            <select onchange="window.financialReportsInstance.data.reportType = this.value;">
-              ${this.reportTypes.map(type => `<option value="${type.value}">${type.label}</option>`).join('')}
+            <select onchange="window.financialReportsInstance.handleReportTypeChange(this.value)">
+              ${this.reportTypes.map(type => `<option value="${type.value}" ${reportType === type.value ? 'selected' : ''}>${type.label}</option>`).join('')}
             </select>
           </div>
 

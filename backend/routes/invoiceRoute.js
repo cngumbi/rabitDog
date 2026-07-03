@@ -2,6 +2,7 @@ const express = require('express');
 const asyncHandler = require('express-async-handler');
 const { isAuth } = require('../util');
 const Invoice = require('../models/invoiceModel');
+const Profile = require('../models/profileModel');
 const JournalEntry = require('../models/journalEntryModel');
 const AuditLog = require('../models/auditLogModel');
 const transporter = require('../middleware/sendmail');
@@ -43,6 +44,7 @@ router.post(
 
     const createdById = req.user?.id || req.user?._id || req.session.user?._id || req.session.user?.id;
     const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const totalAmount = subtotal + taxAmount - discountAmount;
     const invoice = await Invoice.create({
       invoiceNumber,
       customer,
@@ -50,7 +52,8 @@ router.post(
       subtotal,
       taxAmount,
       discountAmount,
-      total: subtotal + taxAmount - discountAmount,
+      total: totalAmount,
+      balanceDue: totalAmount,
       partyId,
       dueDate,
       ...req.body,
@@ -80,7 +83,11 @@ router.get(
     const { status, customer, startDate, endDate, skip = 0, limit = 50 } = req.query;
 
     const filter = {};
-    if (status) filter.status = status;
+    const normalizedStatus = String(status || '').trim();
+    if (normalizedStatus) {
+      const escapedStatus = normalizedStatus.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      filter.status = new RegExp(`^${escapedStatus}$`, 'i');
+    }
     if (customer) filter.customer = customer;
     if (startDate || endDate) {
       filter.invoiceDate = {};
@@ -97,6 +104,56 @@ router.get(
     const total = await Invoice.countDocuments(filter);
 
     res.json({ invoices, total, skip: parseInt(skip), limit: parseInt(limit) });
+  })
+);
+
+// Get aging report
+router.get(
+  '/reports/aging',
+  asyncHandler(async (req, res) => {
+    const invoices = await Invoice.find({
+      status: { $in: ['Sent', 'Viewed', 'Partially Paid', 'Overdue'] }
+    }).populate('customer').populate('partyId');
+
+    const now = new Date();
+    const agingReport = {
+      current: 0,
+      days30: 0,
+      days60: 0,
+      days90: 0,
+      over90: 0,
+      invoices: {
+        current: [],
+        days30: [],
+        days60: [],
+        days90: [],
+        over90: []
+      }
+    };
+
+    invoices.forEach(invoice => {
+      const daysDue = invoice.dueDate ? Math.floor((now - invoice.dueDate) / (1000 * 60 * 60 * 24)) : 0;
+      const balance = Number(invoice.balanceDue ?? (invoice.total - invoice.amountPaid)) || 0;
+
+      if (daysDue <= 0) {
+        agingReport.current += balance;
+        agingReport.invoices.current.push(invoice);
+      } else if (daysDue <= 30) {
+        agingReport.days30 += balance;
+        agingReport.invoices.days30.push(invoice);
+      } else if (daysDue <= 60) {
+        agingReport.days60 += balance;
+        agingReport.invoices.days60.push(invoice);
+      } else if (daysDue <= 90) {
+        agingReport.days90 += balance;
+        agingReport.invoices.days90.push(invoice);
+      } else {
+        agingReport.over90 += balance;
+        agingReport.invoices.over90.push(invoice);
+      }
+    });
+
+    res.json(agingReport);
   })
 );
 
@@ -164,43 +221,89 @@ router.post(
     const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
 
     let invoice = await Invoice.findById(req.params.id).populate('customer partyId');
+    const profile = await Profile.findOne({ user: req.user._id });
 
     if (!invoice) {
       return res.status(404).json({ message: 'Invoice not found' });
     }
 
-    // Build simple HTML invoice (same basic structure as frontend preview)
-    const businessName = 'RabitDog Accounting';
+    const settings = profile?.settings || {};
+    const businessName = settings.workspaceName || 'RabitDog Accounting';
+    const businessEmail = settings.businessEmail || 'billing@rabitdog.com';
+    const currency = settings.currency || 'Ksh';
     const customerName = invoice.customer?.name || invoice.partyId?.name || 'Customer';
     const customerEmail = invoice.customer?.email || invoice.partyId?.email;
 
+    const formatCurrency = (value) => {
+      const amount = Number(value || 0);
+      if (currency === 'USD') return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+      if (currency === 'EUR') return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(amount);
+      if (currency === 'GBP') return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
+      return `${currency}${amount.toFixed(2)}`;
+    };
+
     const itemsHtml = Array.isArray(invoice.lineItems) && invoice.lineItems.length ? invoice.lineItems.map(item => `
       <tr>
-        <td>${item.description || '—'}</td>
-        <td>${item.quantity || 0}</td>
-        <td>$${Number(item.unitPrice || 0).toFixed(2)}</td>
-        <td>$${Number(item.taxAmount || 0).toFixed(2)}</td>
-        <td style="text-align:right;">$${Number(item.lineTotal || 0).toFixed(2)}</td>
+        <td style="padding:8px; border:1px solid #e2e8f0;">${item.description || '—'}</td>
+        <td style="padding:8px; border:1px solid #e2e8f0; text-align:center;">${item.quantity || 0}</td>
+        <td style="padding:8px; border:1px solid #e2e8f0; text-align:right;">${formatCurrency(item.unitPrice)}</td>
+        <td style="padding:8px; border:1px solid #e2e8f0; text-align:right;">${formatCurrency(item.taxAmount)}</td>
+        <td style="padding:8px; border:1px solid #e2e8f0; text-align:right;">${formatCurrency(item.lineTotal)}</td>
       </tr>
-    `).join('') : `<tr><td colspan="5">No line items found.</td></tr>`;
+    `).join('') : `<tr><td colspan="5" style="padding:8px; border:1px solid #e2e8f0; text-align:center;">No line items found.</td></tr>`;
 
     const invoiceHtml = `
-      <div style="font-family: Arial, Helvetica, sans-serif; color:#111; padding:16px">
-        <h2>${businessName}</h2>
-        <p><strong>Invoice:</strong> ${invoice.invoiceNumber}</p>
-        <p><strong>To:</strong> ${customerName} ${customerEmail ? `(${customerEmail})` : ''}</p>
-        <table style="width:100%; border-collapse:collapse;">
+      <div style="font-family: Arial, Helvetica, sans-serif; color:#111; padding:16px; max-width:800px; margin:auto;">
+        <style>
+          @page { margin: 12mm; }
+          body { margin: 0; }
+          .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+          .company-name { font-size: 24px; margin: 0; }
+          .company-details, .invoice-details { font-size: 12px; line-height: 1.4; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 11px; }
+          th, td { border: 1px solid #e2e8f0; padding: 8px; }
+          th { background: #f3f4f6; text-align: left; }
+          .amount { text-align: right; }
+          .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 10px; }
+          .summary div { background: #f8fafc; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+        </style>
+        <div class="invoice-header">
+          <div>
+            <p class="company-name">${businessName}</p>
+            <p class="company-details">${businessEmail}</p>
+          </div>
+          <div class="invoice-details">
+            <p><strong>Invoice:</strong> ${invoice.invoiceNumber}</p>
+            <p><strong>Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</p>
+            <p><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
+            <p><strong>Status:</strong> ${invoice.status}</p>
+          </div>
+        </div>
+        <div style="margin-bottom: 12px;">
+          <p style="margin:0 0 4px;"><strong>Bill To:</strong></p>
+          <p style="margin:0;">${customerName}</p>
+          <p style="margin:0;">${customerEmail || ''}</p>
+        </div>
+        <table>
           <thead>
-            <tr style="background:#f3f4f6; text-align:left;">
-              <th>Description</th><th>Qty</th><th>Unit</th><th>Tax</th><th style="text-align:right;">Line Total</th>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th class="amount">Unit Price</th>
+              <th class="amount">Tax</th>
+              <th class="amount">Line Total</th>
             </tr>
           </thead>
           <tbody>
             ${itemsHtml}
           </tbody>
         </table>
-        <p><strong>Total:</strong> $${Number(invoice.total || 0).toFixed(2)}</p>
-        <p>Thank you for your business.</p>
+        <div class="summary">
+          <div><strong>Total:</strong><br>${formatCurrency(invoice.total)}</div>
+          <div><strong>Amount Paid:</strong><br>${formatCurrency(invoice.amountPaid)}</div>
+          <div><strong>Balance Due:</strong><br>${formatCurrency(invoice.balanceDue)}</div>
+        </div>
+        <p style="font-size:11px;">Thank you for your business.</p>
       </div>
     `;
 
@@ -329,55 +432,6 @@ router.delete(
     }
 
     res.json({ message: 'Invoice deleted successfully' });
-  })
-);
-
-// Get aging report
-router.get(
-  '/reports/aging',
-  asyncHandler(async (req, res) => {
-    const invoices = await Invoice.find({
-      status: { $in: ['Sent', 'Viewed', 'Partially Paid', 'Overdue'] }
-    }).populate('customer');
-
-    const now = new Date();
-    const agingReport = {
-      current: 0,
-      days30: 0,
-      days60: 0,
-      days90: 0,
-      over90: 0,
-      invoices: {
-        current: [],
-        days30: [],
-        days60: [],
-        days90: [],
-        over90: []
-      }
-    };
-
-    invoices.forEach(invoice => {
-      const daysDue = Math.floor((now - invoice.dueDate) / (1000 * 60 * 60 * 24));
-
-      if (daysDue <= 0) {
-        agingReport.current += invoice.balanceDue;
-        agingReport.invoices.current.push(invoice);
-      } else if (daysDue <= 30) {
-        agingReport.days30 += invoice.balanceDue;
-        agingReport.invoices.days30.push(invoice);
-      } else if (daysDue <= 60) {
-        agingReport.days60 += invoice.balanceDue;
-        agingReport.invoices.days60.push(invoice);
-      } else if (daysDue <= 90) {
-        agingReport.days90 += invoice.balanceDue;
-        agingReport.invoices.days90.push(invoice);
-      } else {
-        agingReport.over90 += invoice.balanceDue;
-        agingReport.invoices.over90.push(invoice);
-      }
-    });
-
-    res.json(agingReport);
   })
 );
 

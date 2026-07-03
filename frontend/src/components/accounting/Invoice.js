@@ -1,20 +1,35 @@
 import axios from 'axios';
+import { getSettings } from '../../localStorage';
 
 const Invoice = {
   data: {
     invoices: [],
     loading: false,
-    filter: { status: '' }
+    filter: { status: '' },
+    currentPage: 1,
+    itemsPerPage: 10,
+    totalItems: 0
   },
 
   async fetchInvoices() {
     this.data.loading = true;
     try {
+      const params = {
+        skip: (this.data.currentPage - 1) * this.data.itemsPerPage,
+        limit: this.data.itemsPerPage
+      };
+
+      const status = String(this.data.filter.status || '').trim();
+      if (status) {
+        params.status = status;
+      }
+
       const response = await axios.get('/api/accounting/invoices/list', {
-        params: this.data.filter,
+        params,
         withCredentials: true,
       });
       this.data.invoices = response.data.invoices || [];
+      this.data.totalItems = response.data.total || 0;
     } catch (error) {
       console.error('Error fetching invoices:', error);
       alert('Error: ' + (error.response?.data?.message || error.message));
@@ -38,6 +53,32 @@ const Invoice = {
     }
   },
 
+  getCurrencySymbol(currency) {
+    const symbolMap = {
+      'USD': '$',
+      'EUR': '€',
+      'Ksh': 'Ksh',
+      'KES': 'Ksh',
+      'GBP': '£'
+    };
+    return symbolMap[currency] || currency || '$';
+  },
+
+  formatCurrency(value, currency) {
+    const amount = Number(value || 0);
+    const symbol = this.getCurrencySymbol(currency);
+    if (currency === 'USD') {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    }
+    if (currency === 'EUR') {
+      return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(amount);
+    }
+    if (currency === 'GBP') {
+      return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
+    }
+    return `${symbol}${amount.toFixed(2)}`;
+  },
+
   async handleGenerateInvoice(invoiceId) {
     const printWindow = window.open('about:blank', '_blank');
     if (!printWindow) {
@@ -52,9 +93,11 @@ const Invoice = {
       this.data.loading = true;
       const response = await axios.get(`/api/accounting/invoices/${invoiceId}`, { withCredentials: true });
       const invoice = response.data;
-      const businessName = 'RabitDog Accounting';
-      const businessAddress = '123 Finance Lane, Suite 400, Cityville, CA 90210';
-      const businessContact = 'Phone: (555) 123-4567 | Email: billing@rabitdog.com';
+      const settings = getSettings();
+      const businessName = settings.workspaceName || 'RabitDog Accounting';
+      const businessAddress = settings.businessEmail ? `Email: ${settings.businessEmail}` : '123 Finance Lane, Suite 400, Cityville, CA 90210';
+      const businessContact = settings.businessEmail ? `Email: ${settings.businessEmail}` : 'Phone: (555) 123-4567 | Email: billing@rabitdog.com';
+      const currency = settings.currency || 'Ksh';
       const paymentTerms = invoice.paymentTerms || 'Payment due within 30 days of invoice date. Late payments may be subject to fees.';
 
       const invoiceHtml = `
@@ -62,20 +105,22 @@ const Invoice = {
           <head>
             <title>Invoice ${invoice.invoiceNumber}</title>
             <style>
-              body { font-family: Arial, sans-serif; padding: 24px; color: #1f2937; background: #f8fafc; }
-              .brand-panel { background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08); margin-bottom: 24px; }
-              .brand-logo { font-size: 32px; font-weight: 800; color: #1d4ed8; letter-spacing: 0.04em; margin: 0 0 8px; }
-              .brand-details { color: #475569; line-height: 1.7; }
-              .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 24px; }
-              .invoice-summary, .invoice-meta, .payment-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-              .invoice-summary div, .invoice-meta div, .payment-details div { background: #ffffff; border: 1px solid #e5e7eb; padding: 16px; border-radius: 12px; }
-              table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
-              th, td { border-bottom: 1px solid #e2e8f0; padding: 14px 16px; text-align: left; }
-              th { background: #eef2ff; font-weight: 700; color: #1e3a8a; }
+              @page { margin: 12mm; }
+              body { font-family: Arial, sans-serif; margin: 0; padding: 16px; color: #1f2937; background: #f8fafc; font-size: 12px; }
+              .brand-panel { background: #ffffff; border-radius: 12px; padding: 16px; box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06); margin-bottom: 16px; }
+              .brand-logo { font-size: 24px; font-weight: 700; color: #1d4ed8; margin-bottom: 4px; }
+              .brand-details { color: #475569; line-height: 1.5; font-size: 11px; }
+              .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+              .invoice-meta, .invoice-summary, .payment-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 16px; }
+              .invoice-summary div, .invoice-meta div, .payment-details div { background: #ffffff; border: 1px solid #e5e7eb; padding: 10px; border-radius: 10px; }
+              table { width: 100%; border-collapse: collapse; background: #ffffff; margin-bottom: 16px; font-size: 11px; }
+              th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; }
+              th { background: #eef2ff; font-weight: 700; }
               td.amount, th.amount { text-align: right; }
-              .section-title { margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #0f172a; }
-              .payment-terms { padding: 20px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 14px; color: #0c4a6e; line-height: 1.7; }
-              .footer-note { font-size: 13px; color: #64748b; margin-top: 16px; }
+              .section-title { margin: 0 0 8px; font-size: 14px; font-weight: 700; color: #0f172a; }
+              .payment-terms { padding: 12px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 10px; color: #0c4a6e; line-height: 1.5; }
+              .footer-note { font-size: 11px; color: #64748b; margin-top: 12px; }
+              .invoice-table tr { page-break-inside: avoid; }
             </style>
           </head>
           <body>
@@ -88,10 +133,9 @@ const Invoice = {
               <div>
                 <div class="section-title">Bill To</div>
                 <div><strong>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown Customer'}</strong></div>
-                <div>${invoice.customer?.email || invoice.partner?.email || ''}</div>
+                <div>${invoice.customer?.email || invoice.partyId?.email || ''}</div>
                 <div>${invoice.customer?.address || invoice.partyId?.address || ''}</div>
               </div>
-
               <div>
                 <div class="section-title">Invoice Details</div>
                 <div><strong>Invoice #:</strong> ${invoice.invoiceNumber}</div>
@@ -102,23 +146,23 @@ const Invoice = {
             </div>
 
             <div class="invoice-summary">
-              <div><strong>Subtotal</strong><br>$${Number(invoice.subtotal || 0).toFixed(2)}</div>
-              <div><strong>Tax</strong><br>$${Number(invoice.taxAmount || 0).toFixed(2)}</div>
-              <div><strong>Discount</strong><br>$${Number(invoice.discountAmount || 0).toFixed(2)}</div>
-              <div><strong>Total</strong><br>$${Number(invoice.total || 0).toFixed(2)}</div>
-              <div><strong>Amount Paid</strong><br>$${Number(invoice.amountPaid || 0).toFixed(2)}</div>
-              <div><strong>Balance Due</strong><br>$${Number(invoice.balanceDue || 0).toFixed(2)}</div>
+              <div><strong>Subtotal</strong><br>${this.formatCurrency(invoice.subtotal, currency)}</div>
+              <div><strong>Tax</strong><br>${this.formatCurrency(invoice.taxAmount, currency)}</div>
+              <div><strong>Discount</strong><br>${this.formatCurrency(invoice.discountAmount, currency)}</div>
+              <div><strong>Total</strong><br>${this.formatCurrency(invoice.total, currency)}</div>
+              <div><strong>Amount Paid</strong><br>${this.formatCurrency(invoice.amountPaid, currency)}</div>
+              <div><strong>Balance Due</strong><br>${this.formatCurrency(invoice.balanceDue, currency)}</div>
             </div>
 
             <div>
               <div class="section-title">Items</div>
-              <table>
+              <table class="invoice-table">
                 <thead>
                   <tr>
                     <th>Description</th>
-                    <th>Quantity</th>
+                    <th>Qty</th>
                     <th>Unit Price</th>
-                    <th>Tax Amount</th>
+                    <th>Tax</th>
                     <th class="amount">Line Total</th>
                   </tr>
                 </thead>
@@ -127,9 +171,9 @@ const Invoice = {
                     <tr>
                       <td>${item.description || '—'}</td>
                       <td>${item.quantity || 0}</td>
-                      <td>$${Number(item.unitPrice || 0).toFixed(2)}</td>
-                      <td>$${Number(item.taxAmount || 0).toFixed(2)}</td>
-                      <td class="amount">$${Number(item.lineTotal || 0).toFixed(2)}</td>
+                      <td>${this.formatCurrency(item.unitPrice, currency)}</td>
+                      <td>${this.formatCurrency(item.taxAmount, currency)}</td>
+                      <td class="amount">${this.formatCurrency(item.lineTotal, currency)}</td>
                     </tr>
                   `).join('') : `
                     <tr>
@@ -147,11 +191,11 @@ const Invoice = {
               </div>
               <div>
                 <div class="section-title">Payment Instructions</div>
-                <div>Please make payment to:<br><strong>RabitDog Accounting</strong><br>Bank: Example Bank<br>Account #: 123456789<br>Routing #: 987654321</div>
+                <div>Please make payment to:<br><strong>${businessName}</strong></div>
               </div>
             </div>
 
-            <div class="footer-note">Thank you for your business. If you have questions about this invoice, please contact billing@rabitdog.com.</div>
+            <div class="footer-note">Thank you for your business. If you have questions about this invoice, please contact ${businessContact}.</div>
           </body>
         </html>
       `;
@@ -188,8 +232,31 @@ const Invoice = {
     }
   },
 
+  getPaginatedInvoices() {
+    return this.data.invoices || [];
+  },
+
+  async handlePageChange(page) {
+    const totalPages = Math.max(1, Math.ceil(this.data.totalItems / this.data.itemsPerPage));
+    if (page < 1 || page > totalPages || page === this.data.currentPage) return;
+    this.data.currentPage = page;
+    await this.fetchInvoices();
+    this.updateView();
+  },
+
+  async handleFilterChange(status) {
+    this.data.filter.status = status;
+    this.data.currentPage = 1;
+    await this.fetchInvoices();
+    this.updateView();
+  },
+
   render() {
-    const { invoices, loading, filter } = this.data;
+    const settings = getSettings();
+    const currency = settings.currency || 'Ksh';
+    const { invoices, loading, filter, currentPage, itemsPerPage, totalItems } = this.data;
+    const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+    const visibleInvoices = this.getPaginatedInvoices();
 
     return `
       <div class="invoice-container">
@@ -208,14 +275,15 @@ const Invoice = {
           </div>
           <div class="invoice-actions-row">
             <a href="#/invoices/create" class="btn-create">+ Create Invoice</a>
+            <a href="#/financial-reports/invoice-aging" class="btn-secondary">Invoice Aging Report</a>
             <div class="filters">
-              <select onchange="window.invoiceInstance.data.filter.status = this.value; window.invoiceInstance.fetchInvoices().then(() => window.invoiceInstance.updateView());">
-                <option value="">All Status</option>
-                <option value="Draft">Draft</option>
-                <option value="Sent">Sent</option>
-                <option value="Paid">Paid</option>
-                <option value="Partially Paid">Partially Paid</option>
-                <option value="Overdue">Overdue</option>
+              <select onchange="window.invoiceInstance.handleFilterChange(this.value)">
+                <option value="" ${filter.status === '' ? 'selected' : ''}>All Status</option>
+                <option value="Draft" ${filter.status === 'Draft' ? 'selected' : ''}>Draft</option>
+                <option value="Sent" ${filter.status === 'Sent' ? 'selected' : ''}>Sent</option>
+                <option value="Paid" ${filter.status === 'Paid' ? 'selected' : ''}>Paid</option>
+                <option value="Partially Paid" ${filter.status === 'Partially Paid' ? 'selected' : ''}>Partially Paid</option>
+                <option value="Overdue" ${filter.status === 'Overdue' ? 'selected' : ''}>Overdue</option>
               </select>
             </div>
           </div>
@@ -237,13 +305,13 @@ const Invoice = {
                 </tr>
               </thead>
               <tbody>
-                ${invoices.map(invoice => `
+                ${visibleInvoices.map(invoice => `
                   <tr>
                     <td>${invoice.invoiceNumber}</td>
                     <td>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown'}</td>
                     <td>${new Date(invoice.invoiceDate).toLocaleDateString()}</td>
-                    <td class="amount">$${(invoice.total || 0).toFixed(2)}</td>
-                    <td class="amount">$${(invoice.amountPaid || 0).toFixed(2)}</td>
+                    <td class="amount">${this.formatCurrency(invoice.total, currency)}</td>
+                    <td class="amount">${this.formatCurrency(invoice.amountPaid, currency)}</td>
                     <td>${invoice.status}</td>
                     <td class="actions-cell">
                       <a href="#/invoices/${invoice._id}" class="btn-action btn-view">View</a>
@@ -259,6 +327,13 @@ const Invoice = {
                 `).join('')}
               </tbody>
             </table>
+            <div class="pagination-container">
+              <button type="button" class="pagination-button" data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+              ${Array.from({ length: totalPages }, (_, index) => `
+                <button type="button" class="pagination-button ${currentPage === index + 1 ? 'active' : ''}" data-page="${index + 1}">${index + 1}</button>
+              `).join('')}
+              <button type="button" class="pagination-button" data-page="${currentPage + 1}" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+            </div>
           `}
         </div>
 
@@ -269,6 +344,11 @@ const Invoice = {
           .page-title { margin: 0 0 6px; font-size: 28px; }
           .page-subtitle { margin: 0; color: #475569; }
           .invoice-actions-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+          .btn-secondary { padding: 12px 22px; background-color: #10b981; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+          .pagination-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+          .pagination-button { padding: 8px 12px; background: #f3f4f6; color: #111827; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; }
+          .pagination-button.active { background: #2563eb; color: white; border-color: #2563eb; }
+          .pagination-button:disabled { background: #e5e7eb; color: #6b7280; cursor: not-allowed; }
           .invoices-list { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08); }
           .btn-create { padding: 12px 22px; background-color: #2563eb; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
           .invoice-form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
@@ -316,6 +396,13 @@ const Invoice = {
     container.querySelectorAll('[data-send-invoice]').forEach((button) => {
       const invoiceId = button.dataset.sendInvoice;
       button.addEventListener('click', () => this.handleSendInvoice(invoiceId));
+    });
+
+    container.querySelectorAll('[data-page]').forEach((button) => {
+      const page = parseInt(button.dataset.page, 10);
+      if (!Number.isNaN(page)) {
+        button.addEventListener('click', () => this.handlePageChange(page));
+      }
     });
   },
 

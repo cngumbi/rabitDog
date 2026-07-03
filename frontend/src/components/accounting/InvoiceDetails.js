@@ -1,5 +1,5 @@
 import { apiClient } from '../../connection/api';
-import { getUserInfo } from '../../localStorage';
+import { getSettings, getUserInfo } from '../../localStorage';
 
 const InvoiceDetails = {
   data: {
@@ -26,10 +26,40 @@ const InvoiceDetails = {
     }
   },
 
+  getCurrencySymbol(currency) {
+    const symbolMap = {
+      'USD': '$',
+      'EUR': '€',
+      'GBP': '£',
+      'Ksh': 'Ksh',
+      'KES': 'Ksh'
+    };
+    return symbolMap[currency] || currency || '$';
+  },
+
+  formatCurrency(value, currency = 'Ksh') {
+    const amount = Number(value || 0);
+    const symbol = this.getCurrencySymbol(currency);
+    if (currency === 'USD') {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    }
+    if (currency === 'EUR') {
+      return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR' }).format(amount);
+    }
+    if (currency === 'GBP') {
+      return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(amount);
+    }
+    return `${symbol}${amount.toFixed(2)}`;
+  },
+
   async handleGenerateInvoice(invoiceId) {
     try {
       const invoice = this.data.invoice;
-      const printWindow = window.open('', '_blank');
+      const settings = getSettings();
+      const currency = settings.currency || 'Ksh';
+      const businessName = settings.workspaceName || 'RabitDog Accounting';
+      const businessEmail = settings.businessEmail || 'billing@rabitdog.com';
+      const printWindow = window.open('about:blank', '_blank');
       if (!printWindow) {
         alert('Unable to open print window. Please allow popups.');
         return;
@@ -40,62 +70,86 @@ const InvoiceDetails = {
           <head>
             <title>Invoice ${invoice.invoiceNumber}</title>
             <style>
-              body { font-family: Arial, sans-serif; padding: 20px; color: #1f2937; }
-              .invoice-header { display: flex; justify-content: space-between; margin-bottom: 24px; }
-              .invoice-header h1 { margin: 0; font-size: 28px; }
-              .invoice-meta, .invoice-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 24px; }
-              .invoice-summary div, .invoice-meta div { border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; }
-              table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-              th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; }
-              th { background: #f8fafc; }
-              .amount { text-align: right; }
+              @page { margin: 12mm; }
+              body { font-family: Arial, sans-serif; margin: 0; padding: 16px; color: #1f2937; background: #f8fafc; font-size: 11px; }
+              .invoice-container { max-width: 800px; margin: auto; }
+              .invoice-header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+              .company-name { font-size: 22px; margin: 0 0 6px; }
+              .company-details, .invoice-details { font-size: 11px; line-height: 1.4; }
+              .invoice-meta, .invoice-summary, .payment-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 12px; }
+              .invoice-summary div, .invoice-meta div, .payment-details div { background: #ffffff; border: 1px solid #e5e7eb; padding: 8px; border-radius: 8px; }
+              table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 10px; }
+              th, td { border: 1px solid #e2e8f0; padding: 8px; }
+              th { background: #eef2ff; }
+              td.amount, th.amount { text-align: right; }
+              .payment-terms { padding: 10px; background: #e0f2fe; border: 1px solid #bae6fd; border-radius: 8px; }
+              .footer-note { font-size: 10px; color: #64748b; margin-top: 10px; }
+              .invoice-table tr { page-break-inside: avoid; }
             </style>
           </head>
           <body>
-            <div class="invoice-header">
-              <div>
-                <h1>Invoice ${invoice.invoiceNumber}</h1>
-                <p>${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown'}</p>
+            <div class="invoice-container">
+              <div class="invoice-header">
+                <div>
+                  <p class="company-name">${businessName}</p>
+                  <p class="company-details">${businessEmail}</p>
+                </div>
+                <div class="invoice-details">
+                  <p><strong>Invoice:</strong> ${invoice.invoiceNumber}</p>
+                  <p><strong>Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</p>
+                  <p><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
+                  <p><strong>Status:</strong> ${invoice.status}</p>
+                </div>
               </div>
-              <div>
-                <p><strong>Date:</strong> ${new Date(invoice.invoiceDate).toLocaleDateString()}</p>
-                <p><strong>Due Date:</strong> ${invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString() : 'N/A'}</p>
+
+              <div style="margin-bottom: 10px;">
+                <p style="margin:0 0 4px;"><strong>Bill To:</strong></p>
+                <p style="margin:0;">${invoice.customer?.name || invoice.partyId?.name || invoice.customer || 'Unknown Customer'}</p>
+                <p style="margin:0;">${invoice.customer?.email || invoice.partyId?.email || ''}</p>
+                <p style="margin:0;">${invoice.customer?.address || invoice.partyId?.address || ''}</p>
               </div>
-            </div>
 
-            <div class="invoice-summary">
-              <div><strong>Subtotal:</strong> ${this.formatCurrency(invoice.subtotal)}</div>
-              <div><strong>Tax:</strong> ${this.formatCurrency(invoice.taxAmount)}</div>
-              <div><strong>Discount:</strong> ${this.formatCurrency(invoice.discountAmount)}</div>
-              <div><strong>Total:</strong> ${this.formatCurrency(invoice.total)}</div>
-              <div><strong>Amount Paid:</strong> ${this.formatCurrency(invoice.amountPaid)}</div>
-              <div><strong>Balance Due:</strong> ${this.formatCurrency(invoice.balanceDue)}</div>
-            </div>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th>Quantity</th>
-                  <th>Unit Price</th>
-                  <th>Tax Amount</th>
-                  <th class="amount">Line Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${invoice.lineItems.map((item) => `
+              <table class="invoice-table">
+                <thead>
                   <tr>
-                    <td>${item.description || '—'}</td>
-                    <td>${item.quantity || 0}</td>
-                    <td>${this.formatCurrency(item.unitPrice)}</td>
-                    <td>${this.formatCurrency(item.taxAmount)}</td>
-                    <td class="amount">${this.formatCurrency(item.lineTotal)}</td>
+                    <th>Description</th>
+                    <th>Qty</th>
+                    <th class="amount">Unit Price</th>
+                    <th class="amount">Tax</th>
+                    <th class="amount">Line Total</th>
                   </tr>
-                `).join('')}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  ${invoice.lineItems.map((item) => `
+                    <tr>
+                      <td>${item.description || '—'}</td>
+                      <td>${item.quantity || 0}</td>
+                      <td class="amount">${this.formatCurrency(item.unitPrice, currency)}</td>
+                      <td class="amount">${this.formatCurrency(item.taxAmount, currency)}</td>
+                      <td class="amount">${this.formatCurrency(item.lineTotal, currency)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
 
-            <p><strong>Notes:</strong> ${invoice.notes || 'None'}</p>
+              <div class="invoice-summary">
+                <div><strong>Subtotal</strong><br>${this.formatCurrency(invoice.subtotal, currency)}</div>
+                <div><strong>Tax</strong><br>${this.formatCurrency(invoice.taxAmount, currency)}</div>
+                <div><strong>Discount</strong><br>${this.formatCurrency(invoice.discountAmount, currency)}</div>
+                <div><strong>Total</strong><br>${this.formatCurrency(invoice.total, currency)}</div>
+                <div><strong>Amount Paid</strong><br>${this.formatCurrency(invoice.amountPaid, currency)}</div>
+                <div><strong>Balance Due</strong><br>${this.formatCurrency(invoice.balanceDue, currency)}</div>
+              </div>
+
+              <div class="payment-details">
+                <div>
+                  <p class="section-title"><strong>Payment Terms</strong></p>
+                  <p class="payment-terms">${invoice.paymentTerms || 'Payment due within 30 days of invoice date. Late payments may be subject to fees.'}</p>
+                </div>
+              </div>
+
+              <p class="footer-note">Thank you for your business. Please contact ${businessEmail} for questions.</p>
+            </div>
           </body>
         </html>
       `;
