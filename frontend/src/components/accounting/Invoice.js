@@ -277,7 +277,7 @@ const Invoice = {
             <a href="#/invoices/create" class="btn-create">+ Create Invoice</a>
             <a href="#/financial-reports/invoice-aging" class="btn-secondary">Invoice Aging Report</a>
             <div class="filters">
-              <select onchange="window.invoiceInstance.handleFilterChange(this.value)">
+              <select data-status-filter>
                 <option value="" ${filter.status === '' ? 'selected' : ''}>All Status</option>
                 <option value="Draft" ${filter.status === 'Draft' ? 'selected' : ''}>Draft</option>
                 <option value="Sent" ${filter.status === 'Sent' ? 'selected' : ''}>Sent</option>
@@ -387,6 +387,14 @@ const Invoice = {
   registerEvents() {
     const container = document.getElementById('main-content');
     if (!container) return;
+
+    const statusFilter = container.querySelector('[data-status-filter]');
+    if (statusFilter) {
+      statusFilter.value = this.data.filter.status || '';
+      statusFilter.addEventListener('change', (event) => {
+        this.handleFilterChange(event.target.value);
+      });
+    }
 
     container.querySelectorAll('[data-generate-invoice]').forEach((button) => {
       const invoiceId = button.dataset.generateInvoice;

@@ -10,6 +10,8 @@ const config = require('../config/config');
 
 const router = express.Router();
 
+const normalizeStatus = (value) => String(value || '').trim().replace(/\s+/g, ' ');
+
 // Generate unique invoice number
 const generateInvoiceNumber = async () => {
   const lastInvoice = await Invoice.findOne().sort({ _id: -1 });
@@ -83,7 +85,7 @@ router.get(
     const { status, customer, startDate, endDate, skip = 0, limit = 50 } = req.query;
 
     const filter = {};
-    const normalizedStatus = String(status || '').trim();
+    const normalizedStatus = normalizeStatus(status);
     if (normalizedStatus) {
       const escapedStatus = normalizedStatus.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       filter.status = new RegExp(`^${escapedStatus}$`, 'i');
