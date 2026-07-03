@@ -76,6 +76,8 @@ import InvoiceCreate from './components/accounting/InvoiceCreate';
 import InvoiceDetails from './components/accounting/InvoiceDetails';
 import InvoiceEdit from './components/accounting/InvoiceEdit';
 import JournalEntry from './components/accounting/JournalEntry';
+import JournalEntryCreate from './components/accounting/JournalEntryCreate';
+import JournalEntryDetails from './components/accounting/JournalEntryDetails';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 if (faviconImg) {
@@ -169,6 +171,8 @@ const routes = {
     '/invoices/:id': InvoiceDetails,
     '/invoices/:id/edit': InvoiceEdit,
     '/journal-entries': JournalEntry,
+    '/journal-entries/create': JournalEntryCreate,
+    '/journal-entries/:id': JournalEntryDetails,
 };
 //==================ROUTER FUNCTION===========
 const router = async () => {
@@ -243,6 +247,8 @@ const router = async () => {
         '/invoices/:id',
         '/invoices/:id/edit',
         '/journal-entries',
+        '/journal-entries/create',
+        '/journal-entries/:id',
     ];
     //get the current hash path and route pattern for nested routes
     const hashPath = window.location.hash.slice(1).toLowerCase() || '/';
