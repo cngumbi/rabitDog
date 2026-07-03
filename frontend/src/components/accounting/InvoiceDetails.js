@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { apiClient } from '../../connection/api';
 import { getUserInfo } from '../../localStorage';
 
 const InvoiceDetails = {
@@ -15,7 +15,7 @@ const InvoiceDetails = {
     this.data.loading = true;
     this.data.error = null;
     try {
-      const response = await axios.get(`/api/accounting/invoices/${id}`, { withCredentials: true });
+      const response = await apiClient.get(`/api/accounting/invoices/${id}`);
       this.data.invoice = response.data;
     } catch (error) {
       console.error('Error fetching invoice details:', error);
@@ -111,21 +111,17 @@ const InvoiceDetails = {
   },
 
   async handleSendInvoice(invoiceId) {
-    const amount = prompt('Enter payment amount:');
-    if (amount) {
-      try {
-        this.data.loading = true;
-        const { token } = getUserInfo();
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        await axios.post(`/api/accounting/invoices/${invoiceId}/pay`, { amountPaid: parseFloat(amount) }, { withCredentials: true, headers });
-        alert('Payment recorded successfully!');
-        await this.fetchInvoice(invoiceId);
-      } catch (error) {
-        console.error('Error recording payment:', error);
-        alert('Error: ' + (error.response?.data?.message || error.message));
-      } finally {
-        this.data.loading = false;
-      }
+    try {
+      this.data.loading = true;
+      const response = await apiClient.post(`/api/accounting/invoices/${invoiceId}/send`);
+      const message = response.data?.message || 'Invoice sent successfully!';
+      alert(message);
+      await this.fetchInvoice(invoiceId);
+    } catch (error) {
+      console.error('Error sending invoice:', error);
+      alert('Error: ' + (error.response?.data?.message || error.message));
+    } finally {
+      this.data.loading = false;
     }
   },
 
@@ -138,16 +134,13 @@ const InvoiceDetails = {
 
     try {
       this.data.loading = true;
-      const { token } = getUserInfo();
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      await axios.post(
+      await apiClient.post(
         `/api/accounting/invoices/${invoiceId}/pay`,
         {
           amountPaid: amount,
           paymentMethod: this.data.paymentMethod,
           paymentNote: this.data.paymentNote
-        },
-        { withCredentials: true, headers }
+        }
       );
       alert('Payment recorded successfully!');
       this.data.paymentAmount = '';

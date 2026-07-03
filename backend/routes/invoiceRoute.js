@@ -4,6 +4,8 @@ const { isAuth } = require('../util');
 const Invoice = require('../models/invoiceModel');
 const JournalEntry = require('../models/journalEntryModel');
 const AuditLog = require('../models/auditLogModel');
+const transporter = require('../middleware/sendmail');
+const config = require('../config/config');
 
 const router = express.Router();
 
@@ -154,24 +156,79 @@ router.put(
   })
 );
 
-// Send Invoice
+// Send Invoice (also attempt to email the invoice)
 router.post(
   '/:id/send',
   isAuth,
   asyncHandler(async (req, res) => {
     const currentUserId = req.user?.id || req.user?._id || req.session.user?.id || req.session.user?._id;
 
-    const invoice = await Invoice.findByIdAndUpdate(
-      req.params.id,
-      { status: 'Sent', updatedBy: currentUserId },
-      { new: true }
-    );
+    let invoice = await Invoice.findById(req.params.id).populate('customer partyId');
 
     if (!invoice) {
       return res.status(404).json({ message: 'Invoice not found' });
     }
 
-    // Here you would send email to customer
+    // Build simple HTML invoice (same basic structure as frontend preview)
+    const businessName = 'RabitDog Accounting';
+    const customerName = invoice.customer?.name || invoice.partyId?.name || 'Customer';
+    const customerEmail = invoice.customer?.email || invoice.partyId?.email;
+
+    const itemsHtml = Array.isArray(invoice.lineItems) && invoice.lineItems.length ? invoice.lineItems.map(item => `
+      <tr>
+        <td>${item.description || '—'}</td>
+        <td>${item.quantity || 0}</td>
+        <td>$${Number(item.unitPrice || 0).toFixed(2)}</td>
+        <td>$${Number(item.taxAmount || 0).toFixed(2)}</td>
+        <td style="text-align:right;">$${Number(item.lineTotal || 0).toFixed(2)}</td>
+      </tr>
+    `).join('') : `<tr><td colspan="5">No line items found.</td></tr>`;
+
+    const invoiceHtml = `
+      <div style="font-family: Arial, Helvetica, sans-serif; color:#111; padding:16px">
+        <h2>${businessName}</h2>
+        <p><strong>Invoice:</strong> ${invoice.invoiceNumber}</p>
+        <p><strong>To:</strong> ${customerName} ${customerEmail ? `(${customerEmail})` : ''}</p>
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f3f4f6; text-align:left;">
+              <th>Description</th><th>Qty</th><th>Unit</th><th>Tax</th><th style="text-align:right;">Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+        <p><strong>Total:</strong> $${Number(invoice.total || 0).toFixed(2)}</p>
+        <p>Thank you for your business.</p>
+      </div>
+    `;
+
+    // Attempt to send email if recipient exists and transporter configured
+    let mailResult = null;
+    if (customerEmail && transporter) {
+      try {
+        const mailOptions = {
+          from: config.NODE_CODE_EMAIL_ADDRESS,
+          to: customerEmail,
+          subject: `Invoice ${invoice.invoiceNumber}`,
+          html: invoiceHtml
+        };
+
+        mailResult = await transporter.sendMail(mailOptions);
+      } catch (err) {
+        console.error('Error sending invoice email:', err);
+        mailResult = { error: err.message || 'Failed to send invoice email' };
+      }
+    } else {
+      mailResult = { warning: 'No customer email configured or email transporter unavailable.' };
+    }
+
+    // Update invoice status and audit
+    invoice.status = 'Sent';
+    invoice.updatedBy = currentUserId;
+    await invoice.save();
+
     if (currentUserId) {
       await AuditLog.create({
         logNumber: `LOG-${Date.now()}`,
@@ -185,7 +242,13 @@ router.post(
       });
     }
 
-    res.json({ message: 'Invoice sent successfully', invoice });
+    res.json({
+      message: 'Invoice sent successfully',
+      invoice,
+      mailResult,
+      emailSent: !!(mailResult && mailResult.accepted && mailResult.accepted.length),
+      emailInfo: mailResult
+    });
   })
 );
 

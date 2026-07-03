@@ -222,6 +222,9 @@ export const getHealthRecords = async ({ searchKeyword = '', severity = '', acti
     }
 };
 
+// expose the underlying axios client for direct calls from components
+export { apiClient };
+
 export const createHealthRecord = async (data) => {
     try {
         const response = await apiClient({
