@@ -52,17 +52,48 @@ router.post(
 router.get(
   '/list',
   asyncHandler(async (req, res) => {
-    const { accountType, isActive, skip = 0, limit = 50 } = req.query;
+    const { accountType, isActive, search, skip = 0, limit = 50 } = req.query;
 
     const filter = {};
     if (accountType) filter.accountType = accountType;
     if (isActive !== undefined) filter.isActive = isActive === 'true';
+    if (search) {
+      filter.$or = [
+        { accountCode: { $regex: search, $options: 'i' } },
+        { accountName: { $regex: search, $options: 'i' } }
+      ];
+    }
 
     const accounts = await ChartOfAccounts.find(filter)
       .skip(parseInt(skip))
       .limit(parseInt(limit))
       .populate('parentAccount costCenter createdBy updatedBy')
       .sort({ accountCode: 1 });
+
+    const postedEntries = await JournalEntry.find({ status: 'Posted' }).select('lines').lean();
+    const accountMap = new Map(accounts.map((account) => [account._id.toString(), account]));
+    const balanceByAccount = new Map(
+      accounts.map((account) => [account._id.toString(), Number(account.openingBalance || 0)])
+    );
+
+    for (const entry of postedEntries) {
+      for (const line of entry.lines || []) {
+        const accountId = line.account?.toString();
+        const account = accountMap.get(accountId);
+        if (!account) continue;
+
+        const effect = account.normalBalance === 'Debit'
+          ? Number(line.debit || 0) - Number(line.credit || 0)
+          : Number(line.credit || 0) - Number(line.debit || 0);
+
+        balanceByAccount.set(accountId, (balanceByAccount.get(accountId) || 0) + effect);
+      }
+    }
+
+    for (const account of accounts) {
+      const accountId = account._id.toString();
+      account.liveBalance = Number(balanceByAccount.get(accountId) || Number(account.openingBalance || 0));
+    }
 
     const total = await ChartOfAccounts.countDocuments(filter);
 
@@ -155,11 +186,27 @@ router.get(
       return res.status(404).json({ message: 'Account not found' });
     }
 
+    const postedEntries = await JournalEntry.find({ status: 'Posted' }).select('lines').lean();
+    let liveBalance = Number(account.openingBalance || 0);
+
+    for (const entry of postedEntries) {
+      for (const line of entry.lines || []) {
+        if (line.account?.toString() !== req.params.id) continue;
+
+        const effect = account.normalBalance === 'Debit'
+          ? Number(line.debit || 0) - Number(line.credit || 0)
+          : Number(line.credit || 0) - Number(line.debit || 0);
+
+        liveBalance += effect;
+      }
+    }
+
     res.json({
       accountCode: account.accountCode,
       accountName: account.accountName,
       openingBalance: account.openingBalance,
       currentBalance: account.currentBalance,
+      liveBalance,
       normalBalance: account.normalBalance
     });
   })

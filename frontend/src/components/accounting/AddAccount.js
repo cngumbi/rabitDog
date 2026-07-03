@@ -117,7 +117,7 @@ const AddAccount = {
 
       await axios.post('/api/accounting/chart-of-accounts/create', payload, { withCredentials: true });
       alert('Account created successfully.');
-      window.location.hash = '#/cashbank';
+      window.location.hash = '#/accounts';
     } catch (error) {
       console.error('Error creating account:', error);
       alert('Error: ' + (error.response?.data?.message || error.message));
@@ -206,7 +206,7 @@ const AddAccount = {
 
           <div class="form-actions">
             <button type="button" onclick="window.addAccountInstance.handleSubmit();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Create Account'}</button>
-            <a href="/#/cashbank" class="btn-secondary">Back to Cashbook</a>
+            <a href="/#/accounts" class="btn-secondary">Back to Accounts</a>
           </div>
         </div>
 

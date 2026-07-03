@@ -16,6 +16,7 @@ const CashBook = {
           <div class="dashboard-hero-actions">
             <a class="btn-primary text-white" href="entry.html">Add Entry</a>
             <a class="btn-secondary text-white" href="/#/account/add">Add Account</a>
+            <a class="btn-outline-primary text-primary" href="/#/accounts">View Accounts</a>
             <a class="btn-outline-primary text-primary" href="#">Export Report</a>
           </div>
         </div>
@@ -90,6 +91,10 @@ const CashBook = {
           <a class="cashbook-module-card" href="/#/journal-entries">
             <div class="cashbook-module-title">Journal entries</div>
             <div class="cashbook-module-copy">Post manual accounting entries and review balances.</div>
+          </a>
+          <a class="cashbook-module-card" href="/#/accounts">
+            <div class="cashbook-module-title">Chart of accounts</div>
+            <div class="cashbook-module-copy">Review, filter, and manage your ledger accounts.</div>
           </a>
           <a class="cashbook-module-card" href="/#/account/add">
             <div class="cashbook-module-title">Add account</div>

@@ -68,6 +68,8 @@ import ProductionRecords from './components/livestock/productionRecords';
 import ViewProduction from './components/livestock/viewProduction';
 import CashBook from './components/accounting/Cashbook';
 import AddAccount from './components/accounting/AddAccount';
+import ChartOfAccounts from './components/accounting/ChartOfAccounts';
+import EditAccount from './components/accounting/EditAccount';
 import Budget from './components/accounting/Budget';
 import BudgetNew from './components/accounting/BudgetNew';
 import FinancialReports from './components/accounting/FinancialReports';
@@ -161,7 +163,9 @@ const routes = {
     '/livestock/batch/:id': ViewBatch,
     //cash & bank
     '/cashbank': CashBook,
+    '/accounts': ChartOfAccounts,
     '/account/add': AddAccount,
+    '/account/:id/edit': EditAccount,
     '/budget': Budget,
     '/budget/new': BudgetNew,
     '/financial-reports': FinancialReports,
@@ -237,7 +241,9 @@ const router = async () => {
         '/livestock/add',
         '/livestock/batch/:id',
         '/cashbank',
+        '/accounts',
         '/account/add',
+        '/account/:id/edit',
         '/budget',
         '/budget/new',
         '/financial-reports',

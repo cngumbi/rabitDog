@@ -194,7 +194,7 @@ const JournalEntryCreate = {
   async fetchAccounts() {
     try {
       const response = await axios.get('/api/accounting/chart-of-accounts/list', {
-        params: { limit: 100 },
+        params: { limit: 100, isActive: true },
         withCredentials: true
       });
       this.data.accounts = response.data.accounts || [];
@@ -265,11 +265,12 @@ const JournalEntryCreate = {
               ${accounts.length ? accounts.slice(0, 25).map((account) => `
                 <div class="account-item">
                   <div>
-                    <strong>${account.accountCode || 'N/A'}</strong> - ${account.accountName || 'Unnamed'}
+                    <div><strong>${account.accountCode || 'N/A'}</strong> - ${account.accountName || 'Unnamed'}</div>
+                    <div class="account-meta">Balance: Ksh${Number(account.currentBalance || 0).toFixed(2)} | ${account.normalBalance || 'N/A'}</div>
                   </div>
                   <button type="button" class="btn-assign" data-assign-account="${activeLineIndex}" data-account-id="${account._id}" data-account-name="${account.accountName}">Assign</button>
                 </div>
-              `).join('') : '<div class="account-empty">No accounts found.</div>'}
+              `).join('') : '<div class="account-empty">No active accounts found.</div>'}
             </div>
           </div>
 
@@ -330,6 +331,7 @@ const JournalEntryCreate = {
           .active-line { font-size: 0.95rem; color: #475569; }
           .account-list { display: grid; gap: 12px; max-height: 320px; overflow-y: auto; margin-top: 10px; }
           .account-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
+          .account-item .account-meta { color: #475569; font-size: 0.85rem; margin-top: 4px; }
           .account-empty { color: #64748b; padding: 12px; }
           .btn-assign { padding: 8px 12px; border: none; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; font-weight: 700; }
           .account-selection-card .form-group input { width: 100%; }
