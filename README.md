@@ -151,23 +151,30 @@ This generates frontend assets in `frontend/dist`, which the backend serves auto
 
 ## 📷 Screenshots
 
-> Replace these placeholder images with actual screen captures in `docs/` or `frontend/src/assets/`.
 
-### Journal Entries List
+### Dashboard
 
-![Journal Entries List](docs/journal_entries_list.png)
+![Dashboard](docs/5.jpg)
 
-### Create Journal Entry
+### Login
 
-![Create Journal Entry](docs/journal_entry_create.png)
+![Login](docs/2.jpg)
 
-### Account Selection Panel
+### Sign Up
 
-![Account Selection](docs/account_selection_panel.png)
+![Sign Up](docs/3.jpg)
 
-### Journal Entry Details
+### Forget password
 
-![Journal Entry Details](docs/journal_entry_details.png)
+![forget password](docs/4.jpg)
+
+### Profile
+
+![profile](docs/6.jpg)
+
+### Settings
+
+![Setting](docs/7.jpg)
 
 ---
 
