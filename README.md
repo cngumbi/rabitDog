@@ -204,7 +204,6 @@ From `frontend/`:
 ## 📌 Contribution
 
 If you want to extend the project, focus on:
-- additional accounting pages (bank reconciliation, fixed assets)
 - improved frontend routing and component reuse
 - better validation and user feedback in forms
 - responsive mobile UI support
