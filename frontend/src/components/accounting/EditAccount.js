@@ -119,7 +119,11 @@ const EditAccount = {
         return;
       }
 
-      await axios.put(`/api/accounting/chart-of-accounts/${this.data.accountId}`, payload, { withCredentials: true });
+      const sanitizedPayload = { ...payload };
+      if (!sanitizedPayload.costCenter) delete sanitizedPayload.costCenter;
+      if (!sanitizedPayload.parentAccount) delete sanitizedPayload.parentAccount;
+
+      await axios.put(`/api/accounting/chart-of-accounts/${this.data.accountId}`, sanitizedPayload, { withCredentials: true });
       alert('Account updated successfully.');
       window.location.hash = '#/accounts';
     } catch (error) {
@@ -151,63 +155,63 @@ const EditAccount = {
           <div class="form-grid">
             <div class="form-group">
               <label>Account Name</label>
-              <input type="text" value="${formData.accountName}" onchange="window.editAccountInstance.data.formData.accountName = this.value; window.editAccountInstance.updateView();" />
+              <input type="text" data-account-name value="${formData.accountName}" onchange="window.editAccountInstance.data.formData.accountName = this.value; window.editAccountInstance.updateView();" />
             </div>
             <div class="form-group">
               <label>Account Code</label>
-              <input type="text" value="${formData.accountCode}" onchange="window.editAccountInstance.data.formData.accountCode = this.value; window.editAccountInstance.updateView();" />
+              <input type="text" data-account-code value="${formData.accountCode}" onchange="window.editAccountInstance.data.formData.accountCode = this.value; window.editAccountInstance.updateView();" />
             </div>
             <div class="form-group">
               <label>Account Type</label>
-              <select onchange="window.editAccountInstance.data.formData.accountType = this.value; window.editAccountInstance.data.formData.subType = window.editAccountInstance.data.subTypesMap[this.value][0] || ''; window.editAccountInstance.updateView();">
+              <select data-account-type onchange="window.editAccountInstance.data.formData.accountType = this.value; window.editAccountInstance.data.formData.subType = window.editAccountInstance.data.subTypesMap[this.value][0] || ''; window.editAccountInstance.updateView();">
                 ${accountTypes.map((type) => `<option value="${type}" ${formData.accountType === type ? 'selected' : ''}>${type}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Sub Type</label>
-              <select onchange="window.editAccountInstance.data.formData.subType = this.value; window.editAccountInstance.updateView();">
+              <select data-sub-type onchange="window.editAccountInstance.data.formData.subType = this.value; window.editAccountInstance.updateView();">
                 ${subTypes.map((subType) => `<option value="${subType}" ${formData.subType === subType ? 'selected' : ''}>${subType}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Normal Balance</label>
-              <select onchange="window.editAccountInstance.data.formData.normalBalance = this.value; window.editAccountInstance.updateView();">
+              <select data-normal-balance onchange="window.editAccountInstance.data.formData.normalBalance = this.value; window.editAccountInstance.updateView();">
                 ${normalBalances.map((balance) => `<option value="${balance}" ${formData.normalBalance === balance ? 'selected' : ''}>${balance}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Cost Center</label>
-              <select onchange="window.editAccountInstance.data.formData.costCenter = this.value; window.editAccountInstance.updateView();">
-                <option value="">None</option>
+              <select data-cost-center onchange="window.editAccountInstance.data.formData.costCenter = this.value; window.editAccountInstance.updateView();">
+                <option value="">-- No Cost Center --</option>
                 ${costCenters.map((center) => `<option value="${center._id}" ${formData.costCenter === center._id ? 'selected' : ''}>${center.costCenterCode} - ${center.costCenterName}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Parent Account</label>
-              <select onchange="window.editAccountInstance.data.formData.parentAccount = this.value; window.editAccountInstance.updateView();">
-                <option value="">None</option>
+              <select data-parent-account onchange="window.editAccountInstance.data.formData.parentAccount = this.value; window.editAccountInstance.updateView();">
+                <option value="">-- No Parent --</option>
                 ${parentAccounts.map((account) => `<option value="${account._id}" ${formData.parentAccount === account._id ? 'selected' : ''}>${account.accountCode} - ${account.accountName}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Opening Balance</label>
-              <input type="number" step="0.01" value="${formData.openingBalance}" onchange="window.editAccountInstance.data.formData.openingBalance = this.value; window.editAccountInstance.updateView();" />
+              <input type="number" step="0.01" data-opening-balance value="${formData.openingBalance}" onchange="window.editAccountInstance.data.formData.openingBalance = this.value; window.editAccountInstance.updateView();" />
             </div>
             <div class="form-group">
               <label>Current Balance</label>
-              <input type="number" step="0.01" value="${formData.currentBalance}" onchange="window.editAccountInstance.data.formData.currentBalance = this.value; window.editAccountInstance.updateView();" />
+              <input type="number" step="0.01" data-current-balance value="${formData.currentBalance}" onchange="window.editAccountInstance.data.formData.currentBalance = this.value; window.editAccountInstance.updateView();" />
             </div>
             <div class="form-group form-full">
               <label>Description</label>
-              <textarea rows="3" onchange="window.editAccountInstance.data.formData.description = this.value; window.editAccountInstance.updateView();">${formData.description}</textarea>
+              <textarea rows="3" data-description onchange="window.editAccountInstance.data.formData.description = this.value; window.editAccountInstance.updateView();">${formData.description}</textarea>
             </div>
             <div class="form-group form-full">
-              <label><input type="checkbox" ${formData.isActive ? 'checked' : ''} onchange="window.editAccountInstance.data.formData.isActive = this.checked; window.editAccountInstance.updateView();" /> Active account</label>
+              <label><input type="checkbox" data-is-active ${formData.isActive ? 'checked' : ''} onchange="window.editAccountInstance.data.formData.isActive = this.checked; window.editAccountInstance.updateView();" /> Active account</label>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="button" onclick="window.editAccountInstance.handleSubmit();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Save Changes'}</button>
+            <button type="button" data-submit-account class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Save Changes'}</button>
             <a href="/#/accounts" class="btn-secondary">Back to Accounts</a>
           </div>
         </div>
@@ -236,6 +240,89 @@ const EditAccount = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
+    }
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const submitButton = container.querySelector('[data-submit-account]');
+    if (submitButton) {
+      submitButton.addEventListener('click', () => this.handleSubmit());
+    }
+
+    const accountNameInput = container.querySelector('[data-account-name]');
+    if (accountNameInput) {
+      accountNameInput.addEventListener('input', (event) => {
+        this.data.formData.accountName = event.target.value;
+      });
+    }
+
+    const accountTypeSelect = container.querySelector('[data-account-type]');
+    if (accountTypeSelect) {
+      accountTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.accountType = event.target.value;
+        this.data.formData.subType = this.data.subTypesMap[event.target.value][0] || '';
+        this.updateView();
+      });
+    }
+
+    const subTypeSelect = container.querySelector('[data-sub-type]');
+    if (subTypeSelect) {
+      subTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.subType = event.target.value;
+      });
+    }
+
+    const normalBalanceSelect = container.querySelector('[data-normal-balance]');
+    if (normalBalanceSelect) {
+      normalBalanceSelect.addEventListener('change', (event) => {
+        this.data.formData.normalBalance = event.target.value;
+      });
+    }
+
+    const costCenterSelect = container.querySelector('[data-cost-center]');
+    if (costCenterSelect) {
+      costCenterSelect.addEventListener('change', (event) => {
+        this.data.formData.costCenter = event.target.value;
+      });
+    }
+
+    const parentAccountSelect = container.querySelector('[data-parent-account]');
+    if (parentAccountSelect) {
+      parentAccountSelect.addEventListener('change', (event) => {
+        this.data.formData.parentAccount = event.target.value;
+      });
+    }
+
+    const openingBalanceInput = container.querySelector('[data-opening-balance]');
+    if (openingBalanceInput) {
+      openingBalanceInput.addEventListener('input', (event) => {
+        this.data.formData.openingBalance = event.target.value;
+      });
+    }
+
+    const currentBalanceInput = container.querySelector('[data-current-balance]');
+    if (currentBalanceInput) {
+      currentBalanceInput.addEventListener('input', (event) => {
+        this.data.formData.currentBalance = event.target.value;
+      });
+    }
+
+    const descriptionInput = container.querySelector('[data-description]');
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', (event) => {
+        this.data.formData.description = event.target.value;
+      });
+    }
+
+    const isActiveCheckbox = container.querySelector('[data-is-active]');
+    if (isActiveCheckbox) {
+      isActiveCheckbox.addEventListener('change', (event) => {
+        this.data.formData.isActive = event.target.checked;
+      });
     }
   },
 

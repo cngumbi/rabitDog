@@ -103,6 +103,7 @@ UserRoute.post('/signin', authLimiter, expressAsync(async(req, res)=>{
         });
         req.session.user = {
             _id: signinUser._id,
+            id: signinUser._id,
             email: signinUser.email,
             isAdmin: signinUser.isAdmin,
         }

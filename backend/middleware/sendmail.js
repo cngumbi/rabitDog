@@ -4,6 +4,9 @@ const config = require('../config/config');
 //create transporter
 const transporter = nodemailer.createTransport({
     service : config.NODE_SMTP_SERVICE,
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
         user: config.NODE_CODE_EMAIL_ADDRESS,
         pass: config.NODE_CODE_EMAIL_PASSWORD,

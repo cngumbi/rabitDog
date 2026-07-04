@@ -42,7 +42,7 @@ const AddAccount = {
       isActive: true
     }
   },
-
+// Function to generate a unique account code based on the account name
   generateAccountCode(name = '') {
     const prefix = name
       .trim()
@@ -57,7 +57,7 @@ const AddAccount = {
 
   getDefaultFormData() {
     return {
-      accountCode: this.generateAccountCode(),
+      accountCode: '',
       accountName: '',
       accountType: 'Asset',
       subType: 'Current Asset',
@@ -88,6 +88,9 @@ const AddAccount = {
 
       this.data.costCenters = costCentersResponse.data.costCenters || [];
       this.data.parentAccounts = parentAccountsResponse.data.accounts || [];
+      if (!this.data.formData.accountCode) {
+        this.data.formData.accountCode = this.generateAccountCode(this.data.formData.accountName);
+      }
     } catch (error) {
       console.error('Error loading account references:', error);
       alert('Unable to load account reference data.');
@@ -102,6 +105,16 @@ const AddAccount = {
       this.data.loading = true;
       this.updateView();
 
+      const accountName = String(this.data.formData.accountName || '').trim();
+      const accountCode = String(this.data.formData.accountCode || '').trim() || this.generateAccountCode(accountName);
+      const accountType = String(this.data.formData.accountType || '').trim();
+      const normalBalance = String(this.data.formData.normalBalance || '').trim();
+
+      this.data.formData.accountCode = accountCode;
+      this.data.formData.accountName = accountName;
+      this.data.formData.accountType = accountType;
+      this.data.formData.normalBalance = normalBalance;
+
       const payload = {
         ...this.data.formData,
         openingBalance: Number(this.data.formData.openingBalance || 0),
@@ -110,12 +123,37 @@ const AddAccount = {
         parentAccount: this.data.formData.parentAccount || undefined
       };
 
-      if (!payload.accountCode || !payload.accountName || !payload.accountType || !payload.normalBalance) {
-        alert('Please complete the required account fields.');
+      const missingFields = [];
+      if (!payload.accountName) missingFields.push('Account Name');
+      if (!payload.accountCode) missingFields.push('Account Code');
+      if (!payload.accountType) missingFields.push('Account Type');
+      if (!payload.normalBalance) missingFields.push('Normal Balance');
+
+      if (missingFields.length) {
+        alert(`Please complete required fields: ${missingFields.join(', ')}`);
+        this.data.loading = false;
+        this.updateView();
+
+        const selectorMap = {
+          'Account Name': '[data-account-name]',
+          'Account Code': '[data-account-code]',
+          'Account Type': '[data-account-type]',
+          'Normal Balance': '[data-normal-balance]'
+        };
+        const invalidField = document.querySelector(selectorMap[missingFields[0]]);
+        if (invalidField) {
+          invalidField.classList.add('input-error');
+          invalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          invalidField.focus?.();
+        }
         return;
       }
 
-      await axios.post('/api/accounting/chart-of-accounts/create', payload, { withCredentials: true });
+      const sanitizedPayload = { ...payload };
+      if (!sanitizedPayload.costCenter) delete sanitizedPayload.costCenter;
+      if (!sanitizedPayload.parentAccount) delete sanitizedPayload.parentAccount;
+
+      await axios.post('/api/accounting/chart-of-accounts/create', sanitizedPayload, { withCredentials: true });
       alert('Account created successfully.');
       window.location.hash = '#/accounts';
     } catch (error) {
@@ -149,63 +187,63 @@ const AddAccount = {
           <div class="form-grid">
             <div class="form-group">
               <label>Account Name</label>
-              <input type="text" value="${formData.accountName}" onchange="window.addAccountInstance.data.formData.accountName = this.value; if (!window.addAccountInstance.data.formData.accountCode || window.addAccountInstance.data.formData.accountCode.startsWith('ACCT-')) { window.addAccountInstance.data.formData.accountCode = window.addAccountInstance.generateAccountCode(this.value); } window.addAccountInstance.updateView();" />
+              <input type="text" required placeholder="Enter account name" value="${formData.accountName}" data-account-name />
             </div>
             <div class="form-group">
               <label>Account Code</label>
-              <input type="text" readonly value="${formData.accountCode}" />
+              <input type="text" readonly placeholder="Auto-generated code" value="${formData.accountCode}" data-account-code />
             </div>
             <div class="form-group">
               <label>Account Type</label>
-              <select onchange="window.addAccountInstance.data.formData.accountType = this.value; window.addAccountInstance.data.formData.subType = window.addAccountInstance.data.subTypesMap[this.value][0] || ''; window.addAccountInstance.updateView();">
+              <select required data-account-type>
                 ${accountTypes.map((type) => `<option value="${type}" ${formData.accountType === type ? 'selected' : ''}>${type}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Sub Type</label>
-              <select onchange="window.addAccountInstance.data.formData.subType = this.value; window.addAccountInstance.updateView();">
+              <select data-sub-type>
                 ${subTypes.map((subType) => `<option value="${subType}" ${formData.subType === subType ? 'selected' : ''}>${subType}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Normal Balance</label>
-              <select onchange="window.addAccountInstance.data.formData.normalBalance = this.value; window.addAccountInstance.updateView();">
+              <select data-normal-balance>
                 ${normalBalances.map((balance) => `<option value="${balance}" ${formData.normalBalance === balance ? 'selected' : ''}>${balance}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Cost Center</label>
-              <select onchange="window.addAccountInstance.data.formData.costCenter = this.value; window.addAccountInstance.updateView();">
-                <option value="">None</option>
+              <select data-cost-center>
+                <option value="">-- No Cost Center --</option>
                 ${costCenters.map((center) => `<option value="${center._id}" ${formData.costCenter === center._id ? 'selected' : ''}>${center.costCenterCode} - ${center.costCenterName}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Parent Account</label>
-              <select onchange="window.addAccountInstance.data.formData.parentAccount = this.value; window.addAccountInstance.updateView();">
-                <option value="">None</option>
+              <select data-parent-account>
+                <option value="">-- No Parent --</option>
                 ${parentAccounts.map((account) => `<option value="${account._id}" ${formData.parentAccount === account._id ? 'selected' : ''}>${account.accountCode} - ${account.accountName}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
               <label>Opening Balance</label>
-              <input type="number" step="0.01" value="${formData.openingBalance}" onchange="window.addAccountInstance.data.formData.openingBalance = this.value; window.addAccountInstance.updateView();" />
+              <input type="number" step="0.01" value="${formData.openingBalance}" data-opening-balance />
             </div>
             <div class="form-group">
               <label>Current Balance</label>
-              <input type="number" step="0.01" value="${formData.currentBalance}" onchange="window.addAccountInstance.data.formData.currentBalance = this.value; window.addAccountInstance.updateView();" />
+              <input type="number" step="0.01" value="${formData.currentBalance}" data-current-balance />
             </div>
             <div class="form-group form-full">
               <label>Description</label>
-              <textarea rows="3" onchange="window.addAccountInstance.data.formData.description = this.value; window.addAccountInstance.updateView();">${formData.description}</textarea>
+              <textarea rows="3" data-description>${formData.description}</textarea>
             </div>
             <div class="form-group form-full">
-              <label><input type="checkbox" ${formData.isActive ? 'checked' : ''} onchange="window.addAccountInstance.data.formData.isActive = this.checked; window.addAccountInstance.updateView();" /> Active account</label>
+              <label><input type="checkbox" ${formData.isActive ? 'checked' : ''} data-is-active /> Active account</label>
             </div>
           </div>
 
           <div class="form-actions">
-            <button type="button" onclick="window.addAccountInstance.handleSubmit();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Create Account'}</button>
+            <button type="button" data-submit-account class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Create Account'}</button>
             <a href="/#/accounts" class="btn-secondary">Back to Accounts</a>
           </div>
         </div>
@@ -225,6 +263,7 @@ const AddAccount = {
           .btn-submit, .btn-secondary { padding: 10px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
           .btn-submit { background-color: #28a745; color: white; }
           .btn-secondary { background-color: #6c757d; color: white; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+          .input-error { border-color: #dc2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.14); }
           @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
         </style>
       </div>
@@ -235,11 +274,104 @@ const AddAccount = {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
+      this.registerEvents();
+    }
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const submitButton = container.querySelector('[data-submit-account]');
+    if (submitButton) {
+      submitButton.addEventListener('click', () => this.handleSubmit());
+    }
+
+    const accountNameInput = container.querySelector('[data-account-name]');
+    if (accountNameInput) {
+      accountNameInput.addEventListener('input', (event) => {
+        event.target.classList.remove('input-error');
+        this.data.formData.accountName = event.target.value;
+        if (!this.data.formData.accountCode && String(event.target.value).trim()) {
+          this.data.formData.accountCode = this.generateAccountCode(this.data.formData.accountName);
+          const accountCodeInput = container.querySelector('[data-account-code]');
+          if (accountCodeInput) {
+            accountCodeInput.value = this.data.formData.accountCode;
+          }
+        }
+      });
+    }
+
+    const accountTypeSelect = container.querySelector('[data-account-type]');
+    if (accountTypeSelect) {
+      accountTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.accountType = event.target.value;
+        this.data.formData.subType = this.data.subTypesMap[event.target.value][0] || '';
+        this.updateView();
+      });
+    }
+
+    const subTypeSelect = container.querySelector('[data-sub-type]');
+    if (subTypeSelect) {
+      subTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.subType = event.target.value;
+      });
+    }
+
+    const normalBalanceSelect = container.querySelector('[data-normal-balance]');
+    if (normalBalanceSelect) {
+      normalBalanceSelect.addEventListener('change', (event) => {
+        this.data.formData.normalBalance = event.target.value;
+      });
+    }
+
+    const costCenterSelect = container.querySelector('[data-cost-center]');
+    if (costCenterSelect) {
+      costCenterSelect.addEventListener('change', (event) => {
+        this.data.formData.costCenter = event.target.value;
+      });
+    }
+
+    const parentAccountSelect = container.querySelector('[data-parent-account]');
+    if (parentAccountSelect) {
+      parentAccountSelect.addEventListener('change', (event) => {
+        this.data.formData.parentAccount = event.target.value;
+      });
+    }
+
+    const openingBalanceInput = container.querySelector('[data-opening-balance]');
+    if (openingBalanceInput) {
+      openingBalanceInput.addEventListener('input', (event) => {
+        this.data.formData.openingBalance = event.target.value;
+      });
+    }
+
+    const currentBalanceInput = container.querySelector('[data-current-balance]');
+    if (currentBalanceInput) {
+      currentBalanceInput.addEventListener('input', (event) => {
+        this.data.formData.currentBalance = event.target.value;
+      });
+    }
+
+    const descriptionInput = container.querySelector('[data-description]');
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', (event) => {
+        this.data.formData.description = event.target.value;
+      });
+    }
+
+    const isActiveCheckbox = container.querySelector('[data-is-active]');
+    if (isActiveCheckbox) {
+      isActiveCheckbox.addEventListener('change', (event) => {
+        this.data.formData.isActive = event.target.checked;
+      });
     }
   },
 
   async init() {
     window.addAccountInstance = this;
+    this.data.formData = this.getDefaultFormData();
+    this.updateView();
     await this.fetchReferenceData();
     this.updateView();
   },

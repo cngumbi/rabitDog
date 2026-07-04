@@ -39,6 +39,8 @@ const ChartOfAccountsSchema = new mongoose.Schema(
         // Liability subtypes
         'Current Liability',
         'Long-term Liability',
+        // Equity subtypes
+        'Equity',
         // Income subtypes
         'Operating Income',
         'Non-Operating Income',

@@ -22,7 +22,7 @@ router.post(
       return res.status(400).json({ message: 'Account code already exists' });
     }
 
-    const account = await ChartOfAccounts.create({
+    const accountData = {
       accountCode,
       accountName,
       accountType,
@@ -30,19 +30,26 @@ router.post(
       normalBalance,
       ...req.body,
       createdBy: req.session.user?.id
-    });
+    };
 
-    // Log activity
-    await AuditLog.create({
-      logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
-      action: 'Create',
-      module: 'Chart of Accounts',
-      entityType: 'ChartOfAccounts',
-      entityId: account._id,
-      entityName: account.accountName,
-      description: `Created new account: ${account.accountCode}`
-    });
+    if (!accountData.costCenter) delete accountData.costCenter;
+    if (!accountData.parentAccount) delete accountData.parentAccount;
+
+    const account = await ChartOfAccounts.create(accountData);
+
+    const userId = req.session.user?.id || req.session.user?._id;
+    if (userId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: userId,
+        action: 'Create',
+        module: 'Chart of Accounts',
+        entityType: 'ChartOfAccounts',
+        entityId: account._id,
+        entityName: account.accountName,
+        description: `Created new account: ${account.accountCode}`
+      });
+    }
 
     res.status(201).json({ message: 'Account created successfully', account });
   })
@@ -120,9 +127,13 @@ router.get(
 router.put(
   '/:id',
   asyncHandler(async (req, res) => {
+    const updateData = { ...req.body, updatedBy: req.session.user?.id };
+    if (!updateData.costCenter) delete updateData.costCenter;
+    if (!updateData.parentAccount) delete updateData.parentAccount;
+
     const account = await ChartOfAccounts.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedBy: req.session.user?.id },
+      updateData,
       { new: true }
     );
 
@@ -130,17 +141,19 @@ router.put(
       return res.status(404).json({ message: 'Account not found' });
     }
 
-    // Log activity
-    await AuditLog.create({
-      logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
-      action: 'Update',
-      module: 'Chart of Accounts',
-      entityType: 'ChartOfAccounts',
-      entityId: account._id,
-      entityName: account.accountName,
-      description: `Updated account: ${account.accountCode}`
-    });
+    const userId = req.session.user?.id || req.session.user?._id;
+    if (userId) {
+      await AuditLog.create({
+        logNumber: `LOG-${Date.now()}`,
+        user: userId,
+        action: 'Update',
+        module: 'Chart of Accounts',
+        entityType: 'ChartOfAccounts',
+        entityId: account._id,
+        entityName: account.accountName,
+        description: `Updated account: ${account.accountCode}`
+      });
+    }
 
     res.json({ message: 'Account updated successfully', account });
   })
