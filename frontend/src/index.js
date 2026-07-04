@@ -80,6 +80,10 @@ import InvoiceEdit from './components/accounting/InvoiceEdit';
 import JournalEntry from './components/accounting/JournalEntry';
 import JournalEntryCreate from './components/accounting/JournalEntryCreate';
 import JournalEntryDetails from './components/accounting/JournalEntryDetails';
+import CostCenters from './components/accounting/CostCenters';
+import AddCostCenter from './components/accounting/AddCostCenter';
+import EditCostCenter from './components/accounting/EditCostCenter';
+import CostCenterDetails from './components/accounting/CostCenterDetails';
 //setting the favicon of the site
 const faviconImg = document.getElementById('favicon');
 if (faviconImg) {
@@ -166,6 +170,10 @@ const routes = {
     '/accounts': ChartOfAccounts,
     '/account/add': AddAccount,
     '/account/:id/edit': EditAccount,
+    '/cost-centers': CostCenters,
+    '/cost-centers/new': AddCostCenter,
+    '/cost-centers/:id': CostCenterDetails,
+    '/cost-centers/:id/edit': EditCostCenter,
     '/budget': Budget,
     '/budget/new': BudgetNew,
     '/financial-reports': FinancialReports,
@@ -244,6 +252,10 @@ const router = async () => {
         '/accounts',
         '/account/add',
         '/account/:id/edit',
+        '/cost-centers',
+        '/cost-centers/new',
+        '/cost-centers/:id',
+        '/cost-centers/:id/edit',
         '/budget',
         '/budget/new',
         '/financial-reports',
