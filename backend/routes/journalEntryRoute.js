@@ -106,7 +106,7 @@ router.get(
   '/:id',
   asyncHandler(async (req, res) => {
     const entry = await JournalEntry.findById(req.params.id)
-      .populate('lines.account lines.costCenter createdBy updatedBy approvedBy');
+      .populate('lines.account lines.costCenter createdBy updatedBy approvedBy reversal');
 
     if (!entry) {
       return res.status(404).json({ message: 'Journal entry not found' });
@@ -250,6 +250,14 @@ router.post(
       return res.status(400).json({ message: 'Only posted entries can be reversed' });
     }
 
+    if (entry.entryType === 'Reversal') {
+      return res.status(400).json({ message: 'Reversal entries cannot be reversed' });
+    }
+
+    if (entry.reversal) {
+      return res.status(400).json({ message: 'This journal entry has already been reversed' });
+    }
+
     // Create reversing entry
     const reversingLines = entry.lines.map(line => ({
       account: line.account,
@@ -272,9 +280,23 @@ router.post(
       createdBy: req.session.user?.id
     });
 
+    // Update account balances for the reversing entry so the reversal actually offsets the original posting
+    for (const line of reversingEntry.lines) {
+      const account = await ChartOfAccounts.findById(line.account);
+      if (account) {
+        if (account.normalBalance === 'Debit') {
+          account.currentBalance += (line.debit || 0) - (line.credit || 0);
+        } else {
+          account.currentBalance += (line.credit || 0) - (line.debit || 0);
+        }
+        await account.save();
+      }
+    }
+
     // Update original entry
     entry.status = 'Reversed';
     entry.reversal = reversingEntry._id;
+    entry.reversedBy = req.session.user?.id;
     await entry.save();
 
     // Log activity

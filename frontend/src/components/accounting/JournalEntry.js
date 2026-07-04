@@ -114,7 +114,7 @@ const JournalEntry = {
                     <td class="amount">Ksh${(entry.totalCredit || 0).toFixed(2)}</td>
                     <td class="actions-cell">
                       <a href="#/journal-entries/${entry._id}" class="btn-action btn-view">View</a>
-                      ${entry.status === 'Draft' ? `<button type="button" onclick="window.journalEntryInstance.handlePostEntry('${entry._id}');" class="btn-action">Post</button>` : ''}
+                      ${entry.status === 'Draft' ? `<button type="button" class="btn-action btn-post" data-post-entry="${entry._id}">Post</button>` : ''}
                     </td>
                   </tr>
                 `).join('') : '<tr><td colspan="7">No journal entries found.</td></tr>'}
@@ -129,10 +129,12 @@ const JournalEntry = {
           .subtitle { color: #475569; margin: 4px 0 0; }
           .actions-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
           .actions-row select { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
-          .btn-create, .btn-action, .btn-view { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+          .btn-create, .btn-action, .btn-view, .btn-post { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
           .btn-create { background: #16a34a; color: white; }
           .btn-action { background: #2563eb; color: white; }
           .btn-view { background: #0f766e; color: white; }
+          .btn-post { background: #f59e0b; color: white; }
+          .btn-post:hover { background: #d97706; }
           .entries-list { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
           .entries-list table { width: 100%; border-collapse: collapse; margin-top: 15px; }
           .entries-list th, .entries-list td { padding: 12px; border: 1px solid #e2e8f0; text-align: left; }
@@ -157,6 +159,15 @@ const JournalEntry = {
         this.handleFilterChange(event.target.value);
       });
     }
+
+    container.querySelectorAll('[data-post-entry]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const entryId = button.getAttribute('data-post-entry');
+        if (entryId) {
+          this.handlePostEntry(entryId);
+        }
+      });
+    });
   },
 
   updateView() {

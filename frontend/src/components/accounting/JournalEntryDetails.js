@@ -37,6 +37,28 @@ const JournalEntryDetails = {
     }
   },
 
+  async handleReverseEntry() {
+    const entryId = this.data.entry?._id;
+    if (!entryId) return;
+
+    if (!confirm('Reverse this journal entry? This will create an offsetting reversal entry.')) {
+      return;
+    }
+
+    try {
+      this.data.loading = true;
+      const response = await axios.post(`/api/accounting/journal-entries/${entryId}/reverse`, {}, { withCredentials: true });
+      alert(response.data.message || 'Journal entry reversed successfully!');
+      await this.fetchEntry(entryId);
+      this.updateView();
+    } catch (error) {
+      console.error('Error reversing entry:', error);
+      alert('Error: ' + (error.response?.data?.message || error.message));
+    } finally {
+      this.data.loading = false;
+    }
+  },
+
   render() {
     const { entry, loading } = this.data;
 
@@ -66,14 +88,12 @@ const JournalEntryDetails = {
           <div class="actions">
             <a href="#/journal-entries" class="btn-cancel">Back</a>
             ${entry.status === 'Draft' ? `<button type="button" class="btn-submit" data-post-entry>Post Entry</button>` : ''}
+            ${entry.status === 'Posted' && entry.entryType !== 'Reversal' && !entry.reversal ? `<button type="button" class="btn-submit btn-reverse" data-reverse-entry>Reverse Entry</button>` : ''}
           </div>
         </div>
 
         <div class="entry-details-card">
           <div class="meta-grid">
-            <div><strong>Status</strong><div>${entry.status}</div></div>
-            <div><strong>Entry Type</strong><div>${entry.entryType}</div></div>
-            <div><strong>Reference</strong><div>${entry.referenceNumber || '—'}</div></div>
             <div><strong>Total Debit</strong><div>Ksh${Number(entry.totalDebit || 0).toFixed(2)}</div></div>
             <div><strong>Total Credit</strong><div>Ksh${Number(entry.totalCredit || 0).toFixed(2)}</div></div>
             <div><strong>Balanced</strong><div>${entry.isBalanced ? 'Yes' : 'No'}</div></div>
@@ -128,9 +148,14 @@ const JournalEntryDetails = {
     const container = document.getElementById('main-content');
     if (!container) return;
 
-    const button = container.querySelector('[data-post-entry]');
-    if (button) {
-      button.addEventListener('click', () => this.handlePostEntry());
+    const postButton = container.querySelector('[data-post-entry]');
+    if (postButton) {
+      postButton.addEventListener('click', () => this.handlePostEntry());
+    }
+
+    const reverseButton = container.querySelector('[data-reverse-entry]');
+    if (reverseButton) {
+      reverseButton.addEventListener('click', () => this.handleReverseEntry());
     }
   },
 

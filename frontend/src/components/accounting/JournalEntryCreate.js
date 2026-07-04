@@ -33,6 +33,12 @@ const JournalEntryCreate = {
     };
   },
 
+  generateReferenceNumber() {
+    const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14);
+    const randomSuffix = Math.floor(Math.random() * 900 + 100);
+    return `REF-${timestamp}-${randomSuffix}`;
+  },
+
   addLineItem() {
     this.data.formData.lines.push({ account: '', debit: 0, credit: 0, description: '' });
     this.updateView();
@@ -81,6 +87,10 @@ const JournalEntryCreate = {
   async handleSubmit() {
     try {
       this.data.loading = true;
+
+      if (!this.data.formData.referenceNumber) {
+        this.data.formData.referenceNumber = this.generateReferenceNumber();
+      }
 
       const description = (this.data.formData.description || '').trim();
       const lines = this.data.formData.lines
@@ -246,7 +256,7 @@ const JournalEntryCreate = {
 
           <div class="form-group">
             <label>Reference Number</label>
-            <input type="text" value="${formData.referenceNumber}" data-field="referenceNumber" placeholder="Optional" />
+            <input type="text" value="${formData.referenceNumber}" data-field="referenceNumber" placeholder="Auto-generated" readonly />
           </div>
 
           <div class="account-selection-card">
@@ -374,6 +384,9 @@ const JournalEntryCreate = {
 
   async init() {
     await this.fetchAccounts();
+    if (!this.data.formData.referenceNumber) {
+      this.data.formData.referenceNumber = this.generateReferenceNumber();
+    }
     this.updateView();
   },
 
