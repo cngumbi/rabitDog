@@ -207,9 +207,3 @@ If you want to extend the project, focus on:
 - improved frontend routing and component reuse
 - better validation and user feedback in forms
 - responsive mobile UI support
-
----
-
-## License
-
-ISC
