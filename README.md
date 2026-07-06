@@ -199,11 +199,3 @@ From `frontend/`:
 - The accounting system includes journal entry posting logic and account balance updates
 - Configure `.env` before starting the server
 
----
-
-## 📌 Contribution
-
-If you want to extend the project, focus on:
-- improved frontend routing and component reuse
-- better validation and user feedback in forms
-- responsive mobile UI support
