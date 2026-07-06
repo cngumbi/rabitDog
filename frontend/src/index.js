@@ -72,6 +72,8 @@ import ChartOfAccounts from './components/accounting/ChartOfAccounts';
 import EditAccount from './components/accounting/EditAccount';
 import Budget from './components/accounting/Budget';
 import BudgetNew from './components/accounting/BudgetNew';
+import BudgetDetails from './components/accounting/BudgetDetails';
+import BudgetEdit from './components/accounting/BudgetEdit';
 import FinancialReports from './components/accounting/FinancialReports';
 import Invoice from './components/accounting/Invoice';
 import InvoiceCreate from './components/accounting/InvoiceCreate';
@@ -176,6 +178,8 @@ const routes = {
     '/cost-centers/:id/edit': EditCostCenter,
     '/budget': Budget,
     '/budget/new': BudgetNew,
+    '/budget/:id': BudgetDetails,
+    '/budget/:id/edit': BudgetEdit,
     '/financial-reports': FinancialReports,
     '/financial-reports/:id': FinancialReports,
     '/invoices': Invoice,
@@ -258,6 +262,8 @@ const router = async () => {
         '/cost-centers/:id/edit',
         '/budget',
         '/budget/new',
+        '/budget/:id',
+        '/budget/:id/edit',
         '/financial-reports',
         '/financial-reports/:id',
         '/invoices',

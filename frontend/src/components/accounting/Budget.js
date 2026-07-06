@@ -28,10 +28,26 @@ const Budget = {
     }
   },
 
+  generateBudgetCode(name = '') {
+    if (!this._budgetCodeSuffix) {
+      this._budgetCodeSuffix = Date.now().toString().slice(-6);
+    }
+    const prefix = (name || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word[0].toUpperCase())
+      .join('')
+      .slice(0, 3) || 'GEN';
+    return `BUD-${prefix}-${this._budgetCodeSuffix}`;
+  },
+
   getDefaultFormData() {
+    // reset suffix for fresh form so code doesn't jitter while typing
+    this._budgetCodeSuffix = Date.now().toString().slice(-6);
     return {
       budgetName: '',
-      budgetCode: '',
+      budgetCode: this.generateBudgetCode(),
       fiscalYear: new Date().getFullYear(),
       startDate: '',
       endDate: '',
@@ -94,7 +110,7 @@ const Budget = {
           }))
       };
 
-      if (!payload.budgetName || !payload.budgetCode || !payload.fiscalYear || !payload.budgetType) {
+      if (!payload.budgetName || !payload.fiscalYear || !payload.budgetType) {
         alert('Please complete the required budget fields.');
         return;
       }
@@ -172,20 +188,6 @@ const Budget = {
     }
   },
 
-  async handleAnalyzeBudget(budgetId) {
-    try {
-      this.data.loading = true;
-      const response = await axios.get(`/api/accounting/budgets/${budgetId}/analysis`, { withCredentials: true });
-      this.data.selectedBudget = budgetId;
-      this.data.budgetAnalysis = response.data;
-      this.updateView();
-    } catch (error) {
-      console.error('Error analyzing budget:', error);
-      alert('Error: ' + (error.response?.data?.message || error.message));
-    } finally {
-      this.data.loading = false;
-    }
-  },
 
   startCreateBudget() {
     this.data.showForm = true;
@@ -253,11 +255,18 @@ const Budget = {
     return (lines || []).reduce((sum, line) => sum + (parseFloat(line.budgetAmount) || 0), 0);
   },
 
+  getBudgetActualAmount(budget) {
+    if (budget.totalActualAmount != null) {
+      return Number(budget.totalActualAmount || 0);
+    }
+    return (budget.lines || []).reduce((sum, line) => sum + Number(line.actualAmount || 0), 0);
+  },
+
   render() {
     const { budgets, accounts, costCenters, selectedBudget, budgetAnalysis, loading, showForm, editingBudgetId, filter, formData, successMessage } = this.data;
     const totalBudgetValue = budgets.reduce((sum, budget) => sum + (budget.totalBudgetAmount || 0), 0);
     const activeBudgets = budgets.filter((budget) => budget.status === 'Active').length;
-    const totalActualValue = budgets.reduce((sum, budget) => sum + (budget.totalActualAmount || 0), 0);
+    const totalActualValue = budgets.reduce((sum, budget) => sum + this.getBudgetActualAmount(budget), 0);
 
     let content = '';
     if (showForm) {
@@ -272,15 +281,15 @@ const Budget = {
           <div class="form-grid">
             <div class="form-group">
               <label>Budget Name</label>
-              <input type="text" value="${formData.budgetName}" onchange="window.budgetInstance.data.formData.budgetName = this.value; window.budgetInstance.updateView();" required />
+              <input type="text" value="${formData.budgetName}" oninput="window.budgetInstance.data.formData.budgetName = this.value; if (!window.budgetInstance.data.formData.budgetCode || window.budgetInstance.data.formData.budgetCode.startsWith('BUD-')) { window.budgetInstance.data.formData.budgetCode = window.budgetInstance.generateBudgetCode(this.value); } window.budgetInstance.updateView();" required />
             </div>
             <div class="form-group">
               <label>Budget Code</label>
-              <input type="text" value="${formData.budgetCode}" onchange="window.budgetInstance.data.formData.budgetCode = this.value; window.budgetInstance.updateView();" required />
+              <input type="text" readonly value="${formData.budgetCode}" />
             </div>
             <div class="form-group">
               <label>Fiscal Year</label>
-              <input type="number" value="${formData.fiscalYear}" onchange="window.budgetInstance.data.formData.fiscalYear = parseInt(this.value) || new Date().getFullYear(); window.budgetInstance.updateView();" required />
+              <input type="number" value="${formData.fiscalYear}" oninput="window.budgetInstance.data.formData.fiscalYear = parseInt(this.value) || new Date().getFullYear(); window.budgetInstance.updateView();" required />
             </div>
             <div class="form-group">
               <label>Budget Type</label>
@@ -294,22 +303,22 @@ const Budget = {
             </div>
             <div class="form-group">
               <label>Start Date</label>
-              <input type="date" value="${formData.startDate}" onchange="window.budgetInstance.data.formData.startDate = this.value; window.budgetInstance.updateView();" />
+              <input type="date" value="${formData.startDate}" oninput="window.budgetInstance.data.formData.startDate = this.value; window.budgetInstance.updateView();" />
             </div>
             <div class="form-group">
               <label>End Date</label>
-              <input type="date" value="${formData.endDate}" onchange="window.budgetInstance.data.formData.endDate = this.value; window.budgetInstance.updateView();" />
+              <input type="date" value="${formData.endDate}" oninput="window.budgetInstance.data.formData.endDate = this.value; window.budgetInstance.updateView();" />
             </div>
             <div class="form-group form-full">
               <label>Description</label>
-              <textarea rows="3" onchange="window.budgetInstance.data.formData.description = this.value; window.budgetInstance.updateView();">${formData.description}</textarea>
+              <textarea rows="3" oninput="window.budgetInstance.data.formData.description = this.value; window.budgetInstance.updateView();">${formData.description}</textarea>
             </div>
           </div>
 
           <div class="line-items-section">
             <div class="line-items-header">
               <h4>Budget Lines</h4>
-              <button onclick="window.budgetInstance.addLineItem();" class="btn-add">+ Add Line</button>
+              <button type="button" onclick="window.budgetInstance.addLineItem();" class="btn-add">+ Add Line</button>
             </div>
             <table class="line-items-table">
               <thead>
@@ -336,9 +345,9 @@ const Budget = {
                         ${costCenters.map((costCenter) => `<option value="${costCenter._id}" ${line.costCenter === costCenter._id ? 'selected' : ''}>${costCenter.costCenterCode} - ${costCenter.costCenterName}</option>`).join('')}
                       </select>
                     </td>
-                    <td><input type="number" step="0.01" value="${line.budgetAmount}" onchange="window.budgetInstance.updateLine(${index}, 'budgetAmount', this.value);" /></td>
-                    <td><input type="number" step="0.01" value="${line.actualAmount}" onchange="window.budgetInstance.updateLine(${index}, 'actualAmount', this.value);" /></td>
-                    <td><button onclick="window.budgetInstance.removeLineItem(${index});" class="btn-remove" ${formData.lines.length > 1 ? '' : 'disabled'}>Remove</button></td>
+                    <td><input type="number" step="0.01" value="${line.budgetAmount}" oninput="window.budgetInstance.updateLine(${index}, 'budgetAmount', this.value);" /></td>
+                    <td><input type="number" step="0.01" value="${line.actualAmount}" oninput="window.budgetInstance.updateLine(${index}, 'actualAmount', this.value);" /></td>
+                    <td><button type="button" onclick="window.budgetInstance.removeLineItem(${index});" class="btn-remove" ${formData.lines.length > 1 ? '' : 'disabled'}>Remove</button></td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -346,32 +355,9 @@ const Budget = {
             <div class="budget-total">Total budget: <strong>$${totalBudget.toFixed(2)}</strong></div>
           </div>
 
-          <div class="form-actions">
-            <button onclick="window.budgetInstance.handleSubmit();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : editingBudgetId ? 'Update Budget' : 'Create Budget'}</button>
+            <div class="form-actions">
+            <button onclick="(function(){ if(document.activeElement && ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) document.activeElement.blur(); window.budgetInstance.handleSubmit(); })();" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : editingBudgetId ? 'Update Budget' : 'Create Budget'}</button>
           </div>
-        </div>
-      `;
-    } else if (selectedBudget && budgetAnalysis) {
-      content = `
-        <div class="budget-analysis">
-          <button onclick="window.budgetInstance.data.selectedBudget = null; window.budgetInstance.data.budgetAnalysis = null; window.budgetInstance.updateView();" class="btn-back">← Back to Budgets</button>
-          <h3>${budgetAnalysis.budgetName} - Budget vs Actual Analysis</h3>
-          <p>Fiscal Year: ${budgetAnalysis.fiscalYear}</p>
-          <div class="summary">
-            <div class="summary-item"><p>Total Budget</p><p class="amount">$${(budgetAnalysis.totalBudget || 0).toFixed(2)}</p></div>
-            <div class="summary-item"><p>Total Actual</p><p class="amount">$${(budgetAnalysis.totalActual || 0).toFixed(2)}</p></div>
-            <div class="summary-item"><p>Total Variance</p><p class="amount" style="color: ${this.getVarianceColor(budgetAnalysis.totalVariance)}">$${(budgetAnalysis.totalVariance || 0).toFixed(2)}</p></div>
-            <div class="summary-item"><p>Variance %</p><p class="amount" style="color: ${this.getVarianceColor(budgetAnalysis.totalVariance)}">${(budgetAnalysis.variancePercent || 0).toFixed(2)}%</p></div>
-          </div>
-          <h4>Line Items</h4>
-          <table>
-            <thead><tr><th>Account</th><th>Budget</th><th>Actual</th><th>Variance</th><th>% Variance</th></tr></thead>
-            <tbody>${budgetAnalysis.lines ? budgetAnalysis.lines.map((line) => {
-              const variance = (line.budgetAmount || 0) - (line.actualAmount || 0);
-              const variancePercent = line.budgetAmount ? ((variance / line.budgetAmount) * 100).toFixed(2) : 0;
-              return `<tr><td>${line.account?.accountName || 'Unknown'}</td><td class="amount">$${(line.budgetAmount || 0).toFixed(2)}</td><td class="amount">$${(line.actualAmount || 0).toFixed(2)}</td><td class="amount" style="color:${this.getVarianceColor(variance)}">$${variance.toFixed(2)}</td><td class="amount" style="color:${this.getVarianceColor(variance)}">${variancePercent}%</td></tr>`;
-            }).join('') : ''}</tbody>
-          </table>
         </div>
       `;
     } else {
@@ -451,12 +437,12 @@ const Budget = {
                     <td>${budget.fiscalYear}</td>
                     <td>${budget.budgetType}</td>
                     <td class="amount">$${(budget.totalBudgetAmount || 0).toFixed(2)}</td>
-                    <td class="amount">$${(budget.totalActualAmount || 0).toFixed(2)}</td>
+                    <td class="amount">$${this.getBudgetActualAmount(budget).toFixed(2)}</td>
                     <td>${budget.status}</td>
                     <td>
                       <div class="action-buttons">
-                        <button onclick="window.budgetInstance.handleAnalyzeBudget('${budget._id}');" class="btn-action">Analyze</button>
-                        ${budget.status === 'Draft' ? `<button onclick="window.budgetInstance.startEditBudget(${JSON.stringify(budget).replace(/'/g, "\\'")});" class="btn-action btn-edit">Edit</button>` : ''}
+                        <a href="/#/budget/${budget._id}" class="btn-action">View Analysis</a>
+                        ${budget.status === 'Draft' ? `<a href="/#/budget/${budget._id}/edit" class="btn-action btn-edit">Edit</a>` : ''}
                         ${budget.status === 'Draft' ? `<button onclick="window.budgetInstance.handleApproveBudget('${budget._id}');" class="btn-action btn-approve">Approve</button>` : ''}
                         ${budget.status === 'Approved' ? `<button onclick="window.budgetInstance.handleActivateBudget('${budget._id}');" class="btn-action btn-activate">Activate</button>` : ''}
                         ${budget.status === 'Draft' ? `<button onclick="window.budgetInstance.handleDeleteBudget('${budget._id}');" class="btn-action btn-delete">Delete</button>` : ''}

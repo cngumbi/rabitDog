@@ -14,6 +14,7 @@ const DashboardMenu = {
                     <li><a href="#" class="${cons.selected === 'profile' ? 'selected': ''}">POS</a></li>
                     <li><a href="/#/cashbank" class="${cons.selected === 'cashbank' ? 'selected': ''}">Cash & Bank</a></li>
                     <li><a href="/#/accounts" class="${cons.selected === 'accounts' ? 'selected':''}">Chart of Accounts</a></li>
+                    <li><a href="/#/budget" class="${cons.selected === 'budget' ? 'selected':''}">Budgets</a></li>
                     <li><a href="/#/cost-centers" class="${cons.selected === 'cost-centers' ? 'selected':''}">Cost Centers</a></li>
                     <!--<li><a href="/#/expenses" class="${cons.selected === 'expenses' ? 'selected': ''}">Expenses</a></li>-->
                     <li><a href="/#/medicallogs" class="${cons.selected === 'medicallogs' ? 'selected': ''}">Health Records</a></li>

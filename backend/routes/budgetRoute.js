@@ -1,6 +1,7 @@
 const express = require('express');
 const asyncHandler = require('express-async-handler');
 const Budget = require('../models/budgetModel');
+const mongoose = require('mongoose');
 const AuditLog = require('../models/auditLogModel');
 
 const router = express.Router();
@@ -9,10 +10,31 @@ const router = express.Router();
 router.post(
   '/create',
   asyncHandler(async (req, res) => {
-    const { budgetName, budgetCode, fiscalYear, lines, budgetType } = req.body;
+    const { budgetName, fiscalYear, lines, budgetType } = req.body;
+    let { budgetCode, startDate, endDate } = req.body;
 
-    if (!budgetName || !budgetCode || !fiscalYear || !budgetType) {
+    if (!budgetName || !fiscalYear || !budgetType) {
       return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    if (!budgetCode) {
+      const prefix = (budgetName || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => word[0].toUpperCase())
+        .join('')
+        .slice(0, 3) || 'GEN';
+      const suffix = Date.now().toString().slice(-6);
+      budgetCode = `BUD-${prefix}-${suffix}`;
+    }
+
+    // Provide reasonable defaults for start/end dates when not provided
+    if (!startDate) {
+      startDate = new Date(`${fiscalYear}-01-01`);
+    }
+    if (!endDate) {
+      endDate = new Date(`${fiscalYear}-12-31`);
     }
 
     // Check if budget code already exists
@@ -21,30 +43,35 @@ router.post(
       return res.status(400).json({ message: 'Budget code already exists' });
     }
 
-    // Calculate total budget amount
+    // Calculate totals for budget and actual amounts
     let totalBudgetAmount = 0;
+    let totalActualAmount = 0;
     if (lines) {
       lines.forEach(line => {
-        totalBudgetAmount += line.budgetAmount || 0;
+        totalBudgetAmount += Number(line.budgetAmount || 0);
+        totalActualAmount += Number(line.actualAmount || 0);
       });
     }
 
     const budget = await Budget.create({
+      ...req.body,
       budgetName,
       budgetCode,
       fiscalYear,
       lines,
       totalBudgetAmount,
+      totalActualAmount,
       budgetType,
       status: 'Draft',
-      ...req.body,
-      createdBy: req.session.user?.id
+      startDate,
+      endDate,
+      createdBy: req.session.user?.id || mongoose.Types.ObjectId()
     });
 
     // Log activity
     await AuditLog.create({
       logNumber: `LOG-${Date.now()}`,
-      user: req.session.user?.id,
+      user: req.session.user?.id || mongoose.Types.ObjectId(),
       action: 'Create',
       module: 'Budget',
       entityType: 'Budget',
@@ -76,7 +103,21 @@ router.get(
 
     const total = await Budget.countDocuments(filter);
 
-    res.json({ budgets, total, skip: parseInt(skip), limit: parseInt(limit) });
+    const normalizedBudgets = budgets.map((budget) => {
+      const totalBudgetAmount = budget.totalBudgetAmount != null
+        ? budget.totalBudgetAmount
+        : (budget.lines || []).reduce((sum, line) => sum + Number(line.budgetAmount || 0), 0);
+      const totalActualAmount = budget.totalActualAmount != null
+        ? budget.totalActualAmount
+        : (budget.lines || []).reduce((sum, line) => sum + Number(line.actualAmount || 0), 0);
+      return {
+        ...budget.toObject(),
+        totalBudgetAmount,
+        totalActualAmount
+      };
+    });
+
+    res.json({ budgets: normalizedBudgets, total, skip: parseInt(skip), limit: parseInt(limit) });
   })
 );
 
@@ -109,9 +150,21 @@ router.put(
       return res.status(400).json({ message: 'Only draft budgets can be edited' });
     }
 
+    const updatedData = {
+      ...req.body,
+      updatedBy: req.session.user?.id,
+      totalBudgetAmount: 0,
+      totalActualAmount: 0
+    };
+
+    if (Array.isArray(req.body.lines)) {
+      updatedData.totalBudgetAmount = req.body.lines.reduce((sum, line) => sum + Number(line.budgetAmount || 0), 0);
+      updatedData.totalActualAmount = req.body.lines.reduce((sum, line) => sum + Number(line.actualAmount || 0), 0);
+    }
+
     const updated = await Budget.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedBy: req.session.user?.id },
+      updatedData,
       { new: true }
     );
 
@@ -186,15 +239,22 @@ router.get(
       return res.status(404).json({ message: 'Budget not found' });
     }
 
+    const computedTotalBudget = budget.totalBudgetAmount != null
+      ? budget.totalBudgetAmount
+      : (budget.lines || []).reduce((sum, line) => sum + Number(line.budgetAmount || 0), 0);
+    const computedTotalActual = budget.totalActualAmount != null
+      ? budget.totalActualAmount
+      : (budget.lines || []).reduce((sum, line) => sum + Number(line.actualAmount || 0), 0);
+
     const analysis = {
       budgetCode: budget.budgetCode,
       budgetName: budget.budgetName,
       fiscalYear: budget.fiscalYear,
-      totalBudget: budget.totalBudgetAmount,
-      totalActual: budget.totalActualAmount,
-      totalVariance: (budget.totalBudgetAmount - budget.totalActualAmount) || 0,
-      variancePercent: budget.totalBudgetAmount ? 
-        (((budget.totalBudgetAmount - budget.totalActualAmount) / budget.totalBudgetAmount) * 100).toFixed(2) : 0,
+      totalBudget: computedTotalBudget,
+      totalActual: computedTotalActual,
+      totalVariance: (computedTotalBudget - computedTotalActual) || 0,
+      variancePercent: computedTotalBudget ? 
+        (((computedTotalBudget - computedTotalActual) / computedTotalBudget) * 100).toFixed(2) : 0,
       lines: budget.lines
     };
 

@@ -18,18 +18,22 @@ const BudgetNew = {
   },
 
   generateBudgetCode(name = '') {
-    const prefix = name
+    if (!this._budgetCodeSuffix) {
+      this._budgetCodeSuffix = Date.now().toString().slice(-6);
+    }
+    const prefix = (name || '')
       .trim()
-      .split(' ')
+      .split(/\s+/)
       .filter(Boolean)
       .map((word) => word[0].toUpperCase())
       .join('')
       .slice(0, 3) || 'GEN';
-    const suffix = Date.now().toString().slice(-6);
-    return `BUD-${prefix}-${suffix}`;
+    return `BUD-${prefix}-${this._budgetCodeSuffix}`;
   },
 
   getDefaultFormData() {
+    // reset suffix for a fresh form so code remains stable while typing
+    this._budgetCodeSuffix = Date.now().toString().slice(-6);
     return {
       budgetName: '',
       budgetCode: this.generateBudgetCode(),
@@ -40,6 +44,11 @@ const BudgetNew = {
       budgetType: 'Operating',
       lines: [{ account: '', costCenter: '', budgetAmount: 0, actualAmount: 0 }]
     };
+  },
+
+  resetForm() {
+    this.data.formData = this.getDefaultFormData();
+    this.updateView();
   },
 
   async fetchReferenceData() {
@@ -89,16 +98,20 @@ const BudgetNew = {
   updateLine(index, field, value) {
     if (!this.data.formData.lines[index]) return;
     this.data.formData.lines[index][field] = field === 'budgetAmount' || field === 'actualAmount' ? Number(value || 0) : value;
-    this.updateView();
   },
 
   getBudgetTotal(lines) {
     return (lines || []).reduce((sum, line) => sum + (parseFloat(line.budgetAmount) || 0), 0);
   },
 
+  getActualTotal(lines) {
+    return (lines || []).reduce((sum, line) => sum + (parseFloat(line.actualAmount) || 0), 0);
+  },
+
   async handleSubmit() {
     try {
       this.data.loading = true;
+      this.updateView();
       const payload = {
         ...this.data.formData,
         fiscalYear: Number(this.data.formData.fiscalYear || new Date().getFullYear()),
@@ -114,7 +127,7 @@ const BudgetNew = {
           }))
       };
 
-      if (!payload.budgetName || !payload.budgetCode || !payload.fiscalYear || !payload.budgetType) {
+      if (!payload.budgetName || !payload.fiscalYear || !payload.budgetType) {
         alert('Please complete the required budget fields.');
         this.data.loading = false;
         this.updateView();
@@ -137,6 +150,7 @@ const BudgetNew = {
       alert('Error: ' + (error.response?.data?.message || error.message));
     } finally {
       this.data.loading = false;
+      this.updateView();
     }
   },
 
@@ -172,19 +186,19 @@ const BudgetNew = {
           <div class="form-grid">
             <div class="form-group">
               <label>Budget Name</label>
-              <input type="text" value="${formData.budgetName}" onchange="window.budgetNewInstance.data.formData.budgetName = this.value; if (!window.budgetNewInstance.data.formData.budgetCode || window.budgetNewInstance.data.formData.budgetCode.startsWith('BUD-')) { window.budgetNewInstance.data.formData.budgetCode = window.budgetNewInstance.generateBudgetCode(this.value); } window.budgetNewInstance.updateView();" />
+              <input type="text" value="${formData.budgetName}" data-budget-name />
             </div>
             <div class="form-group">
               <label>Budget Code</label>
-              <input type="text" readonly value="${formData.budgetCode}" />
+              <input type="text" readonly value="${formData.budgetCode}" data-budget-code />
             </div>
             <div class="form-group">
               <label>Fiscal Year</label>
-              <input type="number" value="${formData.fiscalYear}" onchange="window.budgetNewInstance.data.formData.fiscalYear = parseInt(this.value) || new Date().getFullYear(); window.budgetNewInstance.updateView();" />
+              <input type="number" value="${formData.fiscalYear}" data-fiscal-year />
             </div>
             <div class="form-group">
               <label>Budget Type</label>
-              <select onchange="window.budgetNewInstance.data.formData.budgetType = this.value; window.budgetNewInstance.updateView();">
+              <select data-budget-type>
                 <option value="Operating" ${formData.budgetType === 'Operating' ? 'selected' : ''}>Operating</option>
                 <option value="Capital" ${formData.budgetType === 'Capital' ? 'selected' : ''}>Capital</option>
                 <option value="Cash" ${formData.budgetType === 'Cash' ? 'selected' : ''}>Cash</option>
@@ -194,15 +208,15 @@ const BudgetNew = {
             </div>
             <div class="form-group">
               <label>Start Date</label>
-              <input type="date" value="${formData.startDate}" onchange="window.budgetNewInstance.data.formData.startDate = this.value; window.budgetNewInstance.updateView();" />
+              <input type="date" value="${formData.startDate}" data-start-date />
             </div>
             <div class="form-group">
               <label>End Date</label>
-              <input type="date" value="${formData.endDate}" onchange="window.budgetNewInstance.data.formData.endDate = this.value; window.budgetNewInstance.updateView();" />
+              <input type="date" value="${formData.endDate}" data-end-date />
             </div>
             <div class="form-group form-full">
               <label>Description</label>
-              <textarea rows="3" onchange="window.budgetNewInstance.data.formData.description = this.value; window.budgetNewInstance.updateView();">${formData.description}</textarea>
+              <textarea rows="3" data-description>${formData.description}</textarea>
             </div>
           </div>
 
@@ -223,31 +237,35 @@ const BudgetNew = {
               </thead>
               <tbody>
                 ${formData.lines.map((line, index) => `
-                  <tr>
+                  <tr data-line-row data-line-index="${index}">
                     <td>
-                      <select onchange="window.budgetNewInstance.updateLine(${index}, 'account', this.value);">
+                      <select data-line-account data-line-index="${index}">
                         <option value="">Select account</option>
                         ${accounts.map((account) => `<option value="${account._id}" ${line.account === account._id ? 'selected' : ''}>${account.accountCode} - ${account.accountName}</option>`).join('')}
                       </select>
                     </td>
                     <td>
-                      <select onchange="window.budgetNewInstance.updateLine(${index}, 'costCenter', this.value);">
+                      <select data-line-cost-center data-line-index="${index}">
                         <option value="">Select cost center</option>
                         ${costCenters.map((costCenter) => `<option value="${costCenter._id}" ${line.costCenter === costCenter._id ? 'selected' : ''}>${costCenter.costCenterCode} - ${costCenter.costCenterName}</option>`).join('')}
                       </select>
                     </td>
-                    <td><input type="number" step="0.01" value="${line.budgetAmount}" onchange="window.budgetNewInstance.updateLine(${index}, 'budgetAmount', this.value);" /></td>
-                    <td><input type="number" step="0.01" value="${line.actualAmount}" onchange="window.budgetNewInstance.updateLine(${index}, 'actualAmount', this.value);" /></td>
+                    <td><input type="number" step="0.01" value="${line.budgetAmount}" data-line-budget-amount data-line-index="${index}" /></td>
+                    <td><input type="number" step="0.01" value="${line.actualAmount}" data-line-actual-amount data-line-index="${index}" /></td>
                     <td><button type="button" data-action="remove-line" data-index="${index}" class="btn-remove" ${formData.lines.length > 1 ? '' : 'disabled'}>Remove</button></td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
-            <div class="budget-total">Total budget: <strong>$${totalBudget.toFixed(2)}</strong></div>
+            <div class="budget-total">
+              <div>Total budget: <strong>$<span data-total-budget>${totalBudget.toFixed(2)}</span></strong></div>
+              <div>Total actual: <strong>$<span data-total-actual>${this.getActualTotal(formData.lines).toFixed(2)}</span></strong></div>
+            </div>
           </div>
 
           <div class="form-actions">
             <button type="button" data-action="submit-budget" class="btn-submit" ${loading ? 'disabled' : ''}>${loading ? 'Saving...' : 'Create Budget'}</button>
+            <button type="button" data-action="reset-budget" class="btn-secondary">Reset</button>
             <a href="#/budget" class="btn-secondary">Back to Budgets</a>
           </div>
         </div>
@@ -281,31 +299,160 @@ const BudgetNew = {
     `;
   },
 
-  bindEvents() {
+  updateBudgetSummary() {
     const container = document.getElementById('main-content');
     if (!container) return;
 
+    const budgetTotal = container.querySelector('[data-total-budget]');
+    if (budgetTotal) {
+      budgetTotal.textContent = this.getBudgetTotal(this.data.formData.lines).toFixed(2);
+    }
+
+    const actualTotal = container.querySelector('[data-total-actual]');
+    if (actualTotal) {
+      actualTotal.textContent = this.getActualTotal(this.data.formData.lines).toFixed(2);
+    }
+  },
+
+  registerEvents() {
+    const container = document.getElementById('main-content');
+    if (!container) return;
+
+    const budgetNameInput = container.querySelector('[data-budget-name]');
+    if (budgetNameInput) {
+      budgetNameInput.addEventListener('input', (event) => {
+        this.data.formData.budgetName = event.target.value;
+        if (!this.data.formData.budgetCode || this.data.formData.budgetCode.startsWith('BUD-')) {
+          this.data.formData.budgetCode = this.generateBudgetCode(event.target.value);
+          const budgetCodeInput = container.querySelector('[data-budget-code]');
+          if (budgetCodeInput) {
+            budgetCodeInput.value = this.data.formData.budgetCode;
+          }
+        }
+      });
+    }
+
+    const fiscalYearInput = container.querySelector('[data-fiscal-year]');
+    if (fiscalYearInput) {
+      fiscalYearInput.addEventListener('input', (event) => {
+        this.data.formData.fiscalYear = Number(event.target.value || new Date().getFullYear());
+      });
+    }
+
+    const budgetTypeSelect = container.querySelector('[data-budget-type]');
+    if (budgetTypeSelect) {
+      budgetTypeSelect.addEventListener('change', (event) => {
+        this.data.formData.budgetType = event.target.value;
+      });
+    }
+
+    const startDateInput = container.querySelector('[data-start-date]');
+    if (startDateInput) {
+      startDateInput.addEventListener('input', (event) => {
+        this.data.formData.startDate = event.target.value;
+      });
+    }
+
+    const endDateInput = container.querySelector('[data-end-date]');
+    if (endDateInput) {
+      endDateInput.addEventListener('input', (event) => {
+        this.data.formData.endDate = event.target.value;
+      });
+    }
+
+    const descriptionInput = container.querySelector('[data-description]');
+    if (descriptionInput) {
+      descriptionInput.addEventListener('input', (event) => {
+        this.data.formData.description = event.target.value;
+      });
+    }
+
     const addLineButton = container.querySelector('[data-action="add-line"]');
     if (addLineButton) {
-      addLineButton.addEventListener('click', () => this.addLineItem());
+      addLineButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.addLineItem();
+      });
     }
 
     container.querySelectorAll('[data-action="remove-line"]').forEach((button) => {
       const index = Number(button.getAttribute('data-index'));
-      button.addEventListener('click', () => this.removeLineItem(index));
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.removeLineItem(index);
+      });
+    });
+
+    container.querySelectorAll('[data-line-row]').forEach((row) => {
+      const index = Number(row.getAttribute('data-line-index'));
+      const accountSelect = row.querySelector('[data-line-account]');
+      const costCenterSelect = row.querySelector('[data-line-cost-center]');
+      const budgetAmountInput = row.querySelector('[data-line-budget-amount]');
+      const actualAmountInput = row.querySelector('[data-line-actual-amount]');
+
+      if (accountSelect) {
+        accountSelect.addEventListener('change', (event) => {
+          this.updateLine(index, 'account', event.target.value);
+          this.updateBudgetSummary();
+        });
+      }
+
+      if (costCenterSelect) {
+        costCenterSelect.addEventListener('change', (event) => {
+          this.updateLine(index, 'costCenter', event.target.value);
+        });
+      }
+
+      if (budgetAmountInput) {
+        budgetAmountInput.addEventListener('input', (event) => {
+          this.updateLine(index, 'budgetAmount', event.target.value);
+          this.updateBudgetSummary();
+        });
+      }
+
+      if (actualAmountInput) {
+        actualAmountInput.addEventListener('input', (event) => {
+          this.updateLine(index, 'actualAmount', event.target.value);
+          this.updateBudgetSummary();
+        });
+      }
     });
 
     const submitButton = container.querySelector('[data-action="submit-budget"]');
     if (submitButton) {
-      submitButton.addEventListener('click', () => this.handleSubmit());
+      submitButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (document && document.activeElement && ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+          document.activeElement.blur();
+        }
+        this.handleSubmit();
+      });
     }
+
+    const resetButton = container.querySelector('[data-action="reset-budget"]');
+    if (resetButton) {
+      resetButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.resetForm();
+      });
+    }
+
+    this.updateBudgetSummary();
+  },
+
+  bindEvents() {
+    this.registerEvents();
   },
 
   updateView() {
     const container = document.getElementById('main-content');
     if (container) {
       container.innerHTML = this.render();
-      this.bindEvents();
+      this.registerEvents();
     }
   },
 
